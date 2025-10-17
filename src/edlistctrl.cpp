@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 1999-2024 Vaclav Slavik
+ *  Copyright (C) 1999-2025 Vaclav Slavik
  *  Copyright (C) 2005 Olivier Sannier
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
@@ -412,7 +412,7 @@ void PoeditListCtrl::Model::GetValueByRow(wxVariant& variant, unsigned row, unsi
                 #else
                     #define MARKUP(x) x
                 #endif
-                    orig.Printf(MARKUP("<span bgcolor=\"%s\" color=\"%s\"> %s </span> %s"),
+                    orig.Printf(MARKUP("<span bgcolor=\"%s\" color=\"%s\"> %s | </span> %s"),
                         m_clrContextBg, m_clrContextFg,
                         EscapeMarkup(d->GetContext()), EscapeMarkup(orig_str));
                 }
@@ -644,8 +644,7 @@ void PoeditListCtrl::CreateColumns()
 #ifdef __WXOSX__
     NSTableView *tableView = (NSTableView*)[((NSScrollView*)GetHandle()) documentView];
     [tableView setIntercellSpacing:NSMakeSize(3.0, 0.0)];
-    if (@available(macOS 11.0, *))
-        tableView.style = NSTableViewStyleFullWidth;
+    tableView.style = NSTableViewStyleFullWidth;
 #endif
 
     m_colID = m_colIcon = m_colSource = m_colTrans = nullptr;
@@ -793,9 +792,7 @@ void PoeditListCtrl::SizeColumns()
             if (!GetColumn(c)->IsHidden())
                 visibleCols++;
         }
-        w -= 3 * visibleCols;
-        if (@available(macOS 11.0, *))
-            w -= 9;
+        w -= 9 + 3 * visibleCols;
     }
 #elif defined(__WXGTK__)
     w -= 2;
@@ -858,13 +855,22 @@ void PoeditListCtrl::CatalogChanged(const CatalogPtr& catalog)
 
 void PoeditListCtrl::RefreshAllItems()
 {
-    // Can't use Cleared() here because it messes up selection and scroll position
+    // Can't use Cleared() here because it messes up selection and scroll position and
+    // implementations across platforms are inconsistent. Doing notification for all items
+    // is reasonably fast except on macOS, where it is *extremely* inefficient and where
+    // Cleared() messes up position. Fortunately, native reloadData is fast and equivalent
+    // to reloading individual rows, so we can do just that.
+#ifdef __WXOSX__
+    NSTableView *tableView = (NSTableView*)[((NSScrollView*)GetHandle()) documentView];
+    [tableView reloadData];
+#else
     const int count = m_model->GetCount();
     wxDataViewItemArray items;
     items.reserve(count);
     for (int i = 0; i < count; i++)
         items.push_back(m_model->GetItem(i));
     m_model->ItemsChanged(items);
+#endif
 }
 
 

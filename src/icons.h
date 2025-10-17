@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2004-2024 Vaclav Slavik
+ *  Copyright (C) 2004-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -27,10 +27,6 @@
 #define _ICONS_H_
 
 #include <wx/artprov.h>
-
-#if defined(__WXGTK20__)
-    #define HAS_THEMES_SUPPORT
-#endif
 
 #ifndef __WXOSX__
 class PoeditArtProvider : public wxArtProvider

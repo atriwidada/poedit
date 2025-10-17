@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 1999-2024 Vaclav Slavik
+ *  Copyright (C) 1999-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -132,9 +132,9 @@ public:
 
     wxString GetId() const override { return m_id; }
 
-    wxString Extract(TempDirectory& tmpdir,
-                     const SourceCodeSpec& sourceSpec,
-                     const std::vector<wxString>& files) const override;
+    ExtractionOutput Extract(TempDirectory& tmpdir,
+                             const SourceCodeSpec& sourceSpec,
+                             const std::vector<wxString>& files) const override;
 
 private:
     wxString m_id;

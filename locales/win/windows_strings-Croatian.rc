@@ -6,4 +6,8 @@ BEGIN
     223, "Kompiliran prijevod"
     224, "Predložak prijevoda"
     225, "XLIFF prijevod"
+    226, "JSON dokument"
+    227, "Flutter prijevod"
+    228, "RESX resurs"
+    229, "Qt prijevod"
 END

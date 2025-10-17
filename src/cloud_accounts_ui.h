@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2015-2024 Vaclav Slavik
+ *  Copyright (C) 2015-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -37,6 +37,7 @@
 
 #include <wx/dialog.h>
 #include <wx/sizer.h>
+#include <wx/stattext.h>
 #include <wx/panel.h>
 
 class WXDLLIMPEXP_FWD_CORE wxBoxSizer;
@@ -98,23 +99,6 @@ public:
 };
 
 
-/// Panel for choosing a service if the user doesn't have any yet
-class ServiceSelectionPanel : public wxPanel
-{
-public:
-    ServiceSelectionPanel(wxWindow *parent);
-
-    /// Add service information
-    void AddService(AccountDetailPanel *account);
-
-protected:
-    wxSizer *CreateServiceContent(AccountDetailPanel *account);
-
-private:
-    wxBoxSizer *m_sizer;
-};
-
-
 /// Window showing all supported accounts in a list-detail view
 class AccountsPanel : public wxPanel, public AnyAccountPanelBase
 {
@@ -140,7 +124,6 @@ protected:
 private:
     IconAndSubtitleListCtrl *m_list;
     wxSimplebook *m_panelsBook;
-    ServiceSelectionPanel *m_introPanel;
     std::vector<AccountDetailPanel*> m_panels;
 };
 
@@ -154,10 +137,21 @@ public:
 
     CloudEditLoginDialog(wxWindow *parent, const wxString& title) : wxDialog(parent, wxID_ANY, title)
     {
-        auto topsizer = new wxBoxSizer(wxHORIZONTAL);
+        auto topsizer = new wxBoxSizer(wxVERTICAL);
+
+#ifdef __WXOSX__
+        auto titleLabel = new wxStaticText(this, wxID_ANY, title);
+        titleLabel->SetFont(titleLabel->GetFont().Bold());
+        topsizer->AddSpacer(PX(4));
+        topsizer->Add(titleLabel, wxSizerFlags().Border(wxTOP|wxLEFT|wxRIGHT, PX(16)));
+        topsizer->AddSpacer(PX(10));
+#else
+        topsizer->AddSpacer(PX(16));
+#endif
+
         m_panel = new LoginPanel(this, LoginPanel::AddCancelButton | LoginPanel::SlimBorders);
         m_panel->SetClientSize(m_panel->GetBestSize());
-        topsizer->Add(m_panel, wxSizerFlags(1).Expand().Border(wxALL, PX(16)));
+        topsizer->Add(m_panel, wxSizerFlags(1).Expand().Border(wxBOTTOM|wxLEFT|wxRIGHT, PX(16)));
         SetSizerAndFit(topsizer);
         CenterOnParent();
 

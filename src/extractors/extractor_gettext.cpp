@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2017-2024 Vaclav Slavik
+ *  Copyright (C) 2017-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -56,7 +56,7 @@ const char * const GETTEXT_EXTENSIONS[] = {
 
     "java",                                               // Java
 
-    "js",                                                 // JavaScript
+    "js", "jsx"                                           // JavaScript
 
     "jl",                                                 // librep
 
@@ -97,10 +97,12 @@ const char * const GETTEXT_EXTENSIONS[] = {
 class GettextExtractorBase : public Extractor
 {
 public:
-    wxString Extract(TempDirectory& tmpdir,
-                     const SourceCodeSpec& sourceSpec,
-                     const std::vector<wxString>& files) const override
+    ExtractionOutput Extract(TempDirectory& tmpdir,
+                             const SourceCodeSpec& sourceSpec,
+                             const std::vector<wxString>& files) const override
     {
+        using subprocess::quote_arg;
+
         auto basepath = sourceSpec.BasePath;
 #ifdef __WXMSW__
         basepath = CliSafeFileName(basepath);
@@ -130,11 +132,24 @@ public:
         cmdline.Printf
         (
             "xgettext --force-po -o %s --directory=%s --files-from=%s --from-code=%s",
-            QuoteCmdlineArg(outfile),
-            QuoteCmdlineArg(basepath),
-            QuoteCmdlineArg(filelist.GetName()),
-            QuoteCmdlineArg(!sourceSpec.Charset.empty() ? sourceSpec.Charset : "UTF-8")
+            quote_arg(outfile),
+            quote_arg(basepath),
+            quote_arg(filelist.GetName()),
+            quote_arg(!sourceSpec.Charset.empty() ? sourceSpec.Charset : "UTF-8")
         );
+
+        if (check_gettext_version(0, 25))
+        {
+            // don't consider mtime of the temporary file passed to --files-from:
+            cmdline += wxString::Format(" --generated=%s", quote_arg(filelist.GetName()));
+        }
+
+        if (check_gettext_version(0, 24, 1))
+        {
+            // FIXME: This is temporary, to avoid the implied slowness. Should be amended with
+            //        calculating mtimes in parallel in Poedit itself.
+            cmdline += " --no-git";
+        }
 
         auto additional = GetAdditionalFlags();
         if (!additional.empty())
@@ -142,7 +157,7 @@ public:
 
         for (auto& kw: sourceSpec.Keywords)
         {
-            cmdline += wxString::Format(" -k%s", QuoteCmdlineArg(kw));
+            cmdline += wxString::Format(" -k%s", quote_arg(kw));
         }
 
         wxString extraFlags;
@@ -158,10 +173,17 @@ public:
         if (!extraFlags.empty())
             cmdline += " " + extraFlags;
 
-        if (!ExecuteGettext(cmdline))
-            throw ExtractionException(ExtractionError::Unspecified);
+        GettextRunner runner;
+        auto output = runner.run_command_sync(cmdline);
+        auto err = runner.parse_stderr(output);
 
-        return outfile;
+        if (output.failed())
+        {
+            err.log_all();
+            BOOST_THROW_EXCEPTION(ExtractionException(ExtractionError::Unspecified));
+        }
+
+        return {outfile, err};
     }
     
 protected:
@@ -177,6 +199,18 @@ public:
     {
         for (const char * const *e = GETTEXT_EXTENSIONS; *e != nullptr; e++)
             RegisterExtension(*e);
+
+        if (check_gettext_version(0, 24))
+        {
+            RegisterExtension("rs"); // Rust
+        }
+        if (check_gettext_version(0, 25))
+        {
+            RegisterExtension("d"); // D
+            RegisterExtension("go"); // Go
+            RegisterExtension("ts"); // TypeScript
+            RegisterExtension("tsx"); // TypeScript JSX
+        }
     }
 
     wxString GetId() const override { return "gettext"; }

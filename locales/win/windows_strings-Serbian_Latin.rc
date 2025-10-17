@@ -1,0 +1,13 @@
+#pragma code_page(65001)
+STRINGTABLE
+LANGUAGE LANG_SERBIAN, SUBLANG_SERBIAN_LATIN
+BEGIN
+    222, "PO prevod"
+    223, "Kompajlirani prevod"
+    224, "Šablon prevoda"
+    225, "XLIFF prevod"
+    226, "JSON dokument"
+    227, "Flutter prevod"
+    228, "RESX resurs"
+    229, "Qt prevod"
+END

@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2024 Vaclav Slavik
+ *  Copyright (C) 2024-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -29,6 +29,7 @@
 
 #include "edapp.h"
 #include "edframe.h"
+#include "concurrency.h"
 
 #include <wx/menu.h>
 
@@ -203,13 +204,22 @@ private:
     // WinSparkle callbacks:
     static int WinSparkle_CanShutdown()
     {
-        return !PoeditFrame::AnyWindowIsModified();
+        wxASSERT( !wxThread::IsMain() );
+
+        return dispatch::on_main([]() {
+            return !PoeditFrame::AnyWindowIsModified();
+        }).get();
     }
 
     static void WinSparkle_Shutdown()
     {
-        wxCommandEvent evt(wxEVT_COMMAND_MENU_SELECTED, wxID_EXIT);
-        wxGetApp().AddPendingEvent(evt);
+        // Register for Application Restart so that Restart Manager (used by Inno Setup)
+        // can restart Poedit after it closes us during installation.
+        // Use empty command line ("") and avoid restarts after crash/hang/reboot.
+        RegisterApplicationRestart(L"", RESTART_NO_CRASH | RESTART_NO_HANG | RESTART_NO_REBOOT);
+
+        // Do NOT shut down here! The installer will close us via Restart Manager and
+        // restart after installation completes.
     }
 };
 

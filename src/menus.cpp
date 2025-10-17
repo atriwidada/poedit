@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 1999-2024 Vaclav Slavik
+ *  Copyright (C) 1999-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -30,6 +30,10 @@
 #include "str_helpers.h"
 
 #include <wx/xrc/xmlres.h>
+
+#ifdef __WXOSX__
+    #include <wx/private/bmpbndl.h>
+#endif
 
 
 #ifdef __WXOSX__
@@ -107,7 +111,7 @@ wxMenuBar *MenusManager::CreateMenu(Menu purpose)
 #ifndef HAVE_HTTP_CLIENT
     wxMenu *menu;
     wxMenuItem *item;
-    item = bar->FindItem(XRCID("menu_update_from_crowdin"), &menu);
+    item = bar->FindItem(XRCID("menu_cloud_sync"), &menu);
     if (item)
         menu->Destroy(item);
     item = bar->FindItem(XRCID("menu_open_cloud"), &menu);
@@ -121,7 +125,10 @@ wxMenuBar *MenusManager::CreateMenu(Menu purpose)
 
 #ifdef __WXOSX__
 
-static NSMenuItem *AddNativeItem(NSMenu *menu, int pos, const wxString& text, SEL ac, NSString *key)
+namespace
+{
+
+NSMenuItem *AddNativeItem(NSMenu *menu, int pos, const wxString& text, SEL ac, NSString *key)
 {
     NSString *str = str::to_NS(text);
     if (pos == -1)
@@ -129,6 +136,27 @@ static NSMenuItem *AddNativeItem(NSMenu *menu, int pos, const wxString& text, SE
     else
         return [menu insertItemWithTitle:str action:ac keyEquivalent:key atIndex:pos];
 }
+
+} // anonymous namespace
+
+
+void SetMacMenuIcon(wxMenuItem *item, const char *symbol)
+{
+    if (@available(macOS 26, *))
+    {
+        NSString *name = str::to_NS(symbol);
+        NSImage *image = [NSImage imageWithSystemSymbolName:name accessibilityDescription:nil];
+        if (!image)
+            image = [NSImage imageNamed:name];
+        if (image)
+        {
+            auto bmp = wxOSXMakeBundleFromImage(image);
+            if (bmp.IsOk())
+                item->SetBitmap(bmp);
+        }
+    }
+}
+
 
 void MenusManager::TweakOSXMenuBar(wxMenuBar *bar)
 {
@@ -149,7 +177,10 @@ void MenusManager::TweakOSXMenuBar(wxMenuBar *bar)
     {
         wxMenuItem *prefsItem = bar->FindItem(wxID_PREFERENCES);
         if (prefsItem)
+        {
             prefsItem->SetItemLabel(_(L"&Preferences…") + "\tCtrl+,");
+            SetMacMenuIcon(prefsItem, "gear");
+        }
     }
 
     wxMenu *fileMenu = nullptr;
@@ -244,7 +275,6 @@ void MenusManager::TweakOSXMenuBar(wxMenuBar *bar)
     if (viewMenuPos != wxNOT_FOUND)
     {
         NSMenu *viewNS = bar->GetMenu(viewMenuPos)->GetHMenu();
-        [viewNS addItem:[NSMenuItem separatorItem]];
         // TRANSLATORS: This must be the same as OS X's translation of this View menu item
         item = AddNativeItem(viewNS, -1, _("Show Toolbar"), @selector(toggleToolbarShown:), @"t");
         [item setKeyEquivalentModifierMask:NSEventModifierFlagCommand | NSEventModifierFlagOption];
@@ -271,6 +301,62 @@ void MenusManager::TweakOSXMenuBar(wxMenuBar *bar)
         AddNativeItem(windowMenu, -1, _("Bring All to Front"), @selector(arrangeInFront:), @"");
         [NSApp setWindowsMenu:windowMenu];
         m_nativeMacData->windowMenu = windowMenu;
+    }
+    
+    if (@available(macOS 26.0, *))
+    {
+        SetMacMenuIcon(bar, XRCID("show_sidebar"), "poedit.sidebar");
+        SetMacMenuIcon(bar, XRCID("menu_validate"), "poedit.validate");
+        SetMacMenuIcon(bar, XRCID("menu_pretranslate"), "poedit.pretranslate");
+        SetMacMenuIcon(bar, XRCID("menu_update_from_src"), "poedit.update");
+        SetMacMenuIcon(bar, XRCID("menu_cloud_sync"), "poedit.sync");
+        SetMacMenuIcon(bar, wxID_NEW, "plus");
+        SetMacMenuIcon(bar, wxID_OPEN, "arrow.up.right");
+        SetMacMenuIcon(bar, XRCID("open_recent"), "clock");
+        SetMacMenuIcon(bar, XRCID("menu_open_cloud"), "cloud");
+        SetMacMenuIcon(bar, wxID_SAVE, "square.and.arrow.down");
+        SetMacMenuIcon(bar, XRCID("menu_compile_mo"), "hammer");
+        SetMacMenuIcon(bar, XRCID("menu_export_html"), "arrow.up.document");
+
+        SetMacMenuIcon(bar, XRCID("menu_clear"), "delete.backward");
+        SetMacMenuIcon(bar, XRCID("menu_copy_from_src"), "document.on.document");
+        SetMacMenuIcon(bar, XRCID("menu_fuzzy"), "exclamationmark.circle");
+        SetMacMenuIcon(bar, XRCID("menu_comment"), "bubble");
+        SetMacMenuIcon(bar, XRCID("menu_suggestions"), "list.dash");
+        
+        SetMacMenuIcon(bar, XRCID("menu_ids"), "textformat.numbers");
+        SetMacMenuIcon(bar, XRCID("menu_warnings"), "exclamationmark.triangle");
+        
+        SetMacMenuIcon(bar, XRCID("sort_by_order"), "list.number");
+        SetMacMenuIcon(bar, XRCID("sort_by_source"), "text.alignleft");
+        SetMacMenuIcon(bar, XRCID("sort_by_translation"), "text.alignright");
+
+        SetMacMenuIcon(bar, XRCID("sort_group_by_context"), "rectangle.stack");
+        SetMacMenuIcon(bar, XRCID("sort_errors_first"), "exclamationmark.octagon");
+        SetMacMenuIcon(bar, XRCID("sort_untrans_first"), "square.dashed");
+        
+        SetMacMenuIcon(bar, XRCID("show_suggestions"), "list.dash");
+        SetMacMenuIcon(bar, XRCID("menu_references"), "curlybraces");
+
+        SetMacMenuIcon(bar, XRCID("menu_source_text"), "globe");
+        SetMacMenuIcon(bar, XRCID("menu_remove_same_as_source"), "trash");
+        SetMacMenuIcon(bar, XRCID("menu_catproperties"), "info.circle.text.page");
+
+        SetMacMenuIcon(bar, XRCID("go_done_and_next"), "return");
+        SetMacMenuIcon(bar, XRCID("go_previously_edited"), "arrow.uturn.up");
+        SetMacMenuIcon(bar, XRCID("go_prev"), "chevron.up");
+        SetMacMenuIcon(bar, XRCID("go_next"), "chevron.down");
+        SetMacMenuIcon(bar, XRCID("go_prev_unfinished"), "chevron.up.circle");
+        SetMacMenuIcon(bar, XRCID("go_next_unfinished"), "chevron.down.circle");
+        SetMacMenuIcon(bar, XRCID("go_prev_pluralform"), "chevron.compact.backward");
+        SetMacMenuIcon(bar, XRCID("go_next_pluralform"), "chevron.compact.forward");
+
+        SetMacMenuIcon(bar, wxID_HELP, "safari");
+        SetMacMenuIcon(bar, XRCID("menu_support"), "envelope");
+
+        SetMacMenuIcon(apple, wxID_ABOUT, "info.circle");
+        SetMacMenuIcon(apple, wxID_PREFERENCES, "gear");
+        SetMacMenuIcon(apple, XRCID("menu_manager"), "archivebox");
     }
 }
 
@@ -301,3 +387,22 @@ void MenusManager::FixupMenusForMacIfNeeded()
 }
 
 #endif // __WXOSX__
+
+
+void AppendMenuSectionHeader(wxMenu *menu, const wxString& title)
+{
+#ifdef __WXOSX__
+    if (@available(macOS 14.0, *))
+    {
+        NSMenu *native = menu->GetHMenu();
+        NSMenuItem *header = [NSMenuItem sectionHeaderWithTitle:str::to_NS(title)];
+        [native addItem:header];
+    }
+    else
+#endif // __WXOSX__
+    {
+        wxMenuItem *item = new wxMenuItem(menu, wxID_ANY, title);
+        menu->Append(item);
+        item->Enable(false);
+    }
+}

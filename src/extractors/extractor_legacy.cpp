@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2000-2024 Vaclav Slavik
+ *  Copyright (C) 2000-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -70,29 +70,6 @@ inline void DoReadLegacyExtractors(wxConfigBase *cfg, F&& action)
 
     cfg->SetPath(oldpath);
 }
-
-// FIXME: Do this in subprocess, avoid changing CWD altogether in main process
-class CurrentWorkingDirectoryChanger
-{
-public:
-    CurrentWorkingDirectoryChanger(const wxString& path)
-    {
-        if (!path.empty() && path != ".")
-        {
-            m_old = wxGetCwd();
-            wxSetWorkingDirectory(path);
-        }
-    }
-
-    ~CurrentWorkingDirectoryChanger()
-    {
-        if (!m_old.empty())
-            wxSetWorkingDirectory(m_old);
-    }
-
-private:
-    wxString m_old;
-};
 
 } // anonymous namespace
 
@@ -238,10 +215,12 @@ wxString LegacyExtractorSpec::BuildCommand(const std::vector<wxString>& files,
                                            const wxString& output,
                                            const wxString& charset) const
 {
+    using subprocess::quote_arg;
+
     wxString cmdline, kline, fline;
 
     cmdline = Command;
-    cmdline.Replace("%o", QuoteCmdlineArg(output));
+    cmdline.Replace("%o", quote_arg(output));
 
     for (auto&kw: keywords)
     {
@@ -263,7 +242,7 @@ wxString LegacyExtractorSpec::BuildCommand(const std::vector<wxString>& files,
 #endif
 
         wxString dummy = FileItem;
-        dummy.Replace("%f", QuoteCmdlineArg(fn));
+        dummy.Replace("%f", quote_arg(fn));
         fline << " " << dummy;
     }
 
@@ -307,36 +286,42 @@ LegacyExtractor::LegacyExtractor(const LegacyExtractorSpec& spec)
 }
 
 
-wxString LegacyExtractor::Extract(TempDirectory& tmpdir,
-                                  const SourceCodeSpec& sourceSpec,
-                                  const std::vector<wxString>& files) const
+ExtractionOutput LegacyExtractor::Extract(TempDirectory& tmpdir,
+                                          const SourceCodeSpec& sourceSpec,
+                                          const std::vector<wxString>& files) const
 {
     // cmdline's length is limited by OS/shell, this is maximal number
     // of files we'll pass to the parser at one run:
     const int BATCH_SIZE = 16;
 
-    std::vector<wxString> batchfiles, tempfiles;
-    size_t i, last = 0;
+    std::vector<ExtractionOutput> partials;
 
+    size_t i, last = 0;
     while (last < files.size())
     {
-        batchfiles.clear();
+        std::vector<wxString> batchfiles;
         for (i = last; i < last + BATCH_SIZE && i < files.size(); i++)
             batchfiles.push_back(files[i]);
         last = i;
 
         wxString tempfile = tmpdir.CreateFileName(GetId() + "_extracted.pot");
 
-        CurrentWorkingDirectoryChanger cwd(sourceSpec.BasePath);
-        if (!ExecuteGettext(m_spec.BuildCommand(batchfiles, sourceSpec.Keywords, tempfile, sourceSpec.Charset)))
+        GettextRunner runner;
+        runner.set_cwd(sourceSpec.BasePath);
+        auto cmdline = m_spec.BuildCommand(batchfiles, sourceSpec.Keywords, tempfile, sourceSpec.Charset);
+        auto output = runner.run_command_sync(cmdline);
+        auto err = runner.parse_stderr(output);
+
+        if (output.failed())
         {
-            throw ExtractionException(ExtractionError::Unspecified);
+            err.log_all();
+            BOOST_THROW_EXCEPTION(ExtractionException(ExtractionError::Unspecified));
         }
 
-        tempfiles.push_back(tempfile);
+        partials.push_back({tempfile, err});
     }
 
-    return ConcatCatalogs(tmpdir, tempfiles);
+    return ConcatPartials(tmpdir, partials);
 }
 
 

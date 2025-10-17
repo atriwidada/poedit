@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2014-2024 Vaclav Slavik
+ *  Copyright (C) 2014-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -259,7 +259,7 @@ private:
         if (msg.empty())
             msg = str::to_utf8(r.reason_phrase());
         m_owner.on_error_response(status_code, msg);
-        BOOST_THROW_EXCEPTION(http::http_exception(status_code, msg));
+        BOOST_THROW_EXCEPTION(http_response_error(status_code, msg));
     }
 
     // convert to wstring

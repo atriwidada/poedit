@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2000-2024 Vaclav Slavik
+ *  Copyright (C) 2000-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -83,7 +83,7 @@ inline void CheckReadPermissions(const wxString& basepath, const wxString& path)
 {
     if (!wxIsReadable(basepath + path))
     {
-        throw ExtractionException(ExtractionError::PermissionDenied);
+        BOOST_THROW_EXCEPTION(ExtractionException(ExtractionError::PermissionDenied));
     }
 }
 
@@ -187,7 +187,7 @@ Extractor::FilesList Extractor::CollectAllFiles(const SourceCodeSpec& sources)
         }
         else
         {
-            throw ExtractionException(ExtractionError::NoSourcesFound, path);
+            BOOST_THROW_EXCEPTION(ExtractionException(ExtractionError::NoSourcesFound, path));
         }
     }
 
@@ -203,14 +203,14 @@ Extractor::FilesList Extractor::CollectAllFiles(const SourceCodeSpec& sources)
 }
 
 
-wxString Extractor::ExtractWithAll(TempDirectory& tmpdir,
-                                   const SourceCodeSpec& sourceSpec,
-                                   const std::vector<wxString>& files_)
+ExtractionOutput Extractor::ExtractWithAll(TempDirectory& tmpdir,
+                                           const SourceCodeSpec& sourceSpec,
+                                           const std::vector<wxString>& files_)
 {
     auto files = files_;
     wxLogTrace("poedit.extractor", "extracting from %d files", (int)files.size());
 
-    std::vector<wxString> subPots;
+    std::vector<ExtractionOutput> partials;
 
     for (auto ex: CreateAllExtractors(sourceSpec))
     {
@@ -219,9 +219,9 @@ wxString Extractor::ExtractWithAll(TempDirectory& tmpdir,
             continue;
 
         wxLogTrace("poedit.extractor", " .. using extractor '%s' for %d files", ex->GetId(), (int)ex_files.size());
-        auto subPot = ex->Extract(tmpdir, sourceSpec, ex_files);
-        if (!subPot.empty())
-            subPots.push_back(subPot);
+        auto sub = ex->Extract(tmpdir, sourceSpec, ex_files);
+        if (sub)
+            partials.push_back(sub);
 
         if (files.size() > ex_files.size())
         {
@@ -240,20 +240,20 @@ wxString Extractor::ExtractWithAll(TempDirectory& tmpdir,
         }
     }
 
-    wxLogTrace("poedit.extractor", "extraction finished with %d unrecognized files and %d sub-POTs", (int)files.size(), (int)subPots.size());
+    wxLogTrace("poedit.extractor", "extraction finished with %d unrecognized files and %d sub-POTs", (int)files.size(), (int)partials.size());
 
-    if (subPots.empty())
+    if (partials.empty())
     {
-        throw ExtractionException(ExtractionError::NoSourcesFound);
+        BOOST_THROW_EXCEPTION(ExtractionException(ExtractionError::NoSourcesFound));
     }
-    else if (subPots.size() == 1)
+    else if (partials.size() == 1)
     {
-        return subPots.front();
+        return partials.front();
     }
     else
     {
-        wxLogTrace("poedit.extractor", "merging %d subPOTs", (int)subPots.size());
-        return ConcatCatalogs(tmpdir, subPots);
+        wxLogTrace("poedit.extractor", "merging %d subPOTs", (int)partials.size());
+        return ConcatPartials(tmpdir, partials);
     }
 }
 
@@ -319,23 +319,25 @@ void Extractor::RegisterWildcard(const wxString& wildcard)
 }
 
 
-wxString Extractor::ConcatCatalogs(TempDirectory& tmpdir, const std::vector<wxString>& files)
+ExtractionOutput Extractor::ConcatPartials(TempDirectory& tmpdir, const std::vector<ExtractionOutput>& partials)
 {
-    if (files.empty())
+    if (partials.empty())
     {
-        return "";
+        return {};
     }
-    else if (files.size() == 1)
+    else if (partials.size() == 1)
     {
-        return files.front();
+        return partials.front();
     }
 
-    auto outfile = tmpdir.CreateFileName("concatenated.pot");
+    ExtractionOutput result;
+    result.pot_file = tmpdir.CreateFileName("concatenated.pot");
 
     wxTextFile filelist;
     filelist.Create(tmpdir.CreateFileName("gettext_filelist.txt"));
-    for (auto fn: files)
+    for (auto& p: partials)
     {
+        auto fn = p.pot_file;
 #ifdef __WXMSW__
         // Gettext tools can't handle Unicode filenames well (due to using
         // char* arguments), so work around this by using the short names.
@@ -346,25 +348,26 @@ wxString Extractor::ConcatCatalogs(TempDirectory& tmpdir, const std::vector<wxSt
         }
 #endif
         filelist.AddLine(fn);
+        result.errors += p.errors;
     }
     filelist.Write(wxTextFileType_Unix, wxConvFile);
 
-    auto cmd = wxString::Format
-               (
-                   "msgcat --force-po -o %s --files-from=%s",
-                   QuoteCmdlineArg(outfile),
-                   QuoteCmdlineArg(filelist.GetName())
-               );
-    bool succ = ExecuteGettext(cmd);
-
-    if (!succ)
+    GettextRunner gt;
+    auto output = gt.run_sync("msgcat",
+                              "--force-po",
+                              // avoid corrupted content of duplicate "" headers
+                              // FIXME: merge headers intelligently, e.g. pick latest POT-Creation-Date
+                              "--use-first",
+                              "-o", result.pot_file,
+                              "--files-from", filelist.GetName());
+    if (output.failed())
     {
-        wxLogError(_("Failed command: %s"), cmd.c_str());
+        wxLogError("msgcat: %s", output.std_err);
         wxLogError(_("Failed to merge gettext catalogs."));
-        throw ExtractionException(ExtractionError::Unspecified);
+        BOOST_THROW_EXCEPTION(ExtractionException(ExtractionError::Unspecified));
     }
 
-    return outfile;
+    return result;
 }
 
 

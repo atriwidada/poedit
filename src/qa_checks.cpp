@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2017-2024 Vaclav Slavik
+ *  Copyright (C) 2017-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -446,7 +446,7 @@ private:
                     break;
             }
         }
-        else if (m_lang == "ar" || m_lang == "fa")
+        else if (m_lang == "ar" || m_lang == "fa" || m_lang == "ug")
         {
             // In Arabic (but not other RTL languages), some punctuation is mirrored.
             switch (src)

@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 1999-2024 Vaclav Slavik
+ *  Copyright (C) 1999-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -52,23 +52,16 @@ struct PreTranslateOptions
 };
 
 /**
-    Pre-translate a range of items.
-    
-    If not nullptr, report # of pre-translated items in @a matchesCount.
-    
-    Returns number of pre-translated (i.e. changed) items.
- */
-template<typename T>
-int PreTranslateCatalog(wxWindow *window, CatalogPtr catalog, const T& range, const PreTranslateOptions& options);
-
-/**
     Pre-translate all items in the catalog.
     
     If not nullptr, report # of pre-translated items in @a matchesCount
 
     Returns number of pre-translated (i.e. changed) items.
  */
-int PreTranslateCatalog(wxWindow *window, CatalogPtr catalog, const PreTranslateOptions& options);
+void PreTranslateCatalogAuto(wxWindow *window,
+                             CatalogPtr catalog,
+                             const PreTranslateOptions& options,
+                             std::function<void()> onChangesMade);
 
 /**
     Show UI for choosing pre-translation choices, then proceed with

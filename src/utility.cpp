@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2010-2024 Vaclav Slavik
+ *  Copyright (C) 2010-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -134,7 +134,7 @@ bool TempDirectory::ms_keepFiles = false;
 
 TempDirectory::TempDirectory()
 {
-#ifdef HAVE_MKDTEMP
+#ifdef __UNIX__
     wxString path = wxFileName::GetTempDir();
     path += "/poeditXXXXXX";
     wxCharBuffer buf(path.fn_str());
@@ -228,7 +228,7 @@ TempOutputFileFor::TempOutputFileFor(const wxString& filename) : m_filenameFinal
     NSURL *tempdirUrl =
         [[NSFileManager defaultManager] URLForDirectory:NSItemReplacementDirectory
                                                inDomain:NSUserDomainMask
-                                      appropriateForURL:[fileUrl URLByDeletingLastPathComponent]
+                                      appropriateForURL:fileUrl
                                                  create:YES
                                                   error:nil];
     if (tempdirUrl)

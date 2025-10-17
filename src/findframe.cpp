@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2001-2024 Vaclav Slavik
+ *  Copyright (C) 2001-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -43,6 +43,8 @@
 #include <gdk/gdkkeysyms.h>
 #endif
 
+#include <regex>
+
 #include "catalog.h"
 #include "text_control.h"
 #include "edframe.h"
@@ -50,6 +52,7 @@
 #include "edlistctrl.h"
 #include "findframe.h"
 #include "hidpi.h"
+#include "unicode_helpers.h"
 #include "utility.h"
 
 namespace
@@ -408,12 +411,21 @@ bool IsTextInString(wxString str, const wxString& text,
 {
     if (str.empty())
         return false;
+
     if (ignoreCase)
-        str.MakeLower();
-    if (ignoreAmp)
-        str.Replace("&", "");
-    if (ignoreUnderscore)
-        str.Replace("_", "");
+        str = unicode::fold_case(str);
+
+    if (ignoreAmp && str.find(_T('&')) != wxString::npos)
+    {
+        static std::wregex re(L"&(\\w)");
+        str = std::regex_replace(str::to_wstring(str), re, L"$1");
+    }
+
+    if (ignoreUnderscore && str.find(_T('_')) != wxString::npos)
+    {
+        static std::wregex re(L"_(\\w)");
+        str = std::regex_replace(str::to_wstring(str), re, L"$1");
+    }
 
     return FindTextInStringAndDo(str, text, wholeWords,
                                  [=](const wxString&,size_t,size_t){ return wxString::npos;/*just 1 hit*/ });
@@ -474,11 +486,7 @@ bool FindFrame::DoFind(int dir)
     FoundState found = Found_Not;
     CatalogItemPtr lastItem;
 
-    wxString textc;
-    wxString text(ms_text);
-
-    if (ignoreCase)
-        text.MakeLower();
+    wxString text(ignoreCase ? unicode::fold_case(ms_text) : ms_text);
 
     // Only ignore mnemonics when searching if the text being searched for
     // doesn't contain them. That's a reasonable heuristics: most of the time,
@@ -594,9 +602,8 @@ bool FindFrame::DoFind(int dir)
 
         if (txt)
         {
-            textc = txt->GetValue();
-            if (ignoreCase)
-                textc.MakeLower();
+            auto textc = ignoreCase ? unicode::fold_case(txt->GetValue()) : txt->GetValue();
+
             FindTextInStringAndDo
             (
                 textc, text, wholeWords,

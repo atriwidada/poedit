@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2023-2024 Vaclav Slavik
+ *  Copyright (C) 2023-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -89,11 +89,10 @@ LocalazyLoginPanel::LocalazyLoginPanel(wxWindow *parent, int flags)
 
     sizer->Add(loginInfoContainer, wxSizerFlags().Expand().ReserveSpaceEvenIfHidden().Border(wxTOP|wxBOTTOM, PX(16)));
 
-    m_projects = new wxDataViewListCtrl(this, wxID_ANY, wxDefaultPosition, wxSize(-1, PX(100)), /*wxDV_NO_HEADER |*/ MSW_OR_OTHER(wxBORDER_SIMPLE, wxBORDER_SUNKEN));
+    m_projects = new wxDataViewListCtrl(this, wxID_ANY, wxDefaultPosition, wxSize(-1, PX(100)), /*wxDV_NO_HEADER |*/ BORDER_LIST);
 #ifdef __WXOSX__
     [((NSTableView*)[((NSScrollView*)m_projects->GetHandle()) documentView]) setIntercellSpacing:NSMakeSize(0.0, 0.0)];
-    if (@available(macOS 11.0, *))
-        ((NSTableView*)[((NSScrollView*)m_projects->GetHandle()) documentView]).style = NSTableViewStyleFullWidth;
+    ((NSTableView*)[((NSScrollView*)m_projects->GetHandle()) documentView]).style = NSTableViewStyleFullWidth;
 #endif
     sizer->Add(m_projects, wxSizerFlags(1).Expand().Border(wxBOTTOM, PX(16)));
     m_projects->AppendIconTextColumn(_("Projects"));
@@ -113,7 +112,7 @@ LocalazyLoginPanel::LocalazyLoginPanel(wxWindow *parent, int flags)
     auto buttons = new wxBoxSizer(wxHORIZONTAL);
     sizer->Add(buttons, wxSizerFlags().Expand().Border(wxBOTTOM, 1));
     buttons->Add(learnMore, wxSizerFlags().Center());
-    buttons->AddSpacer(PX(60));
+    buttons->AddSpacer(PX(6));
     buttons->AddStretchSpacer();
     buttons->Add(m_signIn, wxSizerFlags());
     buttons->Add(m_signOut, wxSizerFlags());
@@ -202,10 +201,9 @@ void LocalazyLoginPanel::CreateLoginInfoControls(State state)
                       ? _(L"Waiting for authentication…")
                       : _(L"Updating user information…");
             m_activity = new ActivityIndicator(this, ActivityIndicator::Centered);
-            sizer->AddStretchSpacer();
-            sizer->Add(m_activity, wxSizerFlags().Expand());
-            sizer->AddStretchSpacer();
-            m_activity->Start(text);
+            sizer->Add(m_activity, wxSizerFlags(1).Center());
+            // delay so that the window is sized properly:
+            m_activity->CallAfter([=]{ m_activity->Start(text); });
             break;
         }
 

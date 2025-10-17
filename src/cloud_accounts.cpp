@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2023-2024 Vaclav Slavik
+ *  Copyright (C) 2023-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -38,7 +38,7 @@ CloudAccountClient& CloudAccountClient::Get(const std::string& service_name)
     if (service_name == LocalazyClient::SERVICE_NAME)
         return LocalazyClient::Get();
 
-    throw std::logic_error("invalid cloud service name");
+    BOOST_THROW_EXCEPTION(std::logic_error("invalid cloud service name"));
 }
 
 

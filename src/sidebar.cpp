@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2014-2024 Vaclav Slavik
+ *  Copyright (C) 2014-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -33,6 +33,7 @@
 #include "configuration.h"
 #include "errors.h"
 #include "hidpi.h"
+#include "menus.h"
 #include "static_ids.h"
 #include "utility.h"
 #include "unicode_helpers.h"
@@ -92,7 +93,7 @@ SidebarBlock::SidebarBlock(Sidebar *parent, const wxString& label, int flags)
         if (!(flags & NoUpperMargin))
         {
             m_sizer->Add(new SidebarSeparator(parent),
-                         wxSizerFlags().Expand().Border(wxBOTTOM|wxLEFT|wxRIGHT, PX(5)));
+                         wxSizerFlags().Expand().Border(wxBOTTOM|wxLEFT|wxRIGHT, PX(6)));
         }
         m_headerSizer = new wxBoxSizer(wxHORIZONTAL);
         m_headerSizer->Add(new HeadingLabel(parent, label), wxSizerFlags().Center());
@@ -481,7 +482,10 @@ private:
 #ifdef __WXOSX__
         [menu.GetHMenu() setFont:[NSFont systemFontOfSize:13]];
 #endif
-        menu.Append(idDelete, MSW_OR_OTHER(_("Delete from translation memory"), _("Delete From Translation Memory")));
+
+        auto itemDelete = menu.Append(idDelete, MSW_OR_OTHER(_("Delete from translation memory"), _("Delete From Translation Memory")));
+        SetMacMenuIcon(itemDelete, "xmark.circle");
+
         menu.Bind(wxEVT_MENU, [sidebar,suggestion](wxCommandEvent&)
         {
             SuggestionsProvider::Delete(suggestion);
@@ -604,9 +608,13 @@ void SuggestionsSidebarBlock::InitControls()
 
 SuggestionsSidebarBlock::~SuggestionsSidebarBlock()
 {
-    ClearSuggestionsMenu();
-    for (auto i : m_suggestionMenuItems)
-        delete i;
+    if (m_suggestionsMenu)
+    {
+        ClearSuggestionsMenu();
+        for (auto i : m_suggestionsMenuItems)
+            delete i;
+    }
+    // else: m_suggestionsMenuItems are already deleted
 }
 
 wxString SuggestionsSidebarBlock::GetIconForSuggestion(const Suggestion&) const
@@ -713,15 +721,18 @@ void SuggestionsSidebarBlock::UpdateSuggestions(const SuggestionsList& hits)
 
 void SuggestionsSidebarBlock::BuildSuggestionsMenu(int count)
 {
-    m_suggestionMenuItems.reserve(SUGGESTIONS_MENU_ENTRIES);
+    m_suggestionsMenuItems.reserve(SUGGESTIONS_MENU_ENTRIES);
     auto menu = m_suggestionsMenu;
+    if (!menu)
+        return;
+
     for (int i = 0; i < count; i++)
     {
         auto text = wxString::Format("(empty)\t%s%d", wxGETTEXT_IN_CONTEXT("keyboard key", "Ctrl+"), i+1);
         auto item = new wxMenuItem(menu, wxID_ANY, text);
         item->SetBitmap(wxArtProvider::GetBitmap("SuggestionTMTemplate"));
 
-        m_suggestionMenuItems.push_back(item);
+        m_suggestionsMenuItems.push_back(item);
         menu->Append(item);
 
         m_suggestionsMenu->Bind(wxEVT_MENU, [this,i,menu](wxCommandEvent&){
@@ -758,7 +769,7 @@ void SuggestionsSidebarBlock::UpdateSuggestionsMenu()
         if (text.length() > 100)
             text = text.substr(0, 100) + L"…";
 
-        auto item = m_suggestionMenuItems[index];
+        auto item = m_suggestionsMenuItems[index];
         m_suggestionsMenu->Append(item);
 
         auto label = wxControl::EscapeMnemonics(wxString::Format(formatMask, text, index+1));
@@ -772,11 +783,13 @@ void SuggestionsSidebarBlock::UpdateSuggestionsMenu()
 void SuggestionsSidebarBlock::ClearSuggestionsMenu()
 {
     auto m = m_suggestionsMenu;
+    if (!m)
+        return;
 
     auto menuItems = m->GetMenuItems();
     for (auto i: menuItems)
     {
-        if (std::find(m_suggestionMenuItems.begin(), m_suggestionMenuItems.end(), i) != m_suggestionMenuItems.end())
+        if (std::find(m_suggestionsMenuItems.begin(), m_suggestionsMenuItems.end(), i) != m_suggestionsMenuItems.end())
             m->Remove(i);
     }
 }
@@ -956,7 +969,6 @@ Sidebar::Sidebar(wxWindow *parent, wxMenu *suggestionsMenu)
     SetDoubleBuffered(true);
 #endif
 
-    Bind(wxEVT_PAINT, &Sidebar::OnPaint, this);
 #ifdef __WXOSX__
     SetWindowVariant(wxWINDOW_VARIANT_SMALL);
 #endif
@@ -1074,14 +1086,4 @@ void Sidebar::SetUpperHeight(int size)
 void Sidebar::DoEnable(bool)
 {
     RefreshContent();
-}
-
-void Sidebar::OnPaint(wxPaintEvent&)
-{
-    wxPaintDC dc(this);
-
-#ifdef __WXOSX__
-    dc.SetPen(ColorScheme::Get(Color::ToolbarSeparator));
-    dc.DrawLine(0, 0, dc.GetSize().x - 1, 0);
-#endif
 }

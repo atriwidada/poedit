@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="packages\Gettext.Tools.0.22.5\build\Gettext.Tools.props" Condition="Exists('packages\Gettext.Tools.0.22.5\build\Gettext.Tools.props')" />
-  <Import Project="packages\Tools.InnoSetup.6.3.1\build\Tools.InnoSetup.props" Condition="Exists('packages\Tools.InnoSetup.6.3.1\build\Tools.InnoSetup.props')" />
+  <Import Project="packages\Gettext.Tools.0.26.0\build\Gettext.Tools.props" Condition="Exists('packages\Gettext.Tools.0.26.0\build\Gettext.Tools.props')" />
+  <Import Project="packages\Tools.InnoSetup.6.4.2\build\Tools.InnoSetup.props" Condition="Exists('packages\Tools.InnoSetup.6.4.2\build\Tools.InnoSetup.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
@@ -37,11 +37,11 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="deps\boost\boost.props" />
+    <Import Project="Poedit.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="deps\boost\boost.props" />
+    <Import Project="Poedit.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -57,7 +57,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>HAVE_CLD2;HAVE_HTTP_CLIENT;XML_STATIC;_NO_ASYNCRTIMP;WIN32;_DEBUG;DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>src;deps\custom_build\config;deps\wx\include;deps\boost;deps\lucene;deps\lucene\LucenePlusPlus\include;deps\cld2;deps\icu\windows;deps\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <MinimalRebuild>false</MinimalRebuild>
@@ -88,7 +88,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>HAVE_CLD2;HAVE_HTTP_CLIENT;XML_STATIC;_NO_ASYNCRTIMP;WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>src;deps\custom_build\config;deps\wx\include;deps\boost;deps\lucene;deps\lucene\LucenePlusPlus\include;deps\cld2;deps\icu\windows;deps\cpprestsdk\Release\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <DisableSpecificWarnings>4800</DisableSpecificWarnings>
@@ -116,9 +116,17 @@
     <ClCompile Include="src\catalog.cpp" />
     <ClCompile Include="src\catalog_json.cpp" />
     <ClCompile Include="src\catalog_po.cpp" />
+    <ClCompile Include="src\catalog_qt.cpp" />
+    <ClCompile Include="src\catalog_resx.cpp" />
+    <ClCompile Include="src\catalog_xcloc.cpp" />
     <ClCompile Include="src\catalog_xliff.cpp" />
+    <ClCompile Include="src\cat_operations.cpp" />
     <ClCompile Include="src\cat_sorting.cpp" />
     <ClCompile Include="src\cat_update.cpp" />
+    <ClCompile Include="src\layout_helpers.cpp" />
+    <ClCompile Include="src\progress.cpp" />
+    <ClCompile Include="src\progress_ui.cpp" />
+    <ClCompile Include="src\subprocess.cpp" />
     <ClCompile Include="src\uilang.cpp" />
     <ClCompile Include="src\cloud_accounts.cpp" />
     <ClCompile Include="src\cloud_accounts_ui.cpp" />
@@ -161,7 +169,6 @@
     <ClCompile Include="src\pluralforms\pl_evaluate.cpp" />
     <ClCompile Include="src\prefsdlg.cpp" />
     <ClCompile Include="src\pretranslate.cpp" />
-    <ClCompile Include="src\progressinfo.cpp" />
     <ClCompile Include="src\propertiesdlg.cpp" />
     <ClCompile Include="src\qa_checks.cpp" />
     <ClCompile Include="src\recent_files.cpp" />
@@ -188,9 +195,17 @@
     <ClInclude Include="src\catalog.h" />
     <ClInclude Include="src\catalog_json.h" />
     <ClInclude Include="src\catalog_po.h" />
+    <ClInclude Include="src\catalog_qt.h" />
+    <ClInclude Include="src\catalog_resx.h" />
+    <ClInclude Include="src\catalog_xcloc.h" />
     <ClInclude Include="src\catalog_xliff.h" />
+    <ClInclude Include="src\cat_operations.h" />
     <ClInclude Include="src\cat_sorting.h" />
     <ClInclude Include="src\cat_update.h" />
+    <ClInclude Include="src\layout_helpers.h" />
+    <ClInclude Include="src\progress.h" />
+    <ClInclude Include="src\progress_ui.h" />
+    <ClInclude Include="src\subprocess.h" />
     <ClInclude Include="src\uilang.h" />
     <ClInclude Include="src\cloud_accounts.h" />
     <ClInclude Include="src\cloud_accounts_ui.h" />
@@ -234,7 +249,6 @@
     <ClInclude Include="src\pluralforms\pl_evaluate.h" />
     <ClInclude Include="src\prefsdlg.h" />
     <ClInclude Include="src\pretranslate.h" />
-    <ClInclude Include="src\progressinfo.h" />
     <ClInclude Include="src\propertiesdlg.h" />
     <ClInclude Include="src\pugixml.h" />
     <ClInclude Include="src\qa_checks.h" />
@@ -308,6 +322,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Poedit.props" />
     <None Include="Poedit.Targets">
       <SubType>Designer</SubType>
     </None>
@@ -316,12 +331,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <None Include="src\resources\comment.xrc" />
     <None Include="src\resources\manager.xrc" />
     <None Include="src\resources\menus.xrc" />
     <None Include="src\resources\prefs.xrc" />
     <None Include="src\resources\properties.xrc" />
-    <None Include="src\resources\summary.xrc" />
     <None Include="src\resources\toolbar.xrc" />
   </ItemGroup>
   <ItemGroup>
@@ -330,16 +343,16 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="Poedit.targets" />
-    <Import Project="packages\WinSparkle.0.8.1\build\native\WinSparkle.targets" Condition="Exists('packages\WinSparkle.0.8.1\build\native\WinSparkle.targets')" />
     <Import Project="packages\MSBuildTasks.1.5.0.235\build\MSBuildTasks.targets" Condition="Exists('packages\MSBuildTasks.1.5.0.235\build\MSBuildTasks.targets')" />
+    <Import Project="packages\WinSparkle.0.9.2\build\native\WinSparkle.targets" Condition="Exists('packages\WinSparkle.0.9.2\build\native\WinSparkle.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('packages\Tools.InnoSetup.6.3.1\build\Tools.InnoSetup.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Tools.InnoSetup.6.3.1\build\Tools.InnoSetup.props'))" />
-    <Error Condition="!Exists('packages\Gettext.Tools.0.22.5\build\Gettext.Tools.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Gettext.Tools.0.22.5\build\Gettext.Tools.props'))" />
-    <Error Condition="!Exists('packages\WinSparkle.0.8.1\build\native\WinSparkle.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\WinSparkle.0.8.1\build\native\WinSparkle.targets'))" />
+    <Error Condition="!Exists('packages\Tools.InnoSetup.6.4.2\build\Tools.InnoSetup.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Tools.InnoSetup.6.4.2\build\Tools.InnoSetup.props'))" />
+    <Error Condition="!Exists('packages\Gettext.Tools.0.26.0\build\Gettext.Tools.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Gettext.Tools.0.26.0\build\Gettext.Tools.props'))" />
     <Error Condition="!Exists('packages\MSBuildTasks.1.5.0.235\build\MSBuildTasks.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\MSBuildTasks.1.5.0.235\build\MSBuildTasks.targets'))" />
+    <Error Condition="!Exists('packages\WinSparkle.0.9.2\build\native\WinSparkle.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\WinSparkle.0.9.2\build\native\WinSparkle.targets'))" />
   </Target>
 </Project>

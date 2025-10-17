@@ -1,7 +1,7 @@
 ﻿;
 ;   This file is part of Poedit (https://poedit.net)
 ;
-;   Copyright (C) 1999-2024 Vaclav Slavik
+;   Copyright (C) 1999-2025 Vaclav Slavik
 ;
 ;   Permission is hereby granted, free of charge, to any person obtaining a
 ;   copy of this software and associated Docsumentation files (the "Software"),
@@ -32,7 +32,7 @@
 
 #include "../" + BINDIR + "/git_build_number.h"
 
-#define VERSION          "3.5.2"
+#define VERSION          "3.8"
 #define VERSION_WIN      VERSION + "." + Str(POEDIT_GIT_BUILD_NUMBER)
 
 #define APP_ID           "{68EB2C37-083A-4303-B5D8-41FA67E50B8F}"
@@ -61,10 +61,7 @@ LicenseFile=COPYING
 InfoAfterFile=
 SolidCompression=true
 Compression=lzma2/ultra64
-WindowShowCaption=true
-WindowStartMaximized=false
 FlatComponentsList=true
-WindowResizable=true
 ShowLanguageDialog=no
 DisableWelcomePage=true
 AllowUNCPath=true
@@ -72,7 +69,7 @@ InternalCompressLevel=ultra
 AppID={{#APP_ID}
 VersionInfoVersion={#VERSION_WIN}
 VersionInfoTextVersion={#VERSION}
-AppCopyright=Copyright © 1999-2024 Vaclav Slavik
+AppCopyright=Copyright © 1999-2025 Vaclav Slavik
 AppPublisher=Vaclav Slavik
 AppSupportURL=https://poedit.net/support
 AppUpdatesURL=https://poedit.net/download
@@ -86,13 +83,16 @@ WizardStyle=modern
 AppPublisherURL=https://poedit.net/
 DisableProgramGroupPage=true
 
+RestartApplications=yes
+CloseApplications=yes
+
 #ifdef SIGNTOOL
 SignTool={#SIGNTOOL}
 SignedUninstaller=yes
 #endif
 VersionInfoCompany=Vaclav Slavik
 VersionInfoDescription=Poedit Installer
-VersionInfoCopyright=Copyright © 1999-2024 Vaclav Slavik
+VersionInfoCopyright=Copyright © 1999-2025 Vaclav Slavik
 VersionInfoProductName=Poedit
 VersionInfoProductVersion={#VERSION_WIN}
 VersionInfoProductTextVersion={#VERSION}
@@ -156,10 +156,22 @@ Root: "HKA"; Subkey: "Software\Classes\Poedit.JSON"; ValueType: string; ValueDat
 Root: "HKA"; Subkey: "Software\Classes\Poedit.JSON"; ValueType: string; ValueName: "FriendlyTypeName"; ValueData: "@{app}\Poedit.exe,-226"; Flags: uninsdeletekey noerror
 Root: "HKA"; Subkey: "Software\Classes\Poedit.JSON\Shell\Open\Command"; ValueType: string; ValueData: """{app}\Poedit.exe"" ""%1"""; Flags: uninsdeletevalue noerror
 
+Root: "HKA"; Subkey: "Software\Classes\.arb"; ValueType: string; ValueName: "Content Type"; ValueData: "application/x-arb"; Flags: noerror
 Root: "HKA"; Subkey: "Software\Classes\.arb\OpenWithProgids"; ValueType: string; ValueName: "Poedit.ARB"; ValueData: ""; Flags: uninsdeletevalue noerror
 Root: "HKA"; Subkey: "Software\Classes\Poedit.ARB"; ValueType: string; ValueData: "Flutter Translation"; Flags: uninsdeletekey noerror
 Root: "HKA"; Subkey: "Software\Classes\Poedit.ARB"; ValueType: string; ValueName: "FriendlyTypeName"; ValueData: "@{app}\Poedit.exe,-227"; Flags: uninsdeletekey noerror
 Root: "HKA"; Subkey: "Software\Classes\Poedit.ARB\Shell\Open\Command"; ValueType: string; ValueData: """{app}\Poedit.exe"" ""%1"""; Flags: uninsdeletevalue noerror
+
+Root: "HKA"; Subkey: "Software\Classes\.resx"; ValueType: string; ValueName: "Content Type"; ValueData: "text/microsoft-resx"; Flags: noerror
+Root: "HKA"; Subkey: "Software\Classes\.resx\OpenWithProgids"; ValueType: string; ValueName: "Poedit.RESX"; ValueData: ""; Flags: uninsdeletevalue noerror
+Root: "HKA"; Subkey: "Software\Classes\Poedit.RESX"; ValueType: string; ValueData: "RESX Resource File"; Flags: uninsdeletekey noerror
+Root: "HKA"; Subkey: "Software\Classes\Poedit.RESX"; ValueType: string; ValueName: "FriendlyTypeName"; ValueData: "@{app}\Poedit.exe,-228"; Flags: uninsdeletekey noerror
+Root: "HKA"; Subkey: "Software\Classes\Poedit.RESX\Shell\Open\Command"; ValueType: string; ValueData: """{app}\Poedit.exe"" ""%1"""; Flags: uninsdeletevalue noerror
+
+Root: "HKA"; Subkey: "Software\Classes\.ts\OpenWithProgids"; ValueType: string; ValueName: "Poedit.QT"; ValueData: ""; Flags: uninsdeletevalue noerror
+Root: "HKA"; Subkey: "Software\Classes\Poedit.QT"; ValueType: string; ValueData: "Qt Translation"; Flags: uninsdeletekey noerror
+Root: "HKA"; Subkey: "Software\Classes\Poedit.QT"; ValueType: string; ValueName: "FriendlyTypeName"; ValueData: "@{app}\Poedit.exe,-229"; Flags: uninsdeletekey noerror
+Root: "HKA"; Subkey: "Software\Classes\Poedit.QT\Shell\Open\Command"; ValueType: string; ValueData: """{app}\Poedit.exe"" ""%1"""; Flags: uninsdeletevalue noerror
 
 ; URL protocol for poedit:// (various custom tasks such as OAuth)
 Root: "HKA"; Subkey: "Software\Classes\poedit"; ValueType: "string"; ValueData: "URL:Poedit Custom Protocol"; Flags: uninsdeletekey noerror

@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2014-2024 Vaclav Slavik
+ *  Copyright (C) 2014-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -32,9 +32,10 @@
     #include <wx/platinfo.h>
 #endif
 
-#include <wx/textctrl.h>
-
 #include "language.h"
+
+class CustomizedTextCtrl;
+
 
 inline bool IsSpellcheckingAvailable()
 {
@@ -52,11 +53,11 @@ bool SetSpellcheckerLang(const wxString& lang);
 
 // Does any initialization needed to be able to use spellchecker with the control later.
 #ifdef __WXMSW__
-void PrepareTextCtrlForSpellchecker(wxTextCtrl *text);
+void PrepareTextCtrlForSpellchecker(CustomizedTextCtrl *text);
 #endif
 
 // Init given text control to do (or not) spellchecking for given language
-bool InitTextCtrlSpellchecker(wxTextCtrl *text, bool enable, const Language& lang);
+bool InitTextCtrlSpellchecker(CustomizedTextCtrl *text, bool enable, const Language& lang);
 
 #ifndef __WXMSW__
 // Show help about how to add more dictionaries for spellchecking.

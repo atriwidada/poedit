@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 1999-2024 Vaclav Slavik
+ *  Copyright (C) 1999-2025 Vaclav Slavik
  *  Copyright (C) 2015 PrismJS (CSS parts)
  *  Copyright (c) 2013-2017 Cole Bemis (Feather Icons)
  *
@@ -198,8 +198,11 @@ wxFileName FileViewer::GetFilename(wxString ref) const
     }
 
     wxPathFormat pathfmt = ref.Contains(_T('\\')) ? wxPATH_WIN : wxPATH_UNIX;
-    wxFileName filename(ref.BeforeLast(_T(':')), pathfmt);
 
+    auto without_linenumber = ref.BeforeLast(_T(':'));
+    auto filepath = without_linenumber.empty() ? ref : without_linenumber;
+
+    wxFileName filename(filepath, pathfmt);
     if ( filename.IsRelative() )
     {
         wxFileName relative(filename);
@@ -488,9 +491,9 @@ wxString FileToHTMLMarkup(const wxTextFile& file, const wxString& ext, size_t li
     // PrismJS is added after everything else so that basic rendering works even
     // when offline.
     html += R"(
-            <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/components/prism-core.min.js"></script>
-            <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/plugins/keep-markup/prism-keep-markup.min.js"></script>
-            <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/plugins/autoloader/prism-autoloader.min.js"></script>
+            <script crossorigin src="https://www.unpkg.com/prismjs@1.30.0/components/prism-core.min.js"></script>
+            <script crossorigin src="https://www.unpkg.com/prismjs@1.30.0/plugins/keep-markup/prism-keep-markup.min.js"></script>
+            <script crossorigin src="https://www.unpkg.com/prismjs@1.30.0/plugins/autoloader/prism-autoloader.min.js"></script>
             </body>
         </html>
         )";

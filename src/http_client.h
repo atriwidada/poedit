@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2014-2024 Vaclav Slavik
+ *  Copyright (C) 2014-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -150,6 +150,20 @@ public:
 private:
     std::string m_body;
 };
+
+
+// Exception thrown when HTTP request fails with error status code
+class http_response_error : public std::runtime_error
+{
+public:
+    http_response_error(int status, const std::string& what) : std::runtime_error(what), m_status(status) {}
+
+    int status_code() const { return m_status; }
+
+private:
+    int m_status;
+};
+
 
 
 /**

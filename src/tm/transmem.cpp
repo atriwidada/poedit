@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2013-2024 Vaclav Slavik
+ *  Copyright (C) 2013-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -27,6 +27,7 @@
 
 #include "catalog.h"
 #include "errors.h"
+#include "progress.h"
 #include "str_helpers.h"
 #include "utility.h"
 
@@ -83,16 +84,16 @@ namespace
             case LuceneException::CorruptIndex:                                                                 \
             case LuceneException::FileNotFound:                                                                 \
             case LuceneException::NoSuchDirectory:                                                              \
-                throw Exception(wxString::Format(_("Translation memory database is corrupted: %s (%d)."),       \
-                                                 e.getError(), (int)e.getType()));                              \
+                BOOST_THROW_EXCEPTION(Exception(wxString::Format(_("Translation memory database is corrupted: %s (%d)."), \
+                                                 e.getError(), (int)e.getType())));                             \
             default:                                                                                            \
-                throw Exception(wxString::Format(_("Translation memory error: %s (%d)."),                       \
-                                                 e.getError(), (int)e.getType()));                              \
+                BOOST_THROW_EXCEPTION(Exception(wxString::Format(_("Translation memory error: %s (%d)."),       \
+                                                 e.getError(), (int)e.getType())));                             \
         }                                                                                                       \
     }                                                                                                           \
     catch (std::exception& e)                                                                                   \
     {                                                                                                           \
-        throw Exception(e.what());                                                                              \
+        BOOST_THROW_EXCEPTION(Exception(e.what()));                                                             \
     }
 
 
@@ -318,7 +319,7 @@ static const int LUCENE_QUERY_MAX_DOCS = 500;
 static const double QUALITY_THRESHOLD = 0.6;
 
 // Maximum allowed difference in phrase length, in #terms.
-static const int MAX_ALLOWED_LENGTH_DIFFERENCE = 2;
+static const int MAX_ALLOWED_LENGTH_DIFFERENCE = 3;
 
 
 void AddOrUpdateResult(SuggestionsList& all, Suggestion&& r)
@@ -364,7 +365,8 @@ std::wstring get_text_field(DocumentPtr doc, const std::wstring& field)
 void postprocess_results(SuggestionsList& results)
 {
     std::stable_sort(results.begin(), results.end());
-    results.resize(MAX_RESULTS);
+    if (results.size() > MAX_RESULTS)
+        results.resize(MAX_RESULTS);
 }
 
 
@@ -575,8 +577,11 @@ void TranslationMemoryImpl::ExportData(TranslationMemory::IOInterface& destinati
     {
         auto reader = m_mng->Reader();
         int32_t numDocs = reader->maxDoc();
+        Progress progress(numDocs);
+
         for (int32_t i = 0; i < numDocs; i++)
         {
+            progress.increment();
             if (reader->isDeleted(i))
                 continue;
             auto doc = reader->document(i);
@@ -734,6 +739,8 @@ public:
 
     void Insert(const CatalogPtr& cat) override
     {
+        Progress progress(cat->items().size());
+
         auto srclang = cat->GetSourceLanguage();
         auto lang = cat->GetLanguage();
         if (!lang.IsValid() || !srclang.IsValid())
@@ -745,6 +752,7 @@ public:
             // want to save old entries in the TM too, so that we harvest as
             // much useful translations as we can.
             Insert(srclang, lang, item);
+            progress.increment();
         }
     }
 

@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 1999-2024 Vaclav Slavik
+ *  Copyright (C) 1999-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -19,7 +19,7 @@
  *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  *  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- *  DEALINGS IN THE SOFTWARE. 
+ *  DEALINGS IN THE SOFTWARE.
  *
  */
 
@@ -28,6 +28,9 @@
 #include "catalog_po.h"
 #include "catalog_xliff.h"
 #include "catalog_json.h"
+#include "catalog_xcloc.h"
+#include "catalog_resx.h"
+#include "catalog_qt.h"
 
 #include "configuration.h"
 #include "errors.h"
@@ -555,6 +558,7 @@ int Catalog::FindItemIndexByLine(int lineno)
 bool Catalog::RemoveSameAsSourceTranslations()
 {
     bool changed = false;
+    const unsigned pluralFormsCount = GetPluralForms().nplurals();
 
     for (auto& i: m_items)
     {
@@ -563,7 +567,7 @@ bool Catalog::RemoveSameAsSourceTranslations()
             if (i->HasPlural())
             {
                 // we can only easily do this operation for languages that have singular+plural, skip everything else:
-                if (GetPluralFormsCount() != 2 || i->GetPluralString() != i->GetTranslation(1))
+                if (pluralFormsCount != 2 || i->GetPluralString() != i->GetTranslation(1))
                     continue;
             }
 
@@ -589,11 +593,17 @@ wxString MaskForType(Catalog::Type t)
             return MaskForType("*.pot", _("POT Translation Templates"));
         case Catalog::Type::XLIFF:
             return MaskForType("*.xlf;*.xliff", _("XLIFF Translation Files"));
+        case Catalog::Type::XCLOC:
+            return MaskForType("*.xcloc", _("Xcode Localization Catalog"));
         case Catalog::Type::JSON:
             return MaskForType("*.json", _("JSON Translation Files"));
         case Catalog::Type::JSON_FLUTTER:
             // TRANSLATORS: "Flutter" is proper noun, name of a developer tool
             return MaskForType("*.arb", _("Flutter Translation Files"));
+        case Catalog::Type::RESX:
+            return MaskForType("*.resx", _("RESX Resource Files"));
+        case Catalog::Type::QT_LINGUIST:
+            return MaskForType("*.ts", _("Qt Translation Files"));
     }
     return ""; // silence stupid warning
 }
@@ -602,9 +612,9 @@ wxString MaskForType(Catalog::Type t)
 
 wxString Catalog::GetAllTypesFileMask()
 {
-    return MaskForType("*.po;*.pot;*.xlf;*.xliff;*.json;*.arb", _("All Translation Files"), /*showExt=*/false) +
+    return MaskForType("*.po;*.pot;*.xlf;*.xliff;*.xcloc;*.json;*.arb;*.resx;*.ts", _("All Translation Files"), /*showExt=*/false) +
         "|" +
-        GetTypesFileMask({ Type::PO, Type::POT, Type::XLIFF, Type::JSON, Type::JSON_FLUTTER });
+        GetTypesFileMask({ Type::PO, Type::POT, Type::XLIFF, Type::JSON, Type::JSON_FLUTTER, Type::XCLOC, Type::RESX, Type::QT_LINGUIST });
 }
 
 wxString Catalog::GetTypesFileMask(std::initializer_list<Type> types)
@@ -769,14 +779,11 @@ std::shared_ptr<SourceCodeSpec> Catalog::GetSourceCodeSpec() const
 }
 
 
-unsigned Catalog::GetPluralFormsCount() const
+unsigned Catalog::GetPluralFormsCountPresentInItems() const
 {
     unsigned count = 0;
-
-    for (auto& i: m_items)
-    {
+    for (const auto& i: m_items)
         count = std::max(count, i->GetPluralFormsCount());
-    }
 
     return count;
 }
@@ -881,12 +888,25 @@ std::string CatalogItem::GetFormatFlag() const
 
 void CatalogItem::SetFuzzy(bool fuzzy)
 {
+    if (fuzzy == m_isFuzzy)
+        return;
+
     if (!fuzzy && m_isFuzzy)
         m_oldMsgid.clear();
     m_isFuzzy = fuzzy;
 
     UpdateInternalRepresentation();
 }
+
+void CatalogItem::SetComment(const wxString& c)
+{
+    if (c == m_comment)
+        return;
+
+    m_comment = c;
+    UpdateInternalRepresentation();
+}
+
 
 wxString CatalogItem::GetTranslation(unsigned idx) const
 {
@@ -968,17 +988,21 @@ void CatalogItem::SetTranslationFromSource()
 
 void CatalogItem::ClearTranslation()
 {
+    bool modified = m_isFuzzy != false;
     m_isFuzzy = false;
     m_isPreTranslated = false;
     m_isTranslated = false;
     for (auto& t: m_translations)
     {
         if (!t.empty())
-            m_isModified = true;
+            modified = true;
         t.clear();
     }
 
-    UpdateInternalRepresentation();
+    m_isModified = modified;
+
+    if (modified)
+        UpdateInternalRepresentation();
 }
 
 unsigned CatalogItem::GetPluralFormsCount() const
@@ -1110,9 +1134,12 @@ CatalogPtr Catalog::Create(Type type)
             return CatalogPtr(new POCatalog(type));
 
         case Type::XLIFF:
+        case Type::XCLOC:
         case Type::JSON:
         case Type::JSON_FLUTTER:
-            wxFAIL_MSG("empty XLIFF/JSON creation not implemented");
+        case Type::RESX:
+        case Type::QT_LINGUIST:
+            wxFAIL_MSG("empty XLIFF/JSON/RESX/QT creation not implemented");
             return CatalogPtr();
     }
 
@@ -1139,9 +1166,21 @@ CatalogPtr Catalog::Create(const wxString& filename, int flags)
     {
         cat = JSONCatalog::Open(filename);
     }
+    else if (XCLOCCatalog::CanLoadFile(ext))
+    {
+        cat = XCLOCCatalog::Open(filename);
+    }
+    else if (RESXCatalog::CanLoadFile(ext))
+    {
+        cat = RESXCatalog::Open(filename);
+    }
+    else if (QtLinguistCatalog::CanLoadFile(ext))
+    {
+        cat = QtLinguistCatalog::Open(filename);
+    }
 
     if (!cat)
-        throw Exception(_("The file is in a format not recognized by Poedit."));
+        BOOST_THROW_EXCEPTION(Exception(_("The file is in a format not recognized by Poedit.")));
 
     if (flags & CreationFlag_IgnoreTranslations)
     {
@@ -1161,7 +1200,9 @@ bool Catalog::CanLoadFile(const wxString& extension_)
 
     return POCatalog::CanLoadFile(extension) ||
            XLIFFCatalog::CanLoadFile(extension) ||
-           JSONCatalog::CanLoadFile(extension);
+           JSONCatalog::CanLoadFile(extension) ||
+           RESXCatalog::CanLoadFile(extension) ||
+           QtLinguistCatalog::CanLoadFile(extension);
 }
 
 

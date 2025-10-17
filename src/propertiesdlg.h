@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2000-2024 Vaclav Slavik
+ *  Copyright (C) 2000-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -33,6 +33,7 @@
 
 #include "catalog.h"
 #include "languagectrl.h"
+#include "layout_helpers.h"
 
 class WXDLLIMPEXP_FWD_ADV wxEditableListBox;
 class WXDLLIMPEXP_FWD_CORE wxTextCtrl;
@@ -41,7 +42,7 @@ class WXDLLIMPEXP_FWD_CORE wxCheckBox;
 class WXDLLIMPEXP_FWD_CORE wxComboBox;
 
 /// Dialog setting various catalog parameters.
-class PropertiesDialog : public wxDialog
+class PropertiesDialog : public StandardDialog
 {
     public:
         PropertiesDialog(wxWindow *parent, CatalogPtr cat, bool fileExistsOnDisk, int initialPage = 0);

@@ -20,11 +20,15 @@ endif
 poedit_SOURCES = \
                  app_updates.cpp app_updates.h \
                  attentionbar.cpp attentionbar.h \
+                 cat_operations.h cat_operations.cpp \
                  cat_update.h cat_update.cpp \
                  cat_sorting.cpp cat_sorting.h \
                  catalog.cpp catalog.h \
                  catalog_po.cpp catalog_po.h \
                  catalog_json.cpp catalog_json.h \
+                 catalog_qt.cpp catalog_qt.h catalog_qt_plurals.h \
+                 catalog_resx.cpp catalog_resx.h \
+                 catalog_xcloc.cpp catalog_xcloc.h \
                  catalog_xliff.cpp catalog_xliff.h \
                  uilang.cpp uilang.h \
                  cloud_sync.h \
@@ -53,6 +57,7 @@ poedit_SOURCES = \
                  language.cpp language.h \
                  language_impl_legacy.h language_impl_plurals.h \
                  languagectrl.cpp languagectrl.h \
+                 layout_helpers.cpp layout_helpers.h \
                  logcapture.h \
                  main_toolbar.h wx/main_toolbar.cpp \
                  manager.h manager.cpp \
@@ -60,7 +65,7 @@ poedit_SOURCES = \
                  pluralforms/pl_evaluate.cpp pluralforms/pl_evaluate.h \
                  prefsdlg.cpp prefsdlg.h \
                  pretranslate.cpp pretranslate.h \
-                 progressinfo.h progressinfo.cpp \
+                 progress.h progress_ui.h progress.cpp progress_ui.cpp \
                  propertiesdlg.cpp propertiesdlg.h \
                  qa_checks.cpp qa_checks.h \
                  recent_files.cpp recent_files.h \
@@ -68,6 +73,7 @@ poedit_SOURCES = \
                  spellchecking.h spellchecking.cpp \
                  static_ids.h \
                  str_helpers.h \
+                 subprocess.h subprocess.cpp \
                  syntaxhighlighter.cpp syntaxhighlighter.h \
                  text_control.h text_control.cpp \
                  titleless_window.h titleless_window.cpp \
@@ -86,13 +92,10 @@ poedit_LDADD = $(WX_LIBS) $(LUCENE_LIBS) $(CLD2_LIBS) $(PUGIXML_LIBS) $(ACCOUNTS
                $(BOOST_LDFLAGS) $(BOOST_THREAD_LIB) $(BOOST_SYSTEM_LIB)
 
 XRC_RESOURCES = \
-        $(srcdir)/resources/comment.xrc \
         $(srcdir)/resources/manager.xrc \
         $(srcdir)/resources/menus.xrc \
         $(srcdir)/resources/prefs.xrc \
-        $(srcdir)/resources/properties.xrc \
-        $(srcdir)/resources/summary.xrc \
-        $(srcdir)/resources/toolbar.xrc
+        $(srcdir)/resources/properties.xrc
 
 compiled_xrc.cpp: $(XRC_RESOURCES)
 	$(WXRC) -v -c -o $@ $(XRC_RESOURCES)

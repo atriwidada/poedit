@@ -1,0 +1,13 @@
+#pragma code_page(65001)
+STRINGTABLE
+LANGUAGE LANG_GEORGIAN, SUBLANG_NEUTRAL
+BEGIN
+    222, "PO თარგმანი"
+    223, "კომპილირებული თარგმანი"
+    224, "თარგმანის შაბლონი"
+    225, "XLIFF თარგმანი"
+    226, "JSON დოკუმენტი"
+    227, "Flutter-ის თარგმანი"
+    228, "RESX რესურსი"
+    229, "Qt-ის თარგმანი"
+END

@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2014-2024 Vaclav Slavik
+ *  Copyright (C) 2014-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -29,16 +29,21 @@
 #include "utility.h"
 #include "unicode_helpers.h"
 
+#include <wx/bmpbuttn.h>
+#include <wx/dcmemory.h>
+#include <wx/stattext.h>
 #include <wx/intl.h>
 #include <wx/settings.h>
 #include <wx/toolbar.h>
 #include <wx/xrc/xmlres.h>
+#include <wx/graphics.h>
+#include <wx/scopedptr.h>
 
 #ifdef __WXMSW__
 #include <wx/msw/uxtheme.h>
 #endif
 
-#ifdef __WXGTK__
+#ifdef __WXGTK3__
 #include <gtk/gtk.h>
 #endif
 
@@ -48,20 +53,22 @@ class WXMainToolbar : public MainToolbar
 public:
     WXMainToolbar(wxFrame *parent)
     {
-        m_tb = wxXmlResource::Get()->LoadToolBar(parent, "toolbar");
-        m_idUpdate = XRCID("toolbar_update");
+        long style = wxTB_HORIZONTAL | wxTB_FLAT | wxTB_HORZ_TEXT | wxBORDER_NONE;
+#ifdef __WXMSW__
+        style |= wxTB_NODIVIDER;
+#endif
+        m_tb = new wxToolBar(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, style, "toolbar");
+        m_tb->SetMargins(3, 3);
 
 #ifdef __WXGTK3__
         GtkToolbar *gtb = Toolbar();
         gtk_toolbar_set_icon_size(gtb, GTK_ICON_SIZE_SMALL_TOOLBAR);
         gtk_style_context_add_class(gtk_widget_get_style_context(GTK_WIDGET(gtb)), GTK_STYLE_CLASS_PRIMARY_TOOLBAR);
-        SetIcon(0 , "document-open-symbolic");
-        SetIcon(1 , "document-save-symbolic");
-        SetIcon(3 , "poedit-validate-symbolic");
-        SetIcon(4 , "poedit-update-symbolic");
-        SetIcon(6 , "sidebar-symbolic");
 #endif
 
+        CreateTools();
+        m_idSync = XRCID("menu_cloud_sync");
+     
 #ifdef __WXMSW__
         // De-uglify the toolbar a bit on Windows 10:
         if (wxUxThemeIsActive())
@@ -70,47 +77,90 @@ public:
             m_tb->SetBackgroundColour(wxRGBToColour(::GetThemeSysColor(hTheme, COLOR_WINDOW)));
         }
 
-        unsigned padding = PX(4);
+        unsigned padding = PX(10);
         ::SendMessage((HWND) m_tb->GetHWND(), TB_SETPADDING, 0, MAKELPARAM(padding, padding));
         
          m_tb->SetDoubleBuffered(true);
 #endif
+
+         m_tb->Realize();
+         parent->SetToolBar(m_tb);
     }
 
-    void EnableSyncWithCrowdin(bool on) override
+    void EnableCloudSync(std::shared_ptr<CloudSyncDestination> sync, bool isCrowdin) override
     {
-        auto tool = m_tb->FindById(m_idUpdate);
+        auto tool = m_tb->FindById(m_idSync);
+        wxString icon;
 
-        if (on)
+        if (!sync || isCrowdin)
         {
+            icon = "sync";
             tool->SetLabel(_("Sync"));
-            m_tb->SetToolShortHelp(m_idUpdate, _("Synchronize the translation with Crowdin"));
-            #ifdef __WXGTK3__
-            SetIcon(4 , "poedit-sync-symbolic");
-            #else
-            m_tb->SetToolNormalBitmap(m_idUpdate, wxArtProvider::GetBitmap("poedit-sync", wxART_TOOLBAR));
-            #endif
-            #ifdef __WXMSW__
-            m_tb->SetToolDisabledBitmap(m_idUpdate, wxArtProvider::GetBitmap("poedit-sync@disabled", wxART_TOOLBAR));
-            #endif
+            m_tb->SetToolShortHelp(m_idSync, _("Synchronize translations with Crowdin"));
         }
         else
         {
-            tool->SetLabel(MSW_OR_OTHER(_("Update from code"), _("Update from Code")));
-            m_tb->SetToolShortHelp(m_idUpdate, _("Update from source code"));
-            #ifdef __WXGTK3__
-            SetIcon(4 , "poedit-update-symbolic");
-            #else
-            m_tb->SetToolNormalBitmap(m_idUpdate, wxArtProvider::GetBitmap("poedit-update", wxART_TOOLBAR));
-            #endif
-            #ifdef __WXMSW__
-            m_tb->SetToolDisabledBitmap(m_idUpdate, wxArtProvider::GetBitmap("poedit-update@disabled", wxART_TOOLBAR));
-            #endif
+            icon = "upload";
+            tool->SetLabel(_("Upload"));
+            // TRANSLATORS: this is the tooltip for the "Upload" button in the toolbar, %s is hostname or service (Crowdin, ftp.foo.com etc.)
+            auto tooltip = wxString::Format(_("Upload translations to %s"), sync->GetName());
+            m_tb->SetToolShortHelp(m_idSync, tooltip);
         }
+
+#ifdef __WXGTK3__
+        SetIcon(m_idSync, icon);
+#else
+        m_tb->SetToolNormalBitmap(m_idSync, wxArtProvider::GetBitmap(icon, wxART_TOOLBAR));
+#endif
+#ifdef __WXMSW__
+        m_tb->SetToolDisabledBitmap(m_idSync, wxArtProvider::GetBitmap(icon + "@disabled", wxART_TOOLBAR));
+#endif
+
+    }
+
+private:
+    void CreateTools()
+    {
+        AddTool(wxID_OPEN, wxEmptyString, "document-open", _("Open file"));
+        AddTool(wxID_SAVE, wxEmptyString, "document-save", _("Save file"));
+
+        m_tb->AddSeparator();
+
+        AddTool(XRCID("menu_validate"), _("Validate"), "validate", _("Check for errors in the translation"));
+
+        AddTool(XRCID("menu_pretranslate"), _("Pre-translate"), "pretranslate", _(L"Pre-translate strings that don’t have a translation yet"));
+        AddTool(XRCID("toolbar_update"), MSW_OR_OTHER(_("Update from code"), _("Update from Code")), "update", _("Update from source code"));
+        AddTool(XRCID("menu_cloud_sync"), _("Sync"), "sync", "");
+
+        m_tb->AddStretchableSpace();
+
+        AddTool(XRCID("show_sidebar"), wxEmptyString, "sidebar", _("Show or hide the sidebar"));
+    }
+
+    wxToolBarToolBase *AddTool(int id, const wxString& label, const wxString& icon, const wxString& shortHelp)
+    {
+        auto tool = m_tb->AddTool
+        (
+            id,
+            label,
+            wxArtProvider::GetBitmap(icon, wxART_TOOLBAR),
+#ifdef __WXMSW__
+            wxArtProvider::GetBitmap(icon + "@disabled", wxART_TOOLBAR),
+#else
+            wxNullBitmap,
+#endif
+            wxITEM_NORMAL,
+            shortHelp
+        );
+
+#ifdef __WXGTK3__
+        SetIcon(id, icon);
+#endif
+
+        return tool;
     }
 
 #ifdef __WXGTK3__
-private:
     GtkToolbar *Toolbar()
     {
     #ifdef __WXGTK4__
@@ -120,27 +170,25 @@ private:
     #endif
     }
 
-    void SetIcon(int index, const char *name)
+    void SetIcon(int toolId, const wxString& name)
     {
-         GtkToolItem *i = gtk_toolbar_get_nth_item(Toolbar(), index);
-         gtk_tool_button_set_icon_widget(GTK_TOOL_BUTTON(i), NULL);
-         gtk_tool_button_set_icon_name(GTK_TOOL_BUTTON(i), name);
-    } 
+        auto icon = name.StartsWith("document-")
+                    ? wxString::Format("%s-symbolic", name)
+                    : wxString::Format("poedit-%s-symbolic", name);
+
+        GtkToolItem* i = gtk_toolbar_get_nth_item(Toolbar(), m_tb->GetToolPos(toolId));
+        gtk_tool_button_set_icon_widget(GTK_TOOL_BUTTON(i), NULL);
+        gtk_tool_button_set_icon_name(GTK_TOOL_BUTTON(i), icon.utf8_str());
+    }
 #endif
 
 private:
     wxToolBar *m_tb;
-    int m_idUpdate;
+    int m_idSync;
 };
-
-
-std::unique_ptr<MainToolbar> MainToolbar::CreateWX(wxFrame *parent)
-{
-    return std::unique_ptr<MainToolbar>(new WXMainToolbar(parent));
-}
 
 
 std::unique_ptr<MainToolbar> MainToolbar::Create(wxFrame *parent)
 {
-    return CreateWX(parent);
+    return std::unique_ptr<MainToolbar>(new WXMainToolbar(parent));
 }

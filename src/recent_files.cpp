@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2020-2024 Vaclav Slavik
+ *  Copyright (C) 2020-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -174,10 +174,14 @@ private:
         wxIcon icon(fullname, wxBITMAP_TYPE_ICO, desiredSize, desiredSize);
         if (!icon.IsOk())
             icon.LoadFile(fullname, wxBITMAP_TYPE_ICO);
+
+        if (!icon.IsOk())
+            return wxNullBitmap;
+
 #ifndef __WXMSW__
         // There is no guarantee that the desired size given at icon construction
         // has been taken into account - only wxMSW seems to use it
-        if (icon.IsOk() && (icon.GetWidth() != desiredSize || icon.GetHeight() != desiredSize))
+        if (icon.GetWidth() != desiredSize || icon.GetHeight() != desiredSize)
         {
             wxImage image = icon.ConvertToImage();
             image.Rescale(desiredSize, desiredSize, wxIMAGE_QUALITY_HIGH);
@@ -220,6 +224,44 @@ wxString pretty_print_path(wxFileName f)
 
     return path;
 }
+
+
+#ifdef __WXOSX__
+
+NSView *find_subview_of_class(NSView *root, Class cls)
+{
+    if (!root || !cls)
+        return nil;
+
+    for (NSView *sub in root.subviews)
+    {
+        if ([sub class] == cls)
+            return sub;
+
+        NSView *found = find_subview_of_class(sub, cls);
+        if (found)
+            return found;
+    }
+
+    return nil;
+}
+
+// Fix rendering artifact where macOS Tahoe attempts to do extending-behind-toolbar
+// glass appearance tricks even though the window has no toolbar and the titlebar
+// is hidden. Inspecting the view hierarchy, there's apparently a private
+// NSScrollPocket view injected that is responsible for it. Fortunately, it can be
+// hidden. See: https://developer.apple.com/forums/thread/798392?page=1#856013022
+void fixup_liquid_ass_breakage(NSView *root)
+{
+    if (@available(macOS 26.0, *))
+    {
+        NSView *pocket = find_subview_of_class(root, NSClassFromString(@"NSScrollPocket"));
+        if (pocket)
+            pocket.hidden = YES;
+    }
+}
+
+#endif // __WXOSX__
 
 } // anonymous namespace
 
@@ -549,10 +591,12 @@ RecentFilesCtrl::RecentFilesCtrl(wxWindow *parent)
     NSTableView *tableView = (NSTableView*)[scrollView documentView];
     scrollView.automaticallyAdjustsContentInsets = NO;
     tableView.selectionHighlightStyle = NSTableViewSelectionHighlightStyleSourceList;
-    if (@available(macOS 11.0, *))
-        tableView.style = NSTableViewStyleSourceList;
+    tableView.style = NSTableViewStyleSourceList;
 
     SetRowHeight(GetDefaultRowHeight());
+
+    fixup_liquid_ass_breakage(scrollView);
+
 #else // !__WXOSX__
     ColorScheme::SetupWindowColors(this, [=]
     {

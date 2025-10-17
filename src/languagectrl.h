@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2013-2024 Vaclav Slavik
+ *  Copyright (C) 2013-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -30,6 +30,7 @@
 #include <wx/dialog.h>
 
 #include "language.h"
+#include "layout_helpers.h"
 
 /// Control for editing languages nicely
 class LanguageCtrl : public wxComboBox
@@ -71,7 +72,7 @@ private:
 
 
 /// A dialog for choosing language for a (new) catalog.
-class LanguageDialog : public wxDialog
+class LanguageDialog : public StandardDialog
 {
 public:
     LanguageDialog(wxWindow *parent);

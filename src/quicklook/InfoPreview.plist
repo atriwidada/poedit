@@ -18,6 +18,10 @@
 				<string>org.oasis-open.xliff</string>
 				<string>org.oasis.xliff</string>
 				<string>net.poedit.arb</string>
+				<string>net.poedit.resx</string>
+ 				<string>com.apple.xcode.xcloc</string>
+ 				<string>public.mpeg-2-transport-stream</string>
+				<string>net.poedit.qt</string>
 			</array>
 			<key>QLSupportsSearchableItems</key>
 			<false/>
@@ -28,6 +32,6 @@
 		<string>PreviewProvider</string>
 	</dict>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © 2015-2024 Václav Slavík. All rights reserved.</string>
+	<string>Copyright © 2015-2025 Václav Slavík. All rights reserved.</string>
 </dict>
 </plist>

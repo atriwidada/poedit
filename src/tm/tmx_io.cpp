@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2018-2024 Vaclav Slavik
+ *  Copyright (C) 2018-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -34,6 +34,7 @@
 #include <wx/translation.h>
 
 #include "errors.h"
+#include "progress.h"
 #include "pugixml.h"
 #include "version.h"
 
@@ -75,16 +76,16 @@ std::wstring extract_seg(xml_node node)
 } // anonymous namespace
 
 
-void TMX::ImportFromFile(std::istream& file, TranslationMemory& tm)
+int TMX::ImportFromFile(std::istream& file, TranslationMemory& tm)
 {
     xml_document doc;
     auto result = doc.load(file);
     if (!result)
-        throw std::runtime_error(result.description());
+        BOOST_THROW_EXCEPTION(std::runtime_error(result.description()));
 
     auto root = doc.child("tmx");
     if (!root)
-        throw Exception(_("The TMX file is malformed."));
+        BOOST_THROW_EXCEPTION(Exception(_("The TMX file is malformed.")));
 
     std::string defaultSrclang;
     std::string defaultDate;
@@ -100,12 +101,17 @@ void TMX::ImportFromFile(std::istream& file, TranslationMemory& tm)
     int counter = 0;
     auto body = root.child("body");
     if (!body)
-        throw Exception(_("The TMX file is malformed."));
+        BOOST_THROW_EXCEPTION(Exception(_("The TMX file is malformed.")));
 
     tm.ImportData([=,&counter,&body](auto& writer)
     {
-        for (auto tu: body.children("tu"))
+        auto tu_children = body.children("tu");
+        Progress progress((int)std::distance(tu_children.begin(), tu_children.end()));
+
+        for (auto tu: tu_children)
         {
+            progress.increment();
+
             auto tuDate = extract_date(tu, defaultDate);
             std::string tuSrclang = tu.attribute("srclang").value();
             if (tuSrclang.empty())
@@ -155,8 +161,7 @@ void TMX::ImportFromFile(std::istream& file, TranslationMemory& tm)
         }
     });
 
-    if (counter == 0)
-        throw Exception(_("No translations were found in the TMX file."));
+    return counter;
 }
 
 

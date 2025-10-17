@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2010-2024 Vaclav Slavik
+ *  Copyright (C) 2010-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -29,8 +29,11 @@
 #include <wx/log.h>
 
 // All this is for rethrow_for_boost:
-#if defined(HAVE_HTTP_CLIENT) && !defined(__WXOSX__)
-#include <cpprest/http_msg.h>
+#if defined(HAVE_HTTP_CLIENT)
+  #include "http_client.h"
+  #ifndef __WXOSX__
+    #include <cpprest/http_msg.h>
+  #endif
 #endif
 
 using namespace dispatch;
@@ -66,10 +69,14 @@ exception_ptr dispatch::current_exception()
     {
         return boost::current_exception();
     }
-#if defined(HAVE_HTTP_CLIENT) && !defined(__WXOSX__)
+#if defined(HAVE_HTTP_CLIENT)
+    CATCH_AND_WRAP(http_response_error)
+  #ifndef __WXOSX__
     CATCH_AND_WRAP(web::http::http_exception)
+  #endif
 #endif
     CATCH_AND_WRAP(Exception)
+    CATCH_AND_WRAP(cancellation_exception)
     CATCH_AND_WRAP(std::runtime_error)
     CATCH_AND_WRAP(std::logic_error)
     CATCH_AND_WRAP(std::exception)
@@ -84,19 +91,9 @@ exception_ptr dispatch::current_exception()
 
 #include <dispatch/dispatch.h>
 
-void detail::dispatch_async_cxx(boost::executors::work&& f, detail::queue q)
+void detail::dispatch_async_cxx(boost::executors::work&& f)
 {
-    dispatch_queue_t dq = 0;
-    switch (q)
-    {
-        case detail::queue::main:
-            dq = dispatch_get_main_queue();
-            break;
-        case detail::queue::priority_default:
-            dq = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-            break;
-    }
-
+    dispatch_queue_t dq = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
     dispatch_async(dq, [f{std::move(f)}]() mutable {
         try
         {
@@ -148,6 +145,8 @@ void dispatch::cleanup()
     if (gs_main_thread_executor)
         gs_main_thread_executor->close();
 
-    gs_background_executor.reset();
-    gs_main_thread_executor.reset();
+    // Don't destroy executor objects, because some still-in-fly tasks may be
+    // referencing them.
+    // Ideally, we would like to shut down worker queues, but that's easier said than done
+    // (except boost's basic_thread_pool).
 }

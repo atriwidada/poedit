@@ -1,3 +1,56 @@
+Version 3.8
+-----------
+
+- Added support for macOS 26. Dropped support for macOS versions older than 11.
+- Added toolbar icons for Ubuntu's Yaru theme.
+
+
+Version 3.7
+-----------
+
+- Added support for Microsoft RESX files.
+- Added support for Qt Linguist (.ts) files.
+- Added support for, and updated bundled version to, GNU gettext 0.26.
+- Added support for additional programming languages in source code extraction:
+  Rust, TypeScript, Go and D (with gettext 0.26).
+- Modernized toolbars on all platforms.
+- Other bugfixes and minor UI improvements.
+
+
+Version 3.6.3
+-------------
+
+- Fix regression in XLIFF 1.2 state handling introduced in 3.6.2.
+
+
+Version 3.6.2
+-------------
+
+- Improved XLIFF 1.2 compatibility with Xcode.
+- [Windows] Fixed crash due to a msvcp140.dll binary breakage.
+- Bugfixes.
+
+
+Version 3.6.1
+-------------
+
+- Fix incorrect msgmerge --no-fuzzy-matching invocation.
+- Recognize Shopify-style en.default.json files.
+- Fix uploading of same-as-source translations to Crowdin.
+
+
+Version 3.6
+-----------
+
+- Support for Apple XCLOC localization bundles.
+- Significantly improved updating and merging UI, with detailed changes
+  reporting and error handling.
+- Long-runnig operations such as export/import now all report progress.
+- Added Serbian (Latin) and Uyghur translations.
+- Performance and UI responsiveness improvements.
+- Updated bundled GNU gettext to 0.23.1.
+
+
 Version 3.5.2
 -------------
 

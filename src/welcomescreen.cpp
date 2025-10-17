@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2013-2024 Vaclav Slavik
+ *  Copyright (C) 2013-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -145,11 +145,12 @@ EmptyPOScreenPanel::EmptyPOScreenPanel(PoeditFrame *parent, bool isGettext)
 
     if (isGettext)
     {
-        auto explain = new AutoWrappingText(this, wxID_ANY, _(L"Translatable entries aren’t added manually in the Gettext system, but are automatically extracted\nfrom source code. This way, they stay up to date and accurate.\nTranslators typically use PO template files (POTs) prepared for them by the developer."));
+        auto explain = new AutoWrappingText(this, wxID_ANY, _(L"Translatable entries aren’t added manually in the Gettext system, but are automatically extracted from source code. This way, they stay up to date and accurate. Translators typically use PO template files (POTs) prepared for them by the developer."));
         sizer->Add(explain, wxSizerFlags().Expand().Border(wxTOP, PX(10)));
 
-        auto learnMore = new LearnMoreLink(this, "http://www.gnu.org/software/gettext/manual/html_node/", _("(Learn more about GNU gettext)"));
-        sizer->Add(learnMore, wxSizerFlags().Border(wxBOTTOM, PX(15)).Align(wxALIGN_RIGHT));
+        auto learnMore = new LearnMoreLink(this, "https://www.gnu.org/software/gettext/manual/html_node/", _("Learn more about GNU gettext"));
+        sizer->Add(learnMore, wxSizerFlags().Border(wxBOTTOM|wxTOP, PX(4)).Align(wxALIGN_LEFT));
+        sizer->AddSpacer(PX(8));
 
         auto explain2 = new wxStaticText(this, wxID_ANY, _("The simplest way to fill this file with translations is to update it from a POT:"));
         sizer->Add(explain2, wxSizerFlags().Expand().Border(wxTOP|wxBOTTOM, PX(10)));
@@ -220,13 +221,22 @@ WelcomeWindow::WelcomeWindow()
                         wxDefaultPosition, wxDefaultSize,
                         wxSYSTEM_MENU | wxCLOSE_BOX | wxCAPTION | wxCLIP_CHILDREN)
 {
-    ColorScheme::SetupWindowColors(this, [=]
+#ifdef __WXOSX__
+    if (@available(macOS 26.0, *))
     {
-        if (ColorScheme::GetWindowMode(this) == ColorScheme::Light)
-            SetBackgroundColour(*wxWHITE);
-        else
-            SetBackgroundColour(GetDefaultAttributes().colBg);
-    });
+        // use standard background
+    }
+    else
+#endif
+    {
+        ColorScheme::SetupWindowColors(this, [=]
+                                       {
+            if (ColorScheme::GetWindowMode(this) == ColorScheme::Light)
+                SetBackgroundColour(*wxWHITE);
+            else
+                SetBackgroundColour(GetDefaultAttributes().colBg);
+        });
+    }
 
 #ifdef __WXOSX__
     NSWindow *wnd = (NSWindow*)GetWXWindow();

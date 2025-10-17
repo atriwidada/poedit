@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2013-2024 Vaclav Slavik
+ *  Copyright (C) 2013-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -205,29 +205,21 @@ wxSize LanguageCtrl::DoGetBestSize() const
 
 
 LanguageDialog::LanguageDialog(wxWindow *parent)
-    : wxDialog(parent, wxID_ANY, _("Translation Language")),
+    : StandardDialog(parent, _("Translation Language")),
       m_validatedLang(-1)
 {
     auto lang = GetLastChosen();
 
-    auto sizer = new wxBoxSizer(wxVERTICAL);
+    auto sizer = ContentSizer();
 
     auto label = new wxStaticText(this, wxID_ANY, _("Language of the translation:"));
     m_language = new LanguageCtrl(this, wxID_ANY, lang);
     m_language->SetMinSize(wxSize(PX(300),-1));
-    auto buttons = CreateButtonSizer(wxOK | wxCANCEL);
 
-#ifdef __WXOSX__
-    sizer->AddSpacer(PX(10));
-    sizer->Add(label, wxSizerFlags().PXBorderAll());
-    sizer->Add(m_language, wxSizerFlags().Expand().PXDoubleBorder(wxLEFT|wxRIGHT));
-    sizer->Add(buttons, wxSizerFlags().Expand());
-#else
-    sizer->AddSpacer(PX(10));
-    sizer->Add(label, wxSizerFlags().PXDoubleBorder(wxLEFT|wxRIGHT));
-    sizer->Add(m_language, wxSizerFlags().Expand().PXDoubleBorder(wxLEFT|wxRIGHT));
-    sizer->Add(buttons, wxSizerFlags().Expand().PXBorderAll());
-#endif
+    CreateButtons(wxOK | wxCANCEL);
+
+    sizer->Add(label, wxSizerFlags().Border(wxBOTTOM, PX(4)));
+    sizer->Add(m_language, wxSizerFlags().Expand());
 
     m_language->Bind(wxEVT_TEXT,     [=](wxCommandEvent& e){ m_validatedLang = -1; e.Skip(); });
     m_language->Bind(wxEVT_COMBOBOX, [=](wxCommandEvent& e){ m_validatedLang = -1; e.Skip(); });
@@ -236,30 +228,10 @@ LanguageDialog::LanguageDialog(wxWindow *parent)
         [=](wxUpdateUIEvent& e){ e.Enable(Validate()); },
         wxID_OK);
 
-    SetSizerAndFit(sizer);
+    FitSizer();
     CenterOnParent();
 
     m_language->SetFocus();
-
-#ifdef __WXOSX__
-    // Workaround wx bug: http://trac.wxwidgets.org/ticket/9521
-    m_language->SelectAll();
-
-    // Workaround broken Enter handling:
-    Bind(wxEVT_CHAR_HOOK, [=](wxKeyEvent& e){
-        if (e.GetKeyCode() == WXK_RETURN)
-        {
-            auto button = GetDefaultItem();
-            wxCommandEvent event(wxEVT_BUTTON, button->GetId());
-            event.SetEventObject(button);
-            button->ProcessWindowEvent(event);
-        }
-        else
-        {
-            e.Skip();
-        }
-    });
-#endif // __WXOSX__
 }
 
 bool LanguageDialog::Validate()

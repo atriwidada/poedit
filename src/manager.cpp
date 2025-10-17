@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2001-2024 Vaclav Slavik
+ *  Copyright (C) 2001-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -55,7 +55,8 @@
 #include "edframe.h"
 #include "hidpi.h"
 #include "menus.h"
-#include "progressinfo.h"
+#include "layout_helpers.h"
+#include "progress_ui.h"
 #include "utility.h"
 
 
@@ -67,11 +68,26 @@ class PseudoToolbarButton : public wxButton
 public:
     PseudoToolbarButton(wxWindow *parent, wxString bitmap, const wxString& label)
     {
+#if defined(__WXOSX__)
+        (void)label;
+        if (bitmap == "poedit-update")
+            bitmap = "UpdateTemplate";
+        else if (bitmap == "stats")
+            bitmap = "StatsTemplate";
+        wxButton::Create(parent, wxID_ANY, "", wxDefaultPosition, wxSize(35, 28), wxBU_EXACTFIT);
+        auto native = (NSButton*)GetHandle();
+        native.image = [NSImage imageNamed:str::to_NS(bitmap)];
+        native.imagePosition = NSImageOnly;
+        native.bezelStyle = NSBezelStyleTexturedRounded;
+        native.buttonType = NSButtonTypeMomentaryPushIn;
+        native.showsBorderOnlyWhileMouseInside = YES;
+#else
     #ifdef __WXGTK3__
         bitmap += "-symbolic";
     #endif
         wxButton::Create(parent, wxID_ANY, label, wxDefaultPosition, wxDefaultSize, wxBU_EXACTFIT);
         SetBitmap(wxArtProvider::GetBitmap(bitmap, wxART_TOOLBAR));
+#endif
     }
 };
 
@@ -116,10 +132,9 @@ ManagerFrame::ManagerFrame() :
     auto sidebarSizer = new wxBoxSizer(wxVERTICAL);
     topsizer->Add(sidebarSizer, wxSizerFlags().Expand().Border(wxALL, PX(10)));
 
-    m_listPrj = new wxListBox(panel, wxID_ANY, wxDefaultPosition, wxSize(PX(200), -1), 0, nullptr, MSW_OR_OTHER(wxBORDER_SIMPLE, wxBORDER_SUNKEN));
+    m_listPrj = new wxListBox(panel, wxID_ANY, wxDefaultPosition, wxSize(PX(200), -1), 0, nullptr, BORDER_LIST);
 #ifdef __WXOSX__
-    if (@available(macOS 11.0, *))
-        ((NSTableView*)[((NSScrollView*)m_listPrj->GetHandle()) documentView]).style = NSTableViewStyleFullWidth;
+    ((NSTableView*)[((NSScrollView*)m_listPrj->GetHandle()) documentView]).style = NSTableViewStyleFullWidth;
 #endif
     sidebarSizer->Add(m_listPrj, wxSizerFlags(1).Expand());
 
@@ -397,11 +412,24 @@ void ManagerFrame::UpdateListCat(int id)
 }
 
 
-class ProjectDlg : public wxDialog
+class ProjectDlg : public StandardDialog
 {
-    protected:
-        DECLARE_EVENT_TABLE()
-        void OnBrowse(wxCommandEvent& event);
+public:
+    ProjectDlg(wxWindow *parent) : StandardDialog(parent, _("Edit project"))
+    {
+        auto sizer = ContentSizer();
+
+        auto panel = wxXmlResource::Get()->LoadPanel(this, "manager_prj_dlg");
+        sizer->Add(panel, wxSizerFlags(1).Expand());
+
+        CreateButtons(wxOK | wxCANCEL);
+
+        FitSizer();
+    }
+
+protected:
+    DECLARE_EVENT_TABLE()
+    void OnBrowse(wxCommandEvent& event);
 };
 
 BEGIN_EVENT_TABLE(ProjectDlg, wxDialog)
@@ -428,9 +456,9 @@ void ManagerFrame::EditProject(int id, TFunctor completionHandler)
     wxString key;
     key.Printf("Manager/project_%i/", id);
 
-    wxWindowPtr<ProjectDlg> dlg(new ProjectDlg);
-    wxXmlResource::Get()->LoadDialog(dlg.get(), this, "manager_prj_dlg");
+    wxWindowPtr<ProjectDlg> dlg(new ProjectDlg(this));
     wxEditableListBox *prj_dirs = new wxEditableListBox(dlg.get(), XRCID("prj_dirs"), _("Directories:"));
+    SetupListlikeBorder(prj_dirs);
     wxXmlResource::Get()->AttachUnknownControl("prj_dirs", prj_dirs);
 
     XRCCTRL(*dlg, "prj_name", wxTextCtrl)->SetValue(cfg->Read(key + "Name"));
@@ -575,38 +603,31 @@ void ManagerFrame::OnUpdateProject(wxCommandEvent&)
          if (retval != wxID_YES)
             return;
 
-        ProgressWindow::RunCancellableTaskThenDo(this, ("Updating project catalogs"),
-        [=](dispatch::cancellation_token_ptr cancellationToken)
+        auto cancellation = std::make_shared<dispatch::cancellation_token>();
+        wxWindowPtr<ProgressWindow> progress(new ProgressWindow(this, _("Updating project catalogs"), cancellation));
+        progress->RunTaskThenDo([=]()
         {
             Progress progress((int)m_catalogs.GetCount());
 
             for (size_t i = 0; i < m_catalogs.GetCount(); i++)
             {
-                if (cancellationToken->is_cancelled())
+                if (cancellation->is_cancelled())
                     return;
 
                 wxString f = m_catalogs[i];
-                PoeditFrame *fr = PoeditFrame::Find(f);
-                if (fr)
-                {
-                    fr->UpdateCatalog();
-                }
-                else
-                {
-                    Progress subtask(1, progress, 1);
 
-                    auto cat = POCatalog::Create(f);
-                    UpdateResultReason reason;
-                    if (PerformUpdateFromSources(cat, reason))
-                    {
-                        Catalog::ValidationResults validation_results;
-                        Catalog::CompilationStatus mo_status;
-                        cat->Save(f, false, validation_results, mo_status);
-                    }
+                Progress subtask(1, progress, 1);
+
+                auto cat = POCatalog::Create(f);
+                if (auto merged = PerformUpdateFromSourcesSimple(cat))
+                {
+                    Catalog::ValidationResults validation_results;
+                    Catalog::CompilationStatus mo_status;
+                    merged.updated_catalog->Save(f, false, validation_results, mo_status);
                 }
              }
         },
-        [=](bool /*finished*/)
+        [=]()
         {
             UpdateListCat();
         });

@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2013-2024 Vaclav Slavik
+ *  Copyright (C) 2013-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -28,6 +28,7 @@
 #include "str_helpers.h"
 #include "unicode_helpers.h"
 
+#include <charconv>
 #include <cctype>
 #include <algorithm>
 #include <unordered_map>
@@ -63,6 +64,9 @@ const std::wregex RE_LANG_CODE(L"([a-z]){2,3}(_([A-Z]{2}|[0-9]{3}))?(@[a-z]+)?")
 
 // a more permissive variant of the same that TryNormalize() would fix
 const std::wregex RE_LANG_CODE_PERMISSIVE(L"([a-zA-Z]){2,3}([_-]([a-zA-Z]{2}|[0-9]{3}))?(@[a-zA-Z]+)?");
+
+// approximate match for BCP 47 language tags
+const std::wregex RE_LANG_CODE_BCP47(LR"(^[a-zA-Z]{2,3}(-[A-Z][a-z]{3})?(-([A-Z]{2}|\d{3}))?$)");
 
 // try some normalizations: s/-/_/, case adjustments
 void TryNormalize(std::wstring& s)
@@ -324,6 +328,11 @@ bool Language::IsValidCode(const std::wstring& s)
     return std::regex_match(s, RE_LANG_CODE);
 }
 
+bool Language::IsPlausibleCode(const std::wstring& s)
+{
+    return std::regex_match(s, RE_LANG_CODE_PERMISSIVE) || std::regex_match(s, RE_LANG_CODE_BCP47);
+}
+
 std::string Language::Lang() const
 {
     return m_code.substr(0, m_code.find_first_of("_@"));
@@ -554,7 +563,7 @@ PluralFormsExpr Language::DefaultPluralFormsExpr() const
 }
 
 
-int Language::nplurals() const
+unsigned Language::nplurals() const
 {
     return DefaultPluralFormsExpr().nplurals();
 }
@@ -636,7 +645,8 @@ Language Language::TryGuessFromFilename(const wxString& filename, wxString *wild
     while (pos != wxString::npos)
     {
         auto part = name.substr(pos+1);
-        lang = Language::TryParseWithValidation(part);
+        if (Language::IsPlausibleCode(part))
+            lang = Language::TryParseWithValidation(part);
         if (lang.IsValid())
         {
             if (wildcard)
@@ -663,12 +673,16 @@ Language Language::TryGuessFromFilename(const wxString& filename, wxString *wild
         wxString rest, wmatch;
         if (dirs[i].EndsWith(".lproj", &rest))
         {
-            lang = Language::TryParseWithValidation(rest.ToStdWstring());
+            auto l = rest.ToStdWstring();
+            if (Language::IsPlausibleCode(l))
+                lang = Language::TryParseWithValidation(l);
             wmatch = "*.lproj";
         }
         else
         {
-            lang = Language::TryParseWithValidation(dirs[i].ToStdWstring());
+            auto l = dirs[i].ToStdWstring();
+            if (Language::IsPlausibleCode(l))
+                lang = Language::TryParseWithValidation(l);
             wmatch = "*";
         }
         if (lang.IsValid())
@@ -762,29 +776,59 @@ PluralFormsExpr::~PluralFormsExpr()
 {
 }
 
-int PluralFormsExpr::nplurals() const
+unsigned PluralFormsExpr::nplurals() const
 {
     if (m_nplurals != -1)
         return m_nplurals;
-    if (m_calc)
-        return m_calc->nplurals();
 
-    const std::regex re("^nplurals=([0-9]+)");
-    std::smatch m;
-    if (std::regex_match(m_expr, m, re))
-        return std::stoi(m.str(1));
+    auto pos = m_expr.find("nplurals=");
+    if (pos == 0)
+    {
+        auto end = m_expr.find(';', pos);
+
+        unsigned value;
+        auto [ptr, ec] = std::from_chars(m_expr.data() + 9, m_expr.data() + end, value);
+        if (ec == std::errc{})
+            m_nplurals = static_cast<int>(value);
+        else
+            m_nplurals = 2; // default to 2 if parsing failed
+    }
     else
-        return -1;
+    {
+        m_nplurals = 2; // default to 2 if the expression is badly malformed
+    }
+
+    return m_nplurals;
 }
 
 std::shared_ptr<PluralFormsCalculator> PluralFormsExpr::calc() const
 {
-    auto self = const_cast<PluralFormsExpr*>(this);
     if (m_calcCreated)
         return m_calc;
+
     if (!m_expr.empty())
-        self->m_calc = PluralFormsCalculator::make(m_expr.c_str());
-    self->m_calcCreated = true;
+    {
+        // There's typically only a few expressions used at runtime. Cache them to
+        // avoid unnecessary re-creation.
+        static std::unordered_map<std::string, std::shared_ptr<PluralFormsCalculator>> cache;
+        static std::mutex cacheMutex;
+
+        std::lock_guard<std::mutex> lock(cacheMutex);
+
+        auto it = cache.find(m_expr);
+        if (it != cache.end())
+        {
+            m_calc = it->second;
+        }
+        else
+        {
+            // Create new calculator and cache it
+            m_calc = PluralFormsCalculator::make(m_expr.c_str());
+            cache[m_expr] = m_calc;
+        }
+    }
+
+    m_calcCreated = true;
     return m_calc;
 }
 
@@ -819,10 +863,10 @@ bool PluralFormsExpr::operator==(const PluralFormsExpr& other) const
     return true;
 }
 
-int PluralFormsExpr::evaluate_for_n(int n) const
+unsigned PluralFormsExpr::evaluate_for_n(int n) const
 {
     auto c = calc();
-    return c ? c->evaluate(n) : 0;
+    return c ? (unsigned)c->evaluate(n) : 0;
 }
 
 PluralFormsExpr PluralFormsExpr::English()

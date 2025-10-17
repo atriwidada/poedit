@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2023-2024 Vaclav Slavik
+ *  Copyright (C) 2023-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -111,6 +111,7 @@ bool JSONCatalog::HasCapability(Catalog::Cap cap) const
 
 bool JSONCatalog::CanLoadFile(const wxString& extension)
 {
+    // This is static, for all types created by JSONCatalog::Open(), so has to cover Flutter ARB too:
     return extension == "json" || extension == "arb";
 }
 
@@ -125,7 +126,7 @@ std::shared_ptr<JSONCatalog> JSONCatalog::Open(const wxString& filename)
 
         auto cat = CreateForJSON(std::move(data), ext);
         if (!cat)
-            throw JSONUnrecognizedFileException();
+            BOOST_THROW_EXCEPTION(JSONUnrecognizedFileException());
 
         f.clear();
         f.seekg(0, std::ios::beg);
@@ -137,7 +138,7 @@ std::shared_ptr<JSONCatalog> JSONCatalog::Open(const wxString& filename)
     }
     catch (json::exception& e)
     {
-        throw JSONFileException(wxString::Format(_("Reading file content failed with the following error: %s"), e.what()));
+        BOOST_THROW_EXCEPTION(JSONFileException(wxString::Format(_("Reading file content failed with the following error: %s"), e.what())));
     }
 }
 
@@ -234,7 +235,7 @@ public:
         ParseSubtree(id, m_doc, "");
 
         if (m_items.empty())
-            throw JSONUnrecognizedFileException();
+            BOOST_THROW_EXCEPTION(JSONUnrecognizedFileException());
     }
 
 private:
@@ -253,7 +254,7 @@ private:
             }
             else
             {
-                throw JSONUnrecognizedFileException();
+                BOOST_THROW_EXCEPTION(JSONUnrecognizedFileException());
             }
         }
     }
@@ -291,7 +292,9 @@ protected:
 class FlutterCatalog : public JSONCatalog
 {
 public:
-    using JSONCatalog::JSONCatalog;
+    FlutterCatalog(json_t&& doc) : JSONCatalog(std::move(doc), Type::JSON_FLUTTER) {}
+
+    wxString GetPreferredExtension() const override { return "arb"; }
 
     static bool SupportsFile(const json_t& doc, const std::string& extension)
     {
@@ -353,7 +356,7 @@ private:
             }
             else
             {
-                throw JSONUnrecognizedFileException();
+                BOOST_THROW_EXCEPTION(JSONUnrecognizedFileException());
             }
         }
     }
@@ -387,13 +390,13 @@ public:
         {
             auto& val = el.value();
             if (!val.is_object())
-                throw JSONUnrecognizedFileException();
+                BOOST_THROW_EXCEPTION(JSONUnrecognizedFileException());
 
             m_items.push_back(std::make_shared<Item>(++id, el.key(), val));
         }
 
         if (m_items.empty())
-            throw JSONUnrecognizedFileException();
+            BOOST_THROW_EXCEPTION(JSONUnrecognizedFileException());
     }
 
 protected:

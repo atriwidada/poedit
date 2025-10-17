@@ -9,6 +9,7 @@ appiconsscalabledir=$(iconsdir)/scalable/apps
 
 uiiconsdir=$(datadir)/poedit/icons
 uiiconssymbolicdir=$(uiiconsdir)/hicolor/scalable/actions
+uiiconssymbolicyarudir=$(uiiconsdir)/Yaru/scalable/actions
 
 dist_appicons16_DATA = linux/appicon/16x16/apps/net.poedit.Poedit.png
 dist_appicons24_DATA = linux/appicon/24x24/apps/net.poedit.Poedit.png
@@ -18,24 +19,29 @@ dist_appicons128_DATA = linux/appicon/128x128/apps/net.poedit.Poedit.png
 dist_appiconsscalable_DATA = linux/appicon/scalable/apps/net.poedit.Poedit.svg
 
 dist_uiiconssymbolic_DATA = \
+		linux/poedit-pretranslate-symbolic.svg \
 		linux/poedit-sync-symbolic.svg \
 		linux/poedit-update-symbolic.svg \
+		linux/poedit-upload-symbolic.svg \
 		linux/poedit-validate-symbolic.svg \
-		linux/sidebar-symbolic.svg
+		linux/poedit-sidebar-symbolic.svg
+
+dist_uiiconssymbolicyaru_DATA = \
+		linux/yaru/poedit-pretranslate-symbolic.svg \
+		linux/yaru/poedit-sync-symbolic.svg \
+		linux/yaru/poedit-update-symbolic.svg \
+		linux/yaru/poedit-upload-symbolic.svg \
+		linux/yaru/poedit-validate-symbolic.svg \
+		linux/yaru/poedit-sidebar-symbolic.svg
 
 dist_uiicons_DATA = \
-		linux/document-open.png \
-		linux/document-save.png \
-		linux/poedit-sync.png \
-		linux/poedit-update.png \
-		linux/poedit-validate.png \
-		linux/sidebar.png \
 		AccountCrowdin.png \
 		AccountLocalazy.png \
 		CrowdinLogo.png \
 		CrowdinLogoDark.png \
 		LocalazyLogo.png \
 		DownvoteTemplate.png \
+		EmptyMultiSelectionTemplate.png \
 		ExtractorsGNUgettext.png \
 		ItemCommentTemplate.png \
 		SuggestionErrorTemplate.png \

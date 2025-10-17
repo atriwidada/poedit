@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 1999-2024 Vaclav Slavik
+ *  Copyright (C) 1999-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -42,6 +42,7 @@
 #include <wx/datetime.h>
 #include <wx/config.h>
 #include <wx/textfile.h>
+#include <wx/scopeguard.h>
 #include <wx/stdpaths.h>
 #include <wx/strconv.h>
 #include <wx/memtext.h>
@@ -188,31 +189,6 @@ wxTextFileType GetDesiredCRLFFormat(wxTextFileType existingCRLF)
     }
 }
 
-
-unsigned GetCountFromPluralFormsHeader(const Catalog::HeaderData& header)
-{
-    if ( header.HasHeader("Plural-Forms") )
-    {
-        // e.g. "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ?
-        //       0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-
-        wxString form = header.GetHeader("Plural-Forms");
-        form = form.BeforeFirst(_T(';'));
-        if (form.BeforeFirst(_T('=')) == "nplurals")
-        {
-            wxString vals = form.AfterFirst('=');
-            if (vals == "INTEGER") // POT default
-                return 2;
-            long val;
-            if (vals.ToLong(&val))
-                return (unsigned)val;
-        }
-    }
-
-    // fallback value for plural forms count should be 2, as in English:
-    return 2;
-}
-
 } // anonymous namespace
 
 
@@ -223,6 +199,7 @@ unsigned GetCountFromPluralFormsHeader(const Catalog::HeaderData& header)
 bool POCatalogParser::Parse()
 {
     static const wxString prefix_flags(wxS("#, "));
+    static const wxString prefix_flags_alt(wxS("#= "));
     static const wxString prefix_autocomments(wxS("#. "));
     static const wxString prefix_autocomments2(wxS("#.")); // account for empty auto comments
     static const wxString prefix_references(wxS("#: "));
@@ -248,26 +225,30 @@ bool POCatalogParser::Parse()
     unsigned mlinenum = 0;
 
     line = m_textFile->GetFirstLine();
-    if (line.empty()) line = ReadTextLine();
+    if (line.empty())
+        line = ReadTextLine();
 
     while (!line.empty())
     {
         // ignore empty special tags (except for extracted comments which we
         // DO want to preserve):
-        while (line.length() == 2 && *line.begin() == '#' && (line[1] == ',' || line[1] == ':' || line[1] == '|'))
+        while (line.length() == 2 && *line.begin() == '#' && (line[1] == ',' || line[1] == '=' || line[1] == ':' || line[1] == '|'))
             line = ReadTextLine();
 
         // flags:
-        // Can't we have more than one flag, now only the last is kept ...
-        if (ReadParam(line, prefix_flags, dummy))
+        if (ReadParam(line, prefix_flags, dummy) || ReadParam(line, prefix_flags_alt, dummy))
         {
+            // see https://lists.gnu.org/archive/html/bug-gettext/2025-06/msg00018.html for introduction of
+            // the #= alt form. We currently take the approach of converting #= to #, on write, as msgcat
+            // also does, but this is just the initial, interim implementation
             static wxString prefix_flags_partial(wxS(", "));
-            mflags = prefix_flags_partial + dummy;
+            mflags += prefix_flags_partial;
+            mflags += dummy;
             line = ReadTextLine();
         }
 
         // auto comments:
-        if (ReadParam(line, prefix_autocomments, dummy, /*preserveWhitespace=*/true) || ReadParam(line, prefix_autocomments2, dummy, /*preserveWhitespace=*/true))
+        else if (ReadParam(line, prefix_autocomments, dummy, /*preserveWhitespace=*/true) || ReadParam(line, prefix_autocomments2, dummy, /*preserveWhitespace=*/true))
         {
             mextractedcomments.Add(dummy);
             line = ReadTextLine();
@@ -436,6 +417,9 @@ bool POCatalogParser::Parse()
                 mtranslations.Add(str);
             }
 
+            if (m_ignoreTranslations)
+                mtranslations.clear();
+
             if (!OnEntry(mstr, msgid_plural, true,
                          has_context, msgctxt,
                          mtranslations,
@@ -471,10 +455,14 @@ bool POCatalogParser::Parse()
 
                 deletedLines.Add(line);
             }
-            if (!OnDeletedEntry(deletedLines,
-                                mflags, mrefs, mcomment, mextractedcomments, mlinenum))
+
+            if (!m_ignoreTranslations)
             {
-                return false;
+                if (!OnDeletedEntry(deletedLines,
+                                    mflags, mrefs, mcomment, mextractedcomments, mlinenum))
+                {
+                    return false;
+                }
             }
 
             mcomment = mstr = msgid_plural = mflags = wxEmptyString;
@@ -919,7 +907,7 @@ void POCatalog::Load(const wxString& po_file, int flags)
 
     if (!f.Open(po_file, wxConvISO8859_1))
     {
-        throw Exception(_(L"Couldn’t load the file, it is probably damaged."));
+        BOOST_THROW_EXCEPTION(Exception(_(L"Couldn’t load the file, it is probably damaged.")));
     }
 
     {
@@ -933,7 +921,7 @@ void POCatalog::Load(const wxString& po_file, int flags)
     wxCSConv encConv(m_header.Charset);
     if (!f.Open(po_file, encConv))
     {
-        throw Exception(_(L"Couldn’t load the file, it is probably damaged."));
+        BOOST_THROW_EXCEPTION(Exception(_(L"Couldn’t load the file, it is probably damaged.")));
     }
 
     if (!VerifyFileCharset(f, po_file, m_header.Charset))
@@ -946,7 +934,7 @@ void POCatalog::Load(const wxString& po_file, int flags)
     parser.IgnoreTranslations(flags & CreationFlag_IgnoreTranslations);
     if (!parser.Parse())
     {
-        throw Exception(_(L"Couldn’t load the file, it is probably damaged."));
+        BOOST_THROW_EXCEPTION(Exception(_(L"Couldn’t load the file, it is probably damaged.")));
     }
 
     m_sourceLanguage = parser.GetSpecifiedMsgidLanguage();  // may be, and likely will, invalid
@@ -958,7 +946,7 @@ void POCatalog::Load(const wxString& po_file, int flags)
     // If we didn't find any entries, the file must be invalid:
     if (!parser.FileIsValid)
     {
-        throw Exception(_(L"Couldn’t load the file, it is probably damaged."));
+        BOOST_THROW_EXCEPTION(Exception(_(L"Couldn’t load the file, it is probably damaged.")));
     }
 
     f.Close();
@@ -978,6 +966,7 @@ void POCatalog::FixupCommonIssues()
     // In PHP use, strings with % (typically: 100%) get frequently mis-identified as php-format, because the
     // format string allows space, so e.g. "100% complete" has a valid "% c" format flag in it. Work around
     // this by removing the flag ourselves, as translators can rarely influence it:
+    // TODO: This shouldn't be much of an issue once gettext-0.26 gets wider adoption
     for (auto& i: items())
     {
         if (i->GetFormatFlag() == "php")
@@ -1206,13 +1195,14 @@ bool POCatalog::Save(const wxString& po_file, bool save_mo,
     // to the usual format. This is a (barely) passable fix for #25 until
     // proper preservation of formatting is implemented.
 
-    int msgcat_ok = false;
+    bool msgcat_ok = false;
     {
+        wxArrayString args { "msgcat", "--force-po" };
+
         int wrapping = DEFAULT_WRAPPING;
         if (wxConfig::Get()->ReadBool("keep_crlf", true))
             wrapping = m_fileWrappingWidth;
 
-        wxString wrappingFlag;
         if (wrapping == DEFAULT_WRAPPING)
         {
             if (wxConfig::Get()->ReadBool("wrap_po_files", true))
@@ -1226,26 +1216,26 @@ bool POCatalog::Save(const wxString& po_file, bool save_mo,
         }
 
         if (wrapping == NO_WRAPPING)
-            wrappingFlag = " --no-wrap";
+            args.push_back("--no-wrap");
         else if (wrapping != DEFAULT_WRAPPING)
-            wrappingFlag.Printf(" --width=%d", wrapping);
+            args.push_back(wxString::Format("--width=%d", wrapping));
 
         TempOutputFileFor po_file_temp2_obj(po_file_temp);
         const wxString po_file_temp2 = po_file_temp2_obj.FileName();
-        auto msgcatCmd = wxString::Format("msgcat --force-po%s -o %s %s",
-                                          wrappingFlag,
-                                          QuoteCmdlineArg(po_file_temp2),
-                                          QuoteCmdlineArg(po_file_temp));
-        wxLogTrace("poedit", "formatting file with %s", msgcatCmd);
+
+        args.push_back("-o");
+        args.push_back(po_file_temp2);
+        args.push_back(po_file_temp);
+
+        wxLogTrace("poedit", "formatting file with %s", wxJoin(args, ' '));
 
         // Ignore msgcat errors output (but not exit code), because it
         //   a) complains about things DoValidate() already complained above
         //   b) issues warnings about source-extraction things (e.g. using non-ASCII
         //      msgids) that, while correct, are not something a *translator* can
         //      do anything about.
-        wxLogNull null;
-        msgcat_ok = ExecuteGettext(msgcatCmd) &&
-                    wxFileExists(po_file_temp2);
+        GettextRunner runner;
+        msgcat_ok = runner.run_sync(args) && wxFileExists(po_file_temp2);
 
         // msgcat always outputs Unix line endings, so we need to reformat the file
         if (msgcat_ok && outputCrlf == wxTextFileType_Dos)
@@ -1298,14 +1288,7 @@ bool POCatalog::Save(const wxString& po_file, bool save_mo,
         {
             // Ignore msgfmt errors output (but not exit code), because it
             // complains about things DoValidate() already complained above.
-            wxLogNull null;
-
-            if ( ExecuteGettext
-                  (
-                      wxString::Format("msgfmt -o %s %s",
-                                       QuoteCmdlineArg(mo_file_temp),
-                                       QuoteCmdlineArg(CliSafeFileName(po_file)))
-                  ) )
+            if (GettextRunner().run_sync("msgfmt", "-o", mo_file_temp, CliSafeFileName(po_file)))
             {
                 mo_compilation_status = CompilationStatus::Success;
             }
@@ -1332,16 +1315,12 @@ bool POCatalog::Save(const wxString& po_file, bool save_mo,
 #ifdef __WXOSX__
             NSURL *mofileUrl = [NSURL fileURLWithPath:str::to_NS(mo_file)];
             NSURL *mofiletempUrl = [NSURL fileURLWithPath:str::to_NS(mo_file_temp)];
-            bool sandboxed = (getenv("APP_SANDBOX_CONTAINER_ID") != NULL);
-            CompiledMOFilePresenter *presenter = nil;
-            if (sandboxed)
-            {
-                presenter = [CompiledMOFilePresenter new];
-                presenter.presentedItemURL = mofileUrl;
-                presenter.primaryPresentedItemURL = [NSURL fileURLWithPath:str::to_NS(po_file)];
-                [NSFileCoordinator addFilePresenter:presenter];
-                [NSFileCoordinator filePresenters];
-            }
+
+            CompiledMOFilePresenter *presenter = [CompiledMOFilePresenter new];
+            presenter.presentedItemURL = mofileUrl;
+            presenter.primaryPresentedItemURL = [NSURL fileURLWithPath:str::to_NS(po_file)];
+            [NSFileCoordinator addFilePresenter:presenter];
+
             NSFileCoordinator *coo = [[NSFileCoordinator alloc] initWithFilePresenter:presenter];
             [coo coordinateWritingItemAtURL:mofileUrl options:NSFileCoordinatorWritingForReplacing error:nil byAccessor:^(NSURL *newURL) {
                 NSURL *resultingUrl;
@@ -1357,10 +1336,8 @@ bool POCatalog::Save(const wxString& po_file, bool save_mo,
                     mo_compilation_status = CompilationStatus::Error;
                 }
             }];
-            if (sandboxed)
-            {
-                [NSFileCoordinator removeFilePresenter:presenter];
-            }
+
+            [NSFileCoordinator removeFilePresenter:presenter];
 #else // !__WXOSX__
             if ( !mo_file_temp_obj.Commit() )
             {
@@ -1415,7 +1392,9 @@ bool POCatalog::CompileToMO(const wxString& mo_file,
     TempDirectory tmpdir;
     if ( !tmpdir.IsOk() )
         return false;
-    wxString po_file_temp = tmpdir.CreateFileName("output.po");
+
+    wxFileName mofn(mo_file);
+    wxString po_file_temp = tmpdir.CreateFileName(mofn.GetName() + ".po");
 
     if ( !DoSaveOnly(po_file_temp, wxTextFileType_Unix) )
     {
@@ -1428,16 +1407,13 @@ bool POCatalog::CompileToMO(const wxString& mo_file,
     TempOutputFileFor mo_file_temp_obj(mo_file);
     const wxString mo_file_temp = mo_file_temp_obj.FileName();
 
-    {
-        // Ignore msgfmt errors output (but not exit code), because it
-        // complains about things DoValidate() already complained above.
-        wxLogNull null;
-        ExecuteGettext(wxString::Format("msgfmt -o %s %s",
-                                        QuoteCmdlineArg(mo_file_temp),
-                                        QuoteCmdlineArg(po_file_temp)));
-    }
+    GettextRunner runner;
+    runner.run_sync("msgfmt", "-o", mo_file_temp, po_file_temp);
 
-    // Don't check return code:
+    // Ignore msgfmt errors output (but not exit code), because it
+    // complains about things DoValidate() already complained above.
+    //
+    // Don't check return code either:
     // msgfmt has the ugly habit of sometimes returning non-zero
     // exit code, reporting "fatal errors" and *still* producing a usable
     // .mo file. If this happens, don't pretend the file wasn't created.
@@ -1490,7 +1466,7 @@ bool POCatalog::DoSaveOnly(wxTextBuffer& f, wxTextFileType crlf)
     SaveMultiLines(f, pohdr);
     f.AddLine(wxEmptyString);
 
-    auto pluralsCount = GetPluralFormsCount();
+    auto pluralsCount = std::max(GetPluralFormsCountPresentInItems(), GetPluralForms().nplurals());
 
     for (auto& data_: m_items)
     {
@@ -1594,26 +1570,30 @@ void POCatalog::SetLanguage(Language lang)
         m_header.SetHeaderNotEmpty("Plural-Forms", lang.DefaultPluralFormsExpr().str());
 }
 
-unsigned POCatalog::GetPluralFormsCount() const
+PluralFormsExpr POCatalog::GetPluralForms() const
 {
-    return std::max(GetCountFromPluralFormsHeader(m_header), Catalog::GetPluralFormsCount());
+    if (!m_header.HasHeader("Plural-Forms"))
+        return PluralFormsExpr::English();
+
+    auto hdr = m_header.GetHeader("Plural-Forms");
+    if (hdr.Contains("INTEGER"))
+    {
+        // header has POT default value, assume English because that's all we can do
+        return PluralFormsExpr::English();
+    }
+
+    return PluralFormsExpr(str::to_utf8(hdr));
 }
 
 bool POCatalog::HasWrongPluralFormsCount() const
 {
-    unsigned count = 0;
-
-    for (auto& i: m_items)
-    {
-        count = std::max(count, i->GetPluralFormsCount());
-    }
-
+    unsigned count = GetPluralFormsCountPresentInItems();
     if ( count == 0 )
         return false; // nothing translated, so we can't tell
 
     // if 'count' is less than the count from header, it may simply mean there
     // are untranslated strings
-    if ( count > GetCountFromPluralFormsHeader(m_header) )
+    if ( count > GetPluralForms().nplurals() )
         return true;
 
     return false;
@@ -1651,9 +1631,7 @@ bool POCatalog::FixDuplicateItems()
         return false;
     }
 
-    ExecuteGettext(wxString::Format("msguniq -o %s %s",
-                                    QuoteCmdlineArg(CliSafeFileName(po_file_fixed)),
-                                    QuoteCmdlineArg(CliSafeFileName(po_file_temp))));
+    GettextRunner().run_sync("msguniq", "-o", CliSafeFileName(po_file_fixed), CliSafeFileName(po_file_temp));
 
     if (!wxFileName::FileExists(po_file_fixed))
         return false;
@@ -1695,28 +1673,23 @@ Catalog::ValidationResults POCatalog::Validate(const wxString& fileWithSameConte
 
 void POCatalog::ValidateWithMsgfmt(Catalog::ValidationResults& res, const wxString& po_file)
 {
-    GettextErrors err;
-    ExecuteGettextAndParseOutput
-    (
-        wxString::Format("msgfmt -o /dev/null -c %s", QuoteCmdlineArg(CliSafeFileName(po_file))),
-        err
-    );
+    GettextRunner gtr;
+    auto output = gtr.run_sync("msgfmt", "-o", "/dev/null", "-c", CliSafeFileName(po_file));
+    auto errors = gtr.parse_stderr(output);
 
-    res.errors += (int)err.size();
-
-    for ( GettextErrors::const_iterator i = err.begin(); i != err.end(); ++i )
+    for (auto& i: errors.items)
     {
-        if ( i->line != -1 )
+        if (i.has_location())
         {
-            auto item = FindItemByLine(i->line);
-            if ( item )
+            auto item = FindItemByLine(i.line);
+            if (item)
             {
-                item->SetIssue(CatalogItem::Issue::Error, i->text);
-                continue;
+                res.errors++;
+                item->SetIssue(CatalogItem::Issue::Error, i.text);
             }
         }
-        // if not matched to an item:
-        wxLogError(i->text);
+        // else: ignore msgfmt output w/o a location because msgfmt outputs status information
+        //       (e.g. "N errors found") to stderr too
     }
 }
 
@@ -1777,6 +1750,7 @@ POCatalogPtr POCatalog::CreateFromPOT(POCatalogPtr pot)
 bool POCatalog::Merge(const POCatalogPtr& refcat)
 {
     wxString oldname = m_fileName;
+    wxON_BLOCK_EXIT_SET(m_fileName, oldname);
 
     TempDirectory tmpdir;
     if ( !tmpdir.IsOk() )
@@ -1789,25 +1763,23 @@ bool POCatalog::Merge(const POCatalogPtr& refcat)
     refcat->DoSaveOnly(tmp1, wxTextFileType_Unix);
     DoSaveOnly(tmp2, wxTextFileType_Unix);
 
-    wxString flags("-q --force-po --previous");
+    std::vector<wxString> args { "msgmerge", "-q", "--force-po", "--previous" };
     if (Config::MergeBehavior() == Merge_None)
     {
-        flags += " --no-fuzzy-matching";
+        args.push_back("--no-fuzzy-matching");
     }
 
-    bool succ = ExecuteGettext
-                (
-                    wxString::Format
-                    (
-                        "msgmerge %s -o %s %s %s",
-                        flags,
-                        QuoteCmdlineArg(tmp3),
-                        QuoteCmdlineArg(tmp2),
-                        QuoteCmdlineArg(tmp1)
-                    )
-                );
+    args.push_back("-o");
+    args.push_back(tmp3);
+    args.push_back(tmp2);
+    args.push_back(tmp1);
 
-    if (succ)
+    GettextRunner runner;
+    auto output = runner.run_sync(args);
+    // FIXME: Don't do that here, report as part of return value instead
+    runner.parse_stderr(output).log_errors();
+
+    if (output)
     {
         const wxString charset = m_header.Charset;
 
@@ -1821,7 +1793,5 @@ bool POCatalog::Merge(const POCatalogPtr& refcat)
         m_header.Charset = charset;
     }
 
-    m_fileName = oldname;
-
-    return succ;
+    return (bool)output;
 }

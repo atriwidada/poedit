@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2015-2024 Vaclav Slavik
+ *  Copyright (C) 2015-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -46,7 +46,9 @@
 #include <wx/choice.h>
 #include <wx/config.h>
 #include <wx/dataview.h>
+#include <wx/dcclient.h>
 #include <wx/dialog.h>
+#include <wx/graphics.h>
 #include <wx/msgdlg.h>
 #include <wx/renderer.h>
 #include <wx/sizer.h>
@@ -56,6 +58,67 @@
 #include <wx/windowptr.h>
 
 #include <regex>
+
+
+namespace
+{
+
+class RecommendedLabel : public wxPanel
+{
+public:
+    RecommendedLabel(wxWindow *parent) : wxPanel(parent, wxID_ANY)
+    {
+        auto label = new wxStaticText(this, wxID_ANY, _("Recommended"));
+#ifdef __WXOSX__
+        label->SetWindowVariant(wxWINDOW_VARIANT_SMALL);
+#endif
+
+        auto sizer = new wxBoxSizer(wxHORIZONTAL);
+        sizer->AddSpacer(PX(6));
+        sizer->Add(label, wxSizerFlags(1).Center().Border(wxALL, PX(2)));
+        sizer->AddSpacer(PX(6));
+        SetSizer(sizer);
+
+        Bind(wxEVT_PAINT, [=](wxPaintEvent&)
+        {
+            wxPaintDC dc(this);
+            std::unique_ptr<wxGraphicsContext> gc(wxGraphicsContext::Create(dc));
+            gc->SetBrush(m_bg);
+            gc->SetPen(*wxTRANSPARENT_PEN);
+
+            auto rect = GetClientRect();
+            if (!rect.IsEmpty())
+            {
+                int radius = PX(4);
+#ifdef __WXOSX__
+                if (@available(macOS 26, *))
+                    radius = rect.height / 2;
+#endif
+                gc->DrawRoundedRectangle(rect.x, rect.y, rect.width, rect.height, radius);
+            }
+        });
+
+        ColorScheme::SetupWindowColors(this, [=]
+        {
+            auto fg = ColorScheme::GetBlendedOn(Color::TagWarningLineFg, this, Color::TagWarningLineBg);
+            m_bg = ColorScheme::GetBlendedOn(Color::TagWarningLineBg, this);
+            label->SetForegroundColour(fg);
+#ifdef __WXMSW__
+            for (auto c : GetChildren())
+                c->SetBackgroundColour(m_bg);
+#endif
+        });
+
+        m_container.DisableSelfFocus();
+    }
+
+    bool AcceptsFocus() const override { return false; }
+
+private:
+    wxColour m_bg;
+};
+
+} // anonymous namespace
 
 
 CrowdinLoginPanel::CrowdinLoginPanel(wxWindow *parent, int flags)
@@ -73,7 +136,13 @@ CrowdinLoginPanel::CrowdinLoginPanel(wxWindow *parent, int flags)
     auto logo = new StaticBitmap(this, GetServiceLogo());
     logo->SetCursor(wxCURSOR_HAND);
     logo->Bind(wxEVT_LEFT_UP, [this](wxMouseEvent&){ wxLaunchDefaultBrowser(GetServiceLearnMoreURL()); });
-    sizer->Add(logo, wxSizerFlags().PXDoubleBorder(wxBOTTOM));
+
+    auto logosizer = new wxBoxSizer(wxHORIZONTAL);
+    logosizer->Add(logo, wxSizerFlags().Center());
+    logosizer->AddStretchSpacer();
+    logosizer->Add(new RecommendedLabel(this), wxSizerFlags().Center());
+    sizer->Add(logosizer, wxSizerFlags().Expand().PXDoubleBorder(wxBOTTOM));
+
     auto explain = new ExplanationLabel(this, GetServiceDescription());
     sizer->Add(explain, wxSizerFlags().Expand());
 
@@ -81,7 +150,7 @@ CrowdinLoginPanel::CrowdinLoginPanel(wxWindow *parent, int flags)
     auto loginInfoContainer = new wxBoxSizer(wxVERTICAL);
     loginInfoContainer->SetMinSize(-1, PX(50));
     loginInfoContainer->AddStretchSpacer();
-    loginInfoContainer->Add(m_loginInfo, wxSizerFlags().Center());
+    loginInfoContainer->Add(m_loginInfo, wxSizerFlags().Expand());
     loginInfoContainer->AddStretchSpacer();
 
     sizer->Add(loginInfoContainer, wxSizerFlags().Expand().ReserveSpaceEvenIfHidden().Border(wxTOP|wxBOTTOM, PX(16)));
@@ -101,7 +170,7 @@ CrowdinLoginPanel::CrowdinLoginPanel(wxWindow *parent, int flags)
     auto buttons = new wxBoxSizer(wxHORIZONTAL);
     sizer->Add(buttons, wxSizerFlags().Expand().Border(wxBOTTOM, 1));
     buttons->Add(learnMore, wxSizerFlags().Center());
-    buttons->AddSpacer(PX(60));
+    buttons->AddSpacer(PX(6));
     buttons->AddStretchSpacer();
     buttons->Add(m_signIn, wxSizerFlags());
     buttons->Add(m_signOut, wxSizerFlags());
@@ -123,7 +192,7 @@ CrowdinLoginPanel::CrowdinLoginPanel(wxWindow *parent, int flags)
 
 wxString CrowdinLoginPanel::GetServiceDescription() const
 {
-    return _("Crowdin is an online localization management platform and collaborative translation tool.");
+    return _("Crowdin is an online translation management platform and collaborative translation tool. We use Crowdin ourselves to translate Poedit into many languages, and we love it.");
 }
 
 wxString CrowdinLoginPanel::GetServiceLearnMoreURL() const
@@ -190,8 +259,9 @@ void CrowdinLoginPanel::CreateLoginInfoControls(State state)
                       ? _(L"Waiting for authentication…")
                       : _(L"Updating user information…");
             m_activity = new ActivityIndicator(this, ActivityIndicator::Centered);
-            sizer->Add(m_activity, wxSizerFlags().Expand());
-            m_activity->Start(text);
+            sizer->Add(m_activity, wxSizerFlags(1).Center());
+            // delay so that the window is sized properly:
+            m_activity->CallAfter([=]{ m_activity->Start(text); });
             break;
         }
 
@@ -305,7 +375,7 @@ void CrowdinSyncFile(wxWindow *parent, std::shared_ptr<Catalog> catalog,
 
     wxLogTrace("poedit.crowdin", "Crowdin syncing file ...");
 
-    wxWindowPtr<CloudSyncProgressWindow> dlg(new CloudSyncProgressWindow(parent));
+    wxWindowPtr<CloudSyncProgressWindow> dlg(new CloudSyncProgressWindow(parent, wxString::Format(_(L"Uploading translations to %s…"), CrowdinClient::SERVICE_NAME)));
 
     auto meta = CrowdinClient::Get().ExtractSyncMetadata(*catalog);
 
@@ -324,8 +394,6 @@ void CrowdinSyncFile(wxWindow *parent, std::shared_ptr<Catalog> catalog,
         });
     };
 
-    dlg->Activity->Start(_(L"Uploading translations…"));
-
     // TODO: nicer API for this.
     // This must be done right after entering the modal loop (on non-OSX)
     dlg->CallAfter([=]{
@@ -336,7 +404,7 @@ void CrowdinSyncFile(wxWindow *parent, std::shared_ptr<Catalog> catalog,
             auto outfile = tmpdir->CreateFileName("crowdin." + wxFileName(catalog->GetFileName()).GetExt());
 
             dispatch::on_main([=]{
-                dlg->Activity->Start(_(L"Downloading latest translations…"));
+                dlg->UpdateMessage(_(L"Downloading latest translations…"));
             });
 
             return CrowdinClient::Get().DownloadFile(outfile.ToStdWstring(), meta)

@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2010-2024 Vaclav Slavik
+ *  Copyright (C) 2010-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -26,12 +26,6 @@
 #ifndef Poedit_utility_h
 #define Poedit_utility_h
 
-#ifndef HAVE_MKDTEMP
-    #ifdef __WXOSX__
-        #define HAVE_MKDTEMP
-    #endif
-#endif
-
 #include <map>
 
 #include <wx/arrstr.h>
@@ -40,12 +34,16 @@
 
 #if wxUSE_GUI
     #include <wx/toplevel.h>
+    #include "hidpi.h"
+    #include "colorscheme.h"
 #endif
 
 
 // ----------------------------------------------------------------------
 // Misc platform differences
 // ----------------------------------------------------------------------
+
+#if wxUSE_GUI
 
 #ifdef __WXMSW__
     #define MSW_OR_OTHER(msw, other) msw
@@ -68,16 +66,34 @@
 #endif
 
 #ifdef __WXOSX__
-    inline int AboveChoicePadding()
+    #define BORDER_LIST         wxBORDER_DEFAULT
+    #define BORDER_LISTLIKE     wxBORDER_NONE
+    #ifdef __OBJC__
+    inline void SetupListlikeBorder(wxWindow *w)
     {
-        if (__builtin_available(macOS 11.0, *))
-            return 2;
-        else
-            return 0;
+        ColorScheme::SetupWindowColors(w, [=]
+        {
+            NSView *view = (NSView*)w->GetHandle();
+            [view.effectiveAppearance performAsCurrentDrawingAppearance: [&]{
+                view.wantsLayer = YES;
+                view.layer.borderColor = NSColor.separatorColor.CGColor;
+                view.layer.borderWidth = 1.0;
+            }];
+        });
     }
+    #endif
 #else
-    #define AboveChoicePadding()  0
+    #ifdef __WXMSW__
+        #define BORDER_LIST     wxBORDER_THEME
+        #define BORDER_LISTLIKE wxBORDER_SIMPLE
+    #else
+        #define BORDER_LIST     wxBORDER_SUNKEN
+        #define BORDER_LISTLIKE wxBORDER_SUNKEN
+    #endif
+    inline void SetupListlikeBorder(wxWindow*) {}
 #endif
+
+#endif // wxUSE_GUI
 
 
 // ----------------------------------------------------------------------
@@ -219,7 +235,11 @@ public:
     TempDirectory();
     ~TempDirectory();
 
+    TempDirectory(const TempDirectory&) = delete;
+
     bool IsOk() const { return !m_dir.empty(); }
+
+    const wxString& DirName() const { return m_dir; }
 
     // creates new file name in that directory
     wxString CreateFileName(const wxString& suffix);
@@ -245,6 +265,8 @@ class TempOutputFileFor
 public:
     explicit TempOutputFileFor(const wxString& filename);
     explicit TempOutputFileFor(const wxFileName& filename) : TempOutputFileFor(filename.GetFullPath()) {}
+
+    TempOutputFileFor(const TempOutputFileFor&) = delete;
 
     ~TempOutputFileFor();
 

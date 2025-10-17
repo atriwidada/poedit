@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2020-2024 Vaclav Slavik
+ *  Copyright (C) 2020-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -60,6 +60,7 @@ protected:
 #ifdef __WXMSW__
     wxPoint GetClientAreaOrigin() const override;
     void DoGetClientSize(int *width, int *height) const override;
+    void DoSetClientSize(int width, int height) override;
     WXLRESULT MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam) override;
     void OnPaintBackground(wxPaintEvent& event);
 

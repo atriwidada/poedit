@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2023-2024 Vaclav Slavik
+ *  Copyright (C) 2023-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -84,12 +84,8 @@ public:
     Language GetLanguage() const override { return m_language; }
     void SetLanguage(Language lang) override { m_language = lang; }
 
-    // FIXME: PO specific
-    bool HasDeletedItems() const override { return false;}
-    void RemoveDeletedItems() override {}
-
 protected:
-    JSONCatalog(json_t&& doc) : Catalog(Type::JSON), m_doc(std::move(doc)) {}
+    JSONCatalog(json_t&& doc, Type type = Type::JSON) : Catalog(type), m_doc(std::move(doc)) {}
 
     virtual void Parse() = 0;
 

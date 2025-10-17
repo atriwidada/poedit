@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2016-2024 Vaclav Slavik
+ *  Copyright (C) 2016-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -27,15 +27,6 @@
 
 #include <wx/artprov.h>
 #include <wx/settings.h>
-
-#ifdef __WXGTK__
-    #include <pango/pango.h>
-    #if PANGO_VERSION_CHECK(1,38,0)
-        #define SUPPORTS_BGALPHA
-    #endif
-#else
-    #define SUPPORTS_BGALPHA
-#endif
 
 
 namespace
@@ -94,13 +85,17 @@ wxColour ColorScheme::DoGet(Color color, Mode mode)
 
         case Color::ListControlBg:
             #ifdef __WXOSX__
+            if (@available(macOS 26, *))
+            {
+                // list rendering is same as the rest of the window, best is to not change the color at all
+                return wxNullColour;
+            }
             if (mode == Dark)
             {
                 // FIXME: In dark mode, listbox color is special and requires NSBox to be rendered correctly;
                 //        this is just passable approximation
                 return wxColour([NSColor underPageBackgroundColor]);
             }
-            else
             #endif
             return wxSystemSettings::GetColour(wxSYS_COLOUR_LISTBOX);
 
@@ -118,28 +113,27 @@ wxColour ColorScheme::DoGet(Color color, Mode mode)
             return sRGB(225, 77, 49);
         case Color::ErrorText:
             return *wxRED;
+
         case Color::ItemContextFg:
-            return mode == Dark ? sRGB(180, 222, 254) : sRGB(70, 109, 137);
+            return DoGet(Color::TagContextFg, mode);
         case Color::ItemContextBg:
-            if (mode == Dark)
-                return sRGB(67, 94, 147, 0.6);
-            else
-                return sRGB(217, 232, 242);
+            {
+                auto c = DoGet(Color::TagContextBg, mode);
+                return wxColour(c.Red(), c.Green(), c.Blue(), c.Alpha() * 0.4);
+            }
         case Color::ItemContextBgHighlighted:
             #if defined(__WXMSW__)
-            return sRGB(255, 255, 255, 0.50);
-            #elif defined(SUPPORTS_BGALPHA)
-            return sRGB(255, 255, 255, 0.35);
+            return sRGB(255, 255, 255, 0.5);
             #else
-            return DoGet(Color::ItemContextBg, mode);
+            return sRGB(255, 255, 255, 0.2);
             #endif
 
         // Tags:
 
         case Color::TagContextFg:
-            return DoGet(Color::ItemContextFg, mode);
+            return mode == Dark ? sRGB(180, 222, 254) : sRGB(70, 109, 137);
         case Color::TagContextBg:
-            return DoGet(Color::ItemContextBg, mode);
+            return mode == Dark ? sRGB(67, 94, 147, 0.6) : sRGB(217, 232, 242);
         case Color::TagSecondaryBg:
             return mode == Dark ? sRGB(255, 255, 255, 0.5) : sRGB(0, 0, 0, 0.10);
         case Color::TagErrorLineBg:
@@ -170,10 +164,10 @@ wxColour ColorScheme::DoGet(Color color, Mode mode)
 
         case Color::SidebarBackground:
             #ifdef __WXOSX__
-            if (@available(macOS 11.0, *))
-                return mode == Dark ? sRGB(46, 47, 50) : sRGB(240, 240, 240); // same as EditingThickSeparator
-            #endif
+            return mode == Dark ? sRGB(46, 47, 50) : sRGB(240, 240, 240); // same as EditingThickSeparator
+            #else
             return mode == Dark ? sRGB(45, 42, 41) : "#edf0f4";
+            #endif
 
         case Color::EditingBackground:
             #ifdef __WXOSX__

@@ -69,9 +69,6 @@
     <ClCompile Include="src\prefsdlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\progressinfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\propertiesdlg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -213,6 +210,30 @@
     <ClCompile Include="src\errors.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\catalog_xcloc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\progress.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\progress_ui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\subprocess.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\cat_operations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\catalog_resx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\catalog_qt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\layout_helpers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\attentionbar.h">
@@ -258,9 +279,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\prefsdlg.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\progressinfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\propertiesdlg.h">
@@ -428,6 +446,30 @@
     <ClInclude Include="src\static_ids.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\catalog_xcloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\progress.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\progress_ui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\subprocess.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\cat_operations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\catalog_resx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\catalog_qt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\layout_helpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="src\poedit.rc">
@@ -439,9 +481,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Poedit.targets" />
-    <None Include="src\resources\comment.xrc">
-      <Filter>Data Files</Filter>
-    </None>
     <None Include="src\resources\manager.xrc">
       <Filter>Data Files</Filter>
     </None>
@@ -457,10 +496,8 @@
     <None Include="src\resources\toolbar.xrc">
       <Filter>Data Files</Filter>
     </None>
-    <None Include="src\resources\summary.xrc">
-      <Filter>Data Files</Filter>
-    </None>
     <None Include="packages.config" />
+    <None Include="Poedit.props" />
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="win32\Poedit.manifest">

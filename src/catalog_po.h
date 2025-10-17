@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 1999-2024 Vaclav Slavik
+ *  Copyright (C) 1999-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -180,7 +180,8 @@ public:
     static bool CanLoadFile(const wxString& extension);
     wxString GetPreferredExtension() const override;
 
-    unsigned GetPluralFormsCount() const override;
+    PluralFormsExpr GetPluralForms() const override;
+
     void SetLanguage(Language lang) override;
 
     bool Save(const wxString& po_file, bool save_mo,

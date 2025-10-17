@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 1999-2024 Vaclav Slavik
+ *  Copyright (C) 1999-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -75,7 +75,7 @@
 #include "findframe.h"
 #include "tm/transmem.h"
 #include "language.h"
-#include "progressinfo.h"
+#include "progress_ui.h"
 #include "commentdlg.h"
 #include "main_toolbar.h"
 #include "manager.h"
@@ -308,7 +308,7 @@ BEGIN_EVENT_TABLE(PoeditFrame, wxFrame)
    EVT_MENU           (XRCID("menu_update_from_src"), PoeditFrame::OnUpdateFromSources)
    EVT_MENU           (XRCID("menu_update_from_pot"),PoeditFrame::OnUpdateFromPOT)
   #ifdef HAVE_HTTP_CLIENT
-   EVT_MENU           (XRCID("menu_update_from_crowdin"),PoeditFrame::OnUpdateFromCrowdin)
+   EVT_MENU           (XRCID("menu_cloud_sync"),PoeditFrame::OnCloudSync)
   #endif
    EVT_MENU           (XRCID("toolbar_update"),PoeditFrame::OnUpdateSmart)
    EVT_MENU           (XRCID("menu_validate"),    PoeditFrame::OnValidate)
@@ -381,7 +381,7 @@ BEGIN_EVENT_TABLE(PoeditFrame, wxFrame)
    EVT_UPDATE_UI(XRCID("menu_validate"),      PoeditFrame::OnIsEditableUpdate)
    EVT_UPDATE_UI(XRCID("menu_update_from_src"), PoeditFrame::OnUpdateFromSourcesUpdate)
  #ifdef HAVE_HTTP_CLIENT
-   EVT_UPDATE_UI(XRCID("menu_update_from_crowdin"), PoeditFrame::OnUpdateFromCrowdinUpdate)
+   EVT_UPDATE_UI(XRCID("menu_cloud_sync"), PoeditFrame::OnCloudSyncUpdate)
  #endif
    EVT_UPDATE_UI(XRCID("menu_update_from_pot"), PoeditFrame::OnUpdateFromPOTUpdate)
    EVT_UPDATE_UI(XRCID("toolbar_update"), PoeditFrame::OnUpdateSmartUpdate)
@@ -499,7 +499,7 @@ PoeditFrame::PoeditFrame() :
     GetMenuBar()->Check(XRCID("menu_warnings"), Config::ShowWarnings());
 
     if (wxConfigBase::Get()->ReadBool("/statusbar_shown", true))
-        CreateStatusBar(1, wxST_SIZEGRIP);
+        InitStatusBar();
 
     m_contentWrappingSizer = new wxBoxSizer(wxVERTICAL);
     SetSizer(m_contentWrappingSizer);
@@ -1302,21 +1302,22 @@ void PoeditFrame::OnExportToHTML(wxCommandEvent&)
     });
 }
 
-bool PoeditFrame::ExportCatalogToHTML(const wxString& filename)
+void PoeditFrame::ExportCatalogToHTML(const wxString& filename)
 {
-    wxBusyCursor bcur;
-
-    TempOutputFileFor tempfile(filename);
-    std::ofstream f;
-    f.open(tempfile.FileName().fn_str());
-    m_catalog->ExportToHTML(f);
-    f.close();
-    if (!tempfile.Commit())
+    wxWindowPtr<ProgressWindow> progress(new ProgressWindow(this, _("Exporting to HTML")));
+    progress->RunTaskThenDo([=]()
     {
-        wxLogError(_(L"Couldn’t save file %s."), filename);
-        return false;
-    }
-    return true;
+        TempOutputFileFor tempfile(filename);
+        std::ofstream f;
+        f.open(tempfile.FileName().fn_str());
+        m_catalog->ExportToHTML(f);
+        f.close();
+        if (!tempfile.Commit())
+        {
+            BOOST_THROW_EXCEPTION(Exception(wxString::Format(_(L"Couldn’t save file %s."), filename)));
+        }
+    },
+    [progress](){});
 }
 
 
@@ -1495,8 +1496,11 @@ void PoeditFrame::EditCatalogProperties()
 
         // Only language can be changed for other file types:
         case Catalog::Type::XLIFF:
+        case Catalog::Type::XCLOC:
         case Catalog::Type::JSON:
         case Catalog::Type::JSON_FLUTTER:
+        case Catalog::Type::RESX:
+        case Catalog::Type::QT_LINGUIST:
         {
             wxWindowPtr<LanguageDialog> dlg(new LanguageDialog(this));
             dlg->SetLang(m_catalog->GetLanguage());
@@ -1578,152 +1582,80 @@ void PoeditFrame::UpdateAfterPreferencesChange()
 }
 
 
-bool PoeditFrame::UpdateCatalog(const wxString& pot_file)
+void PoeditFrame::UpdateCatalog(const wxString& pot_file)
 {
-    auto cat = std::dynamic_pointer_cast<POCatalog>(m_catalog);
-    if (!cat)
-        return false;
-
     // This ensures that the list control won't be redrawn during Update()
     // call when a dialog box is hidden; another alternative would be to call
     // m_list->CatalogChanged(NULL) here
-    std::unique_ptr<wxWindowUpdateLocker> locker;
+    // *or* to make sure PerformUpdateFromXXX() always returns a new Catalog instance
+    std::shared_ptr<wxWindowUpdateLocker> locker;
     if (m_list)
         locker.reset(new wxWindowUpdateLocker(m_list));
 
-
-    UpdateResultReason reason;
-    bool succ;
+    dispatch::future<CatalogPtr> bg_work;
 
     if (pot_file.empty())
     {
-        if (cat->HasSourcesAvailable())
-        {
-            succ = PerformUpdateFromSourcesWithUI(this, cat, reason);
+        auto cat = std::dynamic_pointer_cast<POCatalog>(m_catalog);
+        if (!cat)
+            return;
 
-            locker.reset();
-            EnsureAppropriateContentView();
-            NotifyCatalogChanged(m_catalog);
-        }
-        else
+        if (!cat->HasSourcesAvailable())
         {
-            reason = UpdateResultReason::NoSourcesFound;
-            succ = false;
+            wxWindowPtr<wxMessageDialog> dlg(new wxMessageDialog
+                (
+                    this,
+                    _("Source code not available."),
+                    MSW_OR_OTHER(_("Updating failed"), ""),
+                    wxOK | wxICON_ERROR
+                ));
+            wxString expl = _(L"Translations couldn’t be updated from the source code, because no code was found in the location specified in the file’s Properties.");
+            dlg->SetExtendedMessage(expl);
+            dlg->ShowWindowModalThenDo([dlg](int){});
+            return;
         }
+
+        bg_work = PerformUpdateFromSourcesWithUI(this, cat);
     }
     else
     {
-        succ = PerformUpdateFromPOTWithUI(this, cat, pot_file, reason);
+        bg_work = PerformUpdateFromReferenceWithUI(this, m_catalog, pot_file);
+    }
 
-        locker.reset();
+    bg_work.then_on_main([this,locker](CatalogPtr updated_catalog)
+    {
+        if (!updated_catalog)
+            return;
+
+        m_catalog = updated_catalog;
+        m_modified = true;
+
         EnsureAppropriateContentView();
         NotifyCatalogChanged(m_catalog);
-    }
+        RefreshControls();
 
-    m_modified = succ || m_modified;
-    UpdateStatusBar();
-
-    if (!succ)
-    {
-        // FIXME: nicer UI than this
-        wxString msgSuffix;
-        if (!reason.file.empty() && reason.file != ".")
-            msgSuffix += "\n\n" + wxString::Format(_("In: %s"), reason.file);
-
-        switch (reason.code)
+        if (Config::UseTM() && Config::MergeBehavior() == Merge_UseTM)
         {
-            case UpdateResultReason::NoSourcesFound:
+            PreTranslateCatalogAuto(this, m_catalog, PreTranslateOptions(PreTranslate_OnlyGoodQuality), [=]
             {
-                wxWindowPtr<wxMessageDialog> dlg(new wxMessageDialog
-                    (
-                        this,
-                        _("Source code not available."),
-                        MSW_OR_OTHER(_("Updating failed"), ""),
-                        wxOK | wxICON_ERROR
-                    ));
-                wxString expl = _(L"Translations couldn’t be updated from the source code, because no code was found in the location specified in the file’s Properties.");
-                expl += msgSuffix;
-                dlg->SetExtendedMessage(expl);
-                dlg->ShowWindowModalThenDo([dlg](int){});
-                break;
-            }
-            case UpdateResultReason::PermissionDenied:
-            {
-                wxWindowPtr<wxMessageDialog> dlg(new wxMessageDialog
-                    (
-                        this,
-                        _("Permission denied."),
-                        MSW_OR_OTHER(_("Updating failed"), ""),
-                        wxOK | wxICON_ERROR
-                    ));
-                wxString expl = _(L"You don’t have permission to read source code files from the location specified in the file’s Properties.");
-            #ifdef __WXOSX__
-                if (@available(macOS 13.0, *))
-                {
-                    // TRANSLATORS: The System Settings etc. references macOS 13 Ventura or newer system settings and should be translated EXACTLY as in macOS. If you don't use macOS and can't check, please leave it untranslated.
-                    expl += "\n\n" + _("If you previously denied access to your files, you can allow it in System Settings > Privacy & Security > Files & Folders.");
-                }
-                else if (@available(macOS 10.15, *))
-                {
-                    // TRANSLATORS: The System Preferences etc. references macOS system settings and should be translated EXACTLY as in macOS. If you don't use macOS and can't check, please leave it untranslated.
-                    expl += "\n\n" + _("If you previously denied access to your files, you can allow it in System Preferences > Security & Privacy > Privacy > Files & Folders.");
-                }
-            #endif
-                expl += msgSuffix;
-                dlg->SetExtendedMessage(expl);
-                dlg->ShowWindowModalThenDo([dlg](int){});
-                break;
-            }
-            case UpdateResultReason::Unspecified:
-            {
-                wxLogWarning(_("Translation entries in the file are probably incorrect."));
-                wxLogError(
-                   _("Updating the file failed. Click on 'Details >>' for details."));
-                break;
-            }
-            case UpdateResultReason::CancelledByUser:
-                break;
+                RefreshControls();
+            });
         }
-    }
 
-    return succ;
+        // locker gets released now and the list is redrawn
+    });
 }
 
 void PoeditFrame::OnUpdateFromSources(wxCommandEvent&)
 {
     DoIfCanDiscardCurrentDoc([=]{
-        try
-        {
-            if (UpdateCatalog())
-            {
-                if (Config::UseTM() && Config::MergeBehavior() == Merge_UseTM)
-                {
-                    if (PreTranslateCatalog(this, m_catalog, PreTranslateOptions(PreTranslate_OnlyGoodQuality)))
-                    {
-                        if (!m_modified)
-                        {
-                            m_modified = true;
-                            UpdateTitle();
-                        }
-                        RefreshControls();
-                    }
-                }
-            }
-        }
-        catch (...)
-        {
-            wxLogError("%s", DescribeCurrentException());
-        }
-
-        RefreshControls();
+        UpdateCatalog();
     });
 }
 
 void PoeditFrame::OnUpdateFromSourcesUpdate(wxUpdateUIEvent& event)
 {
-    event.Enable(m_catalog &&
-                 m_catalog->HasSourcesConfigured() &&
-                 !CanSyncWithCrowdin(m_catalog));
+    event.Enable(m_catalog && m_catalog->HasSourcesConfigured());
 }
 
 void PoeditFrame::OnUpdateFromPOT(wxCommandEvent&)
@@ -1733,12 +1665,16 @@ void PoeditFrame::OnUpdateFromPOT(wxCommandEvent&)
         if (path.empty())
             path = wxConfig::Get()->Read("last_file_path", wxEmptyString);
 
+        auto fileMask = (m_catalog->GetFileType() == Catalog::Type::PO)
+                        ? Catalog::GetTypesFileMask({Catalog::Type::POT, Catalog::Type::PO})
+                        : m_catalog->GetFileMask();
+
         wxWindowPtr<wxFileDialog> dlg(
             new wxFileDialog(this,
-                             MACOS_OR_OTHER("", _("Open translation template")),
+                             MACOS_OR_OTHER("", _("Open reference file")),
                              path,
                              wxEmptyString,
-                             Catalog::GetTypesFileMask({Catalog::Type::POT, Catalog::Type::PO}),
+                             fileMask,
                              wxFD_OPEN | wxFD_FILE_MUST_EXIST));
 
         // dlg->ShowWindowModalThenDo([=](int retcode){
@@ -1748,28 +1684,8 @@ void PoeditFrame::OnUpdateFromPOT(wxCommandEvent&)
                 return;
             auto pot_file = dlg->GetPath();
             wxConfig::Get()->Write("last_file_path", wxPathOnly(pot_file));
-            try
-            {
-                if (UpdateCatalog(pot_file))
-                {
-                    if (Config::UseTM() && Config::MergeBehavior() == Merge_UseTM)
-                    {
-                        if (PreTranslateCatalog(this, m_catalog, PreTranslateOptions(PreTranslate_OnlyGoodQuality)))
-                        {
-                            if (!m_modified)
-                            {
-                                m_modified = true;
-                                UpdateTitle();
-                            }
-                            RefreshControls();
-                        }
-                    }
-                }
-            }
-            catch (...)
-            {
-                wxLogError("%s", DescribeCurrentException());
-            }
+
+            UpdateCatalog(pot_file);
         }
 
         RefreshControls();
@@ -1778,14 +1694,29 @@ void PoeditFrame::OnUpdateFromPOT(wxCommandEvent&)
 
 void PoeditFrame::OnUpdateFromPOTUpdate(wxUpdateUIEvent& event)
 {
-    if (!m_catalog || m_catalog->GetFileType() != Catalog::Type::PO)
-        event.Enable(false);
-    else
-        OnHasCatalogUpdate(event);
+    OnHasCatalogUpdate(event);
+
+    if (!m_catalog)
+        return;
+
+    switch (m_catalog->GetFileType())
+    {
+        case Catalog::Type::POT:
+            event.Enable(false);
+            // fall through
+        case Catalog::Type::PO:
+            event.SetText(MSW_OR_OTHER(_(L"Update from &POT file…"), _(L"Update from &POT File…")));
+            break;
+
+        default:
+            event.Enable(false);
+            break;
+    };
 }
 
 #ifdef HAVE_HTTP_CLIENT
-void PoeditFrame::OnUpdateFromCrowdin(wxCommandEvent&)
+
+void PoeditFrame::CloudSyncWithCrowdin()
 {
     if (m_modified)
     {
@@ -1826,38 +1757,65 @@ void PoeditFrame::OnUpdateFromCrowdin(wxCommandEvent&)
     });
 }
 
-void PoeditFrame::OnUpdateFromCrowdinUpdate(wxUpdateUIEvent& event)
+void PoeditFrame::CloudSyncUpload()
 {
-    event.Enable(m_catalog &&
-                 m_catalog->HasCapability(Catalog::Cap::Translations) &&
-                 CanSyncWithCrowdin(m_catalog));
+    wxCHECK_RET(m_catalog->GetCloudSync(), "no cloud sync destination");
+    CloudSyncProgressWindow::RunSync(this, m_catalog->GetCloudSync(), m_catalog);
 }
-#endif
+
+void PoeditFrame::OnCloudSync(wxCommandEvent&)
+{
+    if (CanSyncWithCrowdin(m_catalog))
+    {
+        CloudSyncWithCrowdin();
+    }
+    else
+    {
+        CloudSyncUpload();
+    }
+}
+
+void PoeditFrame::OnCloudSyncUpdate(wxUpdateUIEvent& event)
+{
+    event.Enable(false);
+    if (!m_catalog || !m_catalog->HasCapability(Catalog::Cap::Translations))
+        return;
+
+    auto sync = m_catalog->GetCloudSync();
+    bool isCrowdin = CanSyncWithCrowdin(m_catalog);
+
+    event.Enable(sync || isCrowdin);
+
+    if (!sync || isCrowdin)
+    {
+        event.SetText(_("Sync with Crowdin"));
+    }
+    else
+    {
+        // TRANSLATORS: this is the menu action to upload to server/cloud; %s is hostname or service (Crowdin, ftp.foo.com etc.)
+        event.SetText(wxString::Format(_("Upload to %s"), sync->GetName()));
+    }
+}
+
+#endif // HAVE_HTTP_CLIENT
 
 void PoeditFrame::OnUpdateSmart(wxCommandEvent& event)
 {
     if (!m_catalog)
         return;
-#ifdef HAVE_HTTP_CLIENT
-    if (CanSyncWithCrowdin(m_catalog))
-        OnUpdateFromCrowdin(event);
-    else
-#endif
-        OnUpdateFromSources(event);
+
+    // TODO: handle POTs here too
+    OnUpdateFromSources(event);
 }
 
 void PoeditFrame::OnUpdateSmartUpdate(wxUpdateUIEvent& event)
 {
     event.Enable(false);
-    if (m_catalog)
-    {
-#ifdef HAVE_HTTP_CLIENT
-       if (CanSyncWithCrowdin(m_catalog))
-            OnUpdateFromCrowdinUpdate(event);
-        else
-#endif
-            OnUpdateFromSourcesUpdate(event);
-    }
+    if (!m_catalog)
+        return;
+
+    // TODO: handle POTs here too
+    OnUpdateFromSourcesUpdate(event);
 }
 
 
@@ -2280,15 +2238,12 @@ void PoeditFrame::ReadCatalog(const CatalogPtr& cat)
         wxWindowUpdateLocker no_updates(this);
 #endif
         {
-            wxLogNull null;  // don't report non-item warnings
             // the file was just loaded, it is identical to in-memory content and we can pass `fileWithSameContent`
             cat->Validate(/*fileWithSameContent=*/cat->GetFileName());
         }
 
         m_catalog = cat;
         m_fileMonitor->SetFile(m_catalog->GetFileName());
-        m_pendingHumanEditedItem.reset();
-        m_navigationHistory.clear();
 
         if (m_catalog->empty())
         {
@@ -2297,12 +2252,13 @@ void PoeditFrame::ReadCatalog(const CatalogPtr& cat)
         else
         {
             EnsureAppropriateContentView();
-            // This must be done as soon as possible, otherwise the list would be
-            // confused. GetCurrentItem() could return nullptr or something invalid,
-            // causing crash in UpdateToTextCtrl() called from
-            // UpdateEditingUIAfterChange() just few lines below.
-            NotifyCatalogChanged(m_catalog);
         }
+
+        // This must be done as soon as possible, otherwise the list would be
+        // confused. GetCurrentItem() could return nullptr or something invalid,
+        // causing crash in UpdateToTextCtrl() called from
+        // UpdateEditingUIAfterChange() just few lines below.
+        NotifyCatalogChanged(m_catalog);
 
         m_fileExistsOnDisk = true;
         m_modified = false;
@@ -2329,7 +2285,7 @@ void PoeditFrame::ReadCatalog(const CatalogPtr& cat)
         SetupCloudSyncIfShouldBeDoneAutomatically(m_catalog);
     }
 
-    m_toolbar->EnableSyncWithCrowdin(CanSyncWithCrowdin(m_catalog));
+    UpdateCloudSyncUI(CanSyncWithCrowdin(m_catalog));
 #endif
 
     FixDuplicatesIfPresent();
@@ -2484,6 +2440,38 @@ void PoeditFrame::WarnAboutLanguageIssues()
 }
 
 
+namespace
+{
+
+wxFileName FindCandidateFileForSideloading(const wxFileName& thisFile, const wxString& wildcard)
+{
+    for (auto candidate: {"en", "en.default", "default", "", "en-US"})
+    {
+        auto w(wildcard);
+        if (*candidate)
+        {
+            w.Replace("*", candidate);
+        }
+        else
+        {
+            // special-case complete removal of language code, e.g. using foo.resx as base
+            // for foo.*.resx (this is common for RESX in particular)
+            w.Replace(".*.", ".");
+        }
+
+        wxFileName fnw(w);
+        if (fnw.FileExists() && fnw != thisFile)
+        {
+            return fnw;
+        }
+    }
+
+    return {};
+}
+
+} // anonymous namespace
+
+
 void PoeditFrame::OfferSideloadingSourceText()
 {
     if (!m_catalog->UsesSymbolicIDsForSource())
@@ -2495,10 +2483,8 @@ void PoeditFrame::OfferSideloadingSourceText()
         return;
 
     wxFileName fn(filename);
-
-    wildcard.Replace("*", "en");
-    wxFileName ref(wildcard);
-    if (!ref.FileExists() || fn == ref)
+    wxFileName ref = FindCandidateFileForSideloading(fn, wildcard);
+    if (!ref.IsOk())
         return;
 
     wxFileName displayRef(ref);
@@ -2590,12 +2576,31 @@ void PoeditFrame::RefreshControls(int flags)
 
 void PoeditFrame::NotifyCatalogChanged(const CatalogPtr& cat)
 {
+    m_pendingHumanEditedItem.reset();
+    m_navigationHistory.clear();
+
     if (m_sidebar)
         m_sidebar->ResetCatalog();
     if (m_list)
         m_list->CatalogChanged(cat);
 }
 
+
+void PoeditFrame::InitStatusBar()
+{
+    // We create a status bar with 3 fields, 2 of which are dummy and used
+    // only to center the text:
+    // 0 - left padding
+    // 1 - actual text
+    // 2 - right padding
+    auto bar = CreateStatusBar(3, wxST_SIZEGRIP);
+    const int styles[3] = {wxSB_FLAT, wxSB_FLAT, wxSB_FLAT};
+    bar->SetStatusStyles(3, styles);
+
+#ifdef __WXMSW__
+    bar->SetMinHeight(bar->GetCharHeight() + PX(1));
+#endif
+}
 
 void PoeditFrame::UpdateStatusBar()
 {
@@ -2627,7 +2632,11 @@ void PoeditFrame::UpdateStatusBar()
             text.Printf(wxPLURAL("%d entry", "%d entries", all), all);
         }
 
-        bar->SetStatusText(text);
+        bar->SetStatusText(text, 1);
+
+        auto width = bar->GetTextExtent(text).x + PX(8);
+        int fields[3] = {-1, width, -1};
+        bar->SetStatusWidths(3, fields);
     }
 }
 
@@ -2677,18 +2686,15 @@ void PoeditFrame::UpdateTitle()
     }
 
 #ifdef __WXOSX__
-    if (@available(macOS 11.0, *))
-    {
-        NSWindow *win = GetWXWindow();
-        win.subtitle = subtitle.empty() ? @"" : str::to_NS(subtitle);
-    }
-    else
-#endif // __WXOSX__
+    NSWindow *win = GetWXWindow();
+    win.subtitle = subtitle.empty() ? @"" : str::to_NS(subtitle);
+#else
     if (!subtitle.empty())
     {
         title << MACOS_OR_OTHER(L" — ", L" • ");
         title << subtitle;
     }
+#endif // !__WXOSX__
 
     m_fileNamePartOfTitle = title;
 
@@ -2700,7 +2706,6 @@ void PoeditFrame::UpdateTitle()
 
     SetTitle(title);
 }
-
 
 
 void PoeditFrame::UpdateMenu()
@@ -2737,6 +2742,24 @@ void PoeditFrame::UpdateMenu()
     menubar->Enable(XRCID("menu_remove_same_as_source"), editable);
     menubar->Enable(XRCID("menu_purge_deleted"),
                     editable && m_catalog->HasDeletedItems());
+}
+
+
+void PoeditFrame::UpdateCloudSyncUI(bool isCrowdin)
+{
+#ifdef HAVE_HTTP_CLIENT
+    if (!m_catalog)
+        return;
+
+    auto sync = m_catalog->GetCloudSync();
+    m_toolbar->EnableCloudSync(sync, isCrowdin);
+
+#ifdef __WXOSX__
+    const auto symbol = (isCrowdin || !sync) ? "poedit.sync" : "poedit.upload";
+    SetMacMenuIcon(GetMenuBar(), XRCID("menu_cloud_sync"), symbol);
+#endif
+
+#endif
 }
 
 
@@ -2782,7 +2805,27 @@ void PoeditFrame::WriteCatalog(const wxString& catalog, TFunctor completionHandl
 
     Catalog::ValidationResults validation_results;
     Catalog::CompilationStatus mo_compilation_status = Catalog::CompilationStatus::NotDone;
-    if ( !m_catalog->Save(catalog, true, validation_results, mo_compilation_status) )
+
+    bool was_ok = false;
+    try
+    {
+        was_ok = m_catalog->Save(catalog, true, validation_results, mo_compilation_status);
+    }
+    catch (...)
+    {
+        was_ok = false;
+        wxMessageDialog dlg
+        (
+            this,
+            wxString::Format(_(L"The file “%s” couldn’t be saved."), wxFileName(catalog).GetFullName()),
+            _("Error saving file"),
+            wxOK | wxICON_ERROR
+        );
+        dlg.SetExtendedMessage(DescribeCurrentException());
+        dlg.ShowModal();
+    }
+
+    if (!was_ok)
     {
         if (tmUpdateThread.valid())
             tmUpdateThread.wait();
@@ -2886,7 +2929,7 @@ void PoeditFrame::OnRemoveSameAsSourceTranslations(wxCommandEvent&)
     const wxString title =
         _("Remove same-as-source translations");
     const wxString main =
-        _("Do you want to remove all translations that are idential to the source text?");
+        _("Do you want to remove all translations that are identical to the source text?");
     const wxString details = _("This action will delete any translations that match the source text exactly. This cannot be undone.");
 
     wxWindowPtr<wxMessageDialog> dlg(new wxMessageDialog(this, main, title, wxYES_NO | wxICON_QUESTION));
@@ -2973,47 +3016,36 @@ wxMenu *PoeditFrame::CreatePopupMenu(int item)
     const wxArrayString& refs = (*m_catalog)[item]->GetReferences();
     wxMenu *menu = new wxMenu;
 
-    menu->Append(XRCID("menu_copy_from_src"),
-                 #ifdef __WXMSW__
-                 wxString(_("Copy from source text"))
-                 #else
-                 wxString(_("Copy from Source Text"))
-                 #endif
-                   + "\t" + wxGETTEXT_IN_CONTEXT("keyboard key", "Ctrl+") + "B");
-    menu->Append(XRCID("menu_clear"),
-                 #ifdef __WXMSW__
-                 wxString(_("Clear translation"))
-                 #else
-                 wxString(_("Clear Translation"))
-                 #endif
-                   + "\t" + wxGETTEXT_IN_CONTEXT("keyboard key", "Ctrl+") + "K");
-   menu->Append(XRCID("menu_comment"),
-                 #ifdef __WXMSW__
-                 wxString(_("Edit comment"))
-                 #else
-                 wxString(_("Edit Comment"))
-                 #endif
-                 #ifndef __WXOSX__
-                   + "\t" + wxGETTEXT_IN_CONTEXT("keyboard key", "Ctrl+") + "M"
-                 #endif
-                 );
+    auto itemCopy = menu->Append(XRCID("menu_copy_from_src"),
+                                 wxString::Format("%s\t%s",
+                                                  MSW_OR_OTHER(_("Copy from source text"), _("Copy from Source Text")),
+                                                  wxGETTEXT_IN_CONTEXT("keyboard key", "Ctrl+") + "B")
+                                 );
+    SetMacMenuIcon(itemCopy, "document.on.document");
+
+    auto itemClear = menu->Append(XRCID("menu_clear"),
+                                  wxString::Format("%s\t%s",
+                                                   MSW_OR_OTHER(_("Clear translation"), _("Clear Translation")),
+                                                   wxGETTEXT_IN_CONTEXT("keyboard key", "Ctrl+") + "K")
+                                  );
+    SetMacMenuIcon(itemClear, "delete.backward");
+
+    auto itemComment = menu->Append(XRCID("menu_comment"),
+                                    wxString::Format("%s\t%s",
+                                                     MSW_OR_OTHER(_("Edit comment"), _("Edit Comment")),
+                                                     wxGETTEXT_IN_CONTEXT("keyboard key", "Ctrl+") + "M")
+                                    );
+    SetMacMenuIcon(itemComment, "bubble");
 
     if ( !refs.empty() )
     {
         menu->AppendSeparator();
         // TRANSLATORS: Meaning occurrences of the string in source code
-        wxMenuItem *it1 = new wxMenuItem(menu, wxID_ANY, MSW_OR_OTHER(_("Code occurrences"), _("Code Occurrences")));
-#ifdef __WXMSW__
-        it1->SetFont(it1->GetFont().Bold());
-        menu->Append(it1);
-#else
-        menu->Append(it1);
-        it1->Enable(false);
-#endif
+        AppendMenuSectionHeader(menu, MSW_OR_OTHER(_("Code occurrences"), _("Code Occurrences")));
 
         int count = std::min((int)refs.GetCount(), WinID::ListContextReferencesEnd - WinID::ListContextReferencesStart);
         for (int i = 0; i < count; i++)
-            menu->Append(WinID::ListContextReferencesStart + i, "    " + refs[i]);
+            menu->Append(WinID::ListContextReferencesStart + i, refs[i]);
     }
 
     return menu;
@@ -3241,7 +3273,7 @@ void PoeditFrame::OnShowHideStatusbar(wxCommandEvent&)
 
     if (toShow)
     {
-        CreateStatusBar(1, wxST_SIZEGRIP);
+        InitStatusBar();
         UpdateStatusBar();
     }
     else

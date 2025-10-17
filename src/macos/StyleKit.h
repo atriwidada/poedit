@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2016-2024 Vaclav Slavik
+ *  Copyright (C) 2016-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -32,7 +32,6 @@
 @interface StyleKit : NSObject
 
 // Drawing Methods
-+ (void)drawSwitchButtonWithFrame: (NSRect)frame onColor: (NSColor*)onColor labelOffColor: (NSColor*)labelOffColor label: (NSString*)label togglePosition: (CGFloat)togglePosition isDarkMode: (BOOL)isDarkMode;
 + (void)drawTranslucentButtonWithFrame: (NSRect)frame label: (NSString*)label pressed: (BOOL)pressed;
 + (void)drawActionButtonWithFrame: (NSRect)frame buttonColor: (NSColor*)buttonColor hasIcon: (BOOL)hasIcon label: (NSString*)label description: (NSString*)description;
 

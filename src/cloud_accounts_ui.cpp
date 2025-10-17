@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2023-2024 Vaclav Slavik
+ *  Copyright (C) 2023-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -32,6 +32,7 @@
 #include "edapp.h"
 #include "http_client.h"
 #include "languagectrl.h"
+#include "layout_helpers.h"
 #include "str_helpers.h"
 #include "unicode_helpers.h"
 #include "utility.h"
@@ -70,63 +71,13 @@ inline std::vector<CloudAccountClient*> GetSignedInAccounts()
 } // anonymous namespace
 
 
-ServiceSelectionPanel::ServiceSelectionPanel(wxWindow *parent) : wxPanel(parent, wxID_ANY)
-{
-    auto topsizer = new wxBoxSizer(wxVERTICAL);
-    SetSizer(topsizer);
-    m_sizer = new wxBoxSizer(wxVERTICAL);
-    topsizer->AddStretchSpacer();
-    topsizer->Add(m_sizer, wxSizerFlags().Expand().Border(wxALL, PX(16)));
-    topsizer->AddStretchSpacer();
-}
-
-
-void ServiceSelectionPanel::AddService(AccountDetailPanel *account)
-{
-    if (!GetChildren().empty())
-        m_sizer->Add(new wxStaticLine(this, wxID_ANY), wxSizerFlags().Expand().Border(wxTOP|wxBOTTOM, PX(24)));
-
-    auto content = CreateServiceContent(account);
-    m_sizer->Add(content, wxSizerFlags(1).Expand());
-}
-
-
-wxSizer *ServiceSelectionPanel::CreateServiceContent(AccountDetailPanel *account)
-{
-    auto sizer = new wxBoxSizer(wxVERTICAL);
-
-    auto logo = new StaticBitmap(this, account->GetServiceLogo());
-    logo->SetCursor(wxCURSOR_HAND);
-    logo->Bind(wxEVT_LEFT_UP, [=](wxMouseEvent&){ wxLaunchDefaultBrowser(account->GetServiceLearnMoreURL()); });
-    sizer->Add(logo, wxSizerFlags().PXDoubleBorder(wxBOTTOM));
-    auto explain = new ExplanationLabel(this, account->GetServiceDescription());
-    sizer->Add(explain, wxSizerFlags().Expand());
-
-    auto signIn = new wxButton(this, wxID_ANY, MSW_OR_OTHER(_("Add account"), _("Add Account")));
-    signIn->Bind(wxEVT_BUTTON, [=](wxCommandEvent&){ account->SignIn(); });
-#ifdef __WXMSW__
-    signIn->SetBackgroundColour(GetBackgroundColour());
-#endif
-
-    auto learnMore = new LearnMoreLink(this,
-                                       account->GetServiceLearnMoreURL(),
-                                       // TRANSLATORS: %s is online service name, e.g. "Crowdin" or "Localazy"
-                                       wxString::Format(_("Learn more about %s"), account->GetServiceName()));
-
-    auto buttons = new wxBoxSizer(wxHORIZONTAL);
-    sizer->Add(buttons, wxSizerFlags().Expand().Border(wxTOP, PX(16)));
-    buttons->Add(learnMore, wxSizerFlags().Center());
-    buttons->AddStretchSpacer();
-    buttons->Add(signIn, wxSizerFlags());
-
-    return sizer;
-}
-
-
 AccountsPanel::AccountsPanel(wxWindow *parent, int flags) : wxPanel(parent, wxID_ANY)
 {
+    wxBoxSizer *wrappingSizer = new wxBoxSizer(wxVERTICAL);
+    SetSizer(wrappingSizer);
+
     wxSizer *topsizer = new wxBoxSizer(wxVERTICAL);
-    SetSizer(topsizer);
+    wrappingSizer->Add(topsizer, wxSizerFlags(1).Expand().Border(wxALL, PX(1)));
 
     topsizer->Add(new ExplanationLabel(this, _("Connect Poedit with supported cloud localization platforms to seamlessly sync translations managed on them.")),
                   wxSizerFlags().Expand().Border(wxBOTTOM, PX(2)));
@@ -138,19 +89,18 @@ AccountsPanel::AccountsPanel(wxWindow *parent, int flags) : wxPanel(parent, wxID
     wxSizer *sizer = new wxBoxSizer(wxHORIZONTAL);
     topsizer->Add(sizer, wxSizerFlags(1).Expand());
 
-    m_list = new IconAndSubtitleListCtrl(this, _("Account"), MSW_OR_OTHER(wxBORDER_SIMPLE, wxBORDER_SUNKEN));
+    m_list = new IconAndSubtitleListCtrl(this, _("Account"), BORDER_LIST);
     sizer->Add(m_list, wxSizerFlags().Expand().Border(wxRIGHT, PX(10)));
 
-    m_panelsBook = new wxSimplebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL | MSW_OR_OTHER(wxBORDER_SIMPLE, wxBORDER_SUNKEN));
+    m_panelsBook = new wxSimplebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL | BORDER_LISTLIKE);
+    SetupListlikeBorder(m_panelsBook);
+
     ColorScheme::SetupWindowColors(m_panelsBook, [=]
     {
         m_panelsBook->SetBackgroundColour(ColorScheme::Get(Color::ListControlBg));
     });
 
     sizer->Add(m_panelsBook, wxSizerFlags(1).Expand());
-
-    m_introPanel = new ServiceSelectionPanel(m_panelsBook);
-    m_panelsBook->AddPage(m_introPanel, "");
 
     AddAccount("Crowdin", "AccountCrowdin", new CrowdinLoginPanel(m_panelsBook));
     AddAccount("Localazy", "AccountLocalazy", new LocalazyLoginPanel(m_panelsBook));
@@ -173,33 +123,31 @@ AccountsPanel::AccountsPanel(wxWindow *parent, int flags) : wxPanel(parent, wxID
 
 void AccountsPanel::InitializeAfterShown()
 {
-    if (IsSignedIn())
+    // NB: IsDescendant() is used to cover generic wxDataViewMainWindow, which doesn't correctly
+    //     implement HasFocus() in older wx versions.
+    const bool hasFocus = this->IsDescendant(wxWindow::FindFocus());
+
+    // select 1st available signed-in service if we can and hide the intro panel:
+    if (m_list->GetSelectedRow() == wxNOT_FOUND)
     {
-        // select 1st available signed-in service if we can and hide the intro panel:
-        if (m_list->GetSelectedRow() == wxNOT_FOUND)
+        unsigned toSelect = 0;
+        for (unsigned i = 0; i < m_panels.size(); i++)
         {
-            for (unsigned i = 0; i < m_panels.size(); i++)
+            if (m_panels[i]->IsSignedIn())
             {
-                if (m_panels[i]->IsSignedIn())
-                {
-                    SelectAccount(i);
-                    break;
-                }
+                toSelect = i;
+                break;
             }
         }
-    }
-    else
-    {
-        // don't show the list yet if no account was signed in:
-        auto sizer = m_list->GetContainingSizer();
-        sizer->Hide(m_list);
-        sizer->Layout();
+        SelectAccount(toSelect);
     }
 
     // perform first-show initialization:
     for (auto& p: m_panels)
         p->InitializeAfterShown();
-    m_list->SetFocus();
+
+    if (hasFocus)
+        m_list->SetFocus();
 }
 
 
@@ -208,8 +156,6 @@ void AccountsPanel::AddAccount(const wxString& name, const wxString& iconId, Acc
     auto pos = (unsigned)m_panels.size();
     m_panels.push_back(panel);
     m_panelsBook->AddPage(panel, "");
-
-    m_introPanel->AddService(panel);
 
     m_list->AppendFormattedItem(wxArtProvider::GetBitmap(iconId), name, " ... ");
 
@@ -259,7 +205,9 @@ void AccountsPanel::OnSelectAccount(wxDataViewEvent& event)
         return;
     }
 
-    const bool listHasFocus = (wxWindow::FindFocus() == m_list);
+    // NB: IsDescendant() is used to cover generic wxDataViewMainWindow, which doesn't correctly
+    //     implement HasFocus() in older wx versions.
+    const bool listHasFocus = m_list->HasFocus() || m_list->IsDescendant(wxWindow::FindFocus());
 
     SelectAccount(index);
 
@@ -272,7 +220,7 @@ void AccountsPanel::OnSelectAccount(wxDataViewEvent& event)
 void AccountsPanel::SelectAccount(unsigned index)
 {
 	m_list->SelectRow(index);
-	m_panelsBook->ChangeSelection(1 + index);
+	m_panelsBook->ChangeSelection(index);
 }
 
 
@@ -303,18 +251,14 @@ public:
     using FileInfo = CloudAccountClient::ProjectFile;
 
     CloudFileList(wxWindow *parent)
-        : wxDataViewListCtrl(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize,
-                             wxDV_NO_HEADER | MSW_OR_OTHER(wxBORDER_SIMPLE, wxBORDER_SUNKEN))
+        : wxDataViewListCtrl(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxDV_NO_HEADER | BORDER_LIST)
     {
         SetRowHeight(PX(36));
         SetMinSize(wxSize(PX(500), PX(200)));
     #ifdef __WXOSX__
-        if (@available(macOS 11.0, *))
-        {
-            NSScrollView *scrollView = (NSScrollView*)GetHandle();
-            NSTableView *tableView = (NSTableView*)[scrollView documentView];
-            tableView.style = NSTableViewStyleFullWidth;
-        }
+        NSScrollView *scrollView = (NSScrollView*)GetHandle();
+        NSTableView *tableView = (NSTableView*)[scrollView documentView];
+        tableView.style = NSTableViewStyleFullWidth;
     #endif
 
         auto renderer = new MultilineTextRenderer();
@@ -405,17 +349,16 @@ private:
 };
 
 
-class CloudOpenDialog : public wxDialog
+class CloudOpenDialog : public StandardDialog
 {
 public:
-    CloudOpenDialog(wxWindow *parent) : wxDialog(parent, wxID_ANY, _("Open cloud translation"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
+    CloudOpenDialog(wxWindow *parent) : StandardDialog(parent, _("Open cloud translation"), wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
     {
-        auto topsizer = new wxBoxSizer(wxVERTICAL);
+        auto topsizer = ContentSizer();
         topsizer->SetMinSize(PX(400), -1);
 
         auto loginSizer = new wxBoxSizer(wxHORIZONTAL);
-        topsizer->AddSpacer(PX(8));
-        topsizer->Add(loginSizer, wxSizerFlags().Right().PXDoubleBorder(wxLEFT|wxRIGHT));
+        topsizer->Add(loginSizer, wxSizerFlags().Right().PXDoubleBorder(wxLEFT));
         m_loginImage = new AvatarIcon(this, wxSize(PX(24), PX(24)));
         m_loginText = new SecondaryLabel(this, "");
         loginSizer->Add(m_loginImage, wxSizerFlags().ReserveSpaceEvenIfHidden().Center());
@@ -427,7 +370,7 @@ public:
 
         auto pickers = new wxFlexGridSizer(2, wxSize(PX(5),PX(6)));
         pickers->AddGrowableCol(1);
-        topsizer->Add(pickers, wxSizerFlags().Expand().PXDoubleBorderAll());
+        topsizer->Add(pickers, wxSizerFlags().Expand().Border(wxTOP, PX(6)));
 
         pickers->Add(new wxStaticText(this, wxID_ANY, _("Project:")), wxSizerFlags().CenterVertical().Right());
         m_project = new wxChoice(this, wxID_ANY);
@@ -437,24 +380,18 @@ public:
         m_language = new wxChoice(this, wxID_ANY);
         pickers->Add(m_language, wxSizerFlags().Expand().CenterVertical());
 
-        m_files = new CloudFileList(this);
-        topsizer->Add(m_files, wxSizerFlags(1).Expand().PXDoubleBorderAll());
-
         m_activity = new ActivityIndicator(this);
-        topsizer->Add(m_activity, wxSizerFlags().Expand().PXDoubleBorder(wxLEFT|wxRIGHT));
-        topsizer->AddSpacer(MSW_OR_OTHER(PX(4), PX(2)));
+        topsizer->Add(m_activity, wxSizerFlags().Expand().Border(wxTOP|wxBOTTOM, PX(8)));
 
-        auto buttons = CreateButtonSizer(wxOK | wxCANCEL);
-        auto ok = static_cast<wxButton*>(FindWindow(wxID_OK));
-        ok->SetDefault();
-    #ifdef __WXOSX__
-        topsizer->Add(buttons, wxSizerFlags().Expand());
-    #else
-        topsizer->Add(buttons, wxSizerFlags().Expand().PXBorderAll());
-        topsizer->AddSpacer(PX(5));
-    #endif
+        m_files = new CloudFileList(this);
+        topsizer->Add(m_files, wxSizerFlags(1).Expand());
 
-        SetSizerAndFit(topsizer);
+        wxButton *ok = nullptr;
+        CreateButtons()
+            .Add(ok = new wxButton(this, wxID_OK))
+            .Add(wxID_CANCEL);
+
+        FitSizer();
 
         m_project->Bind(wxEVT_CHOICE, [=](wxCommandEvent&){ OnProjectSelected(); });
         ok->Bind(wxEVT_UPDATE_UI, &CloudOpenDialog::OnUpdateOK, this);

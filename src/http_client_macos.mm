@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2014-2024 Vaclav Slavik
+ *  Copyright (C) 2014-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -27,13 +27,6 @@
 
 #include "str_helpers.h"
 #include "version.h"
-
-
-class http_exception : public std::runtime_error
-{
-public:
-    http_exception(const std::string& what) : std::runtime_error(what) {}
-};
 
 
 class http_client::impl
@@ -116,8 +109,10 @@ public:
 
                 NSError *err = nil;
                 if (![[NSFileManager defaultManager] moveItemAtPath:[location path] toPath:outputPath error:&err])
-                    throw std::runtime_error(str::to_utf8([err localizedDescription]));
-
+                {
+                     BOOST_THROW_EXCEPTION(std::runtime_error(str::to_utf8([err localizedDescription])));
+                }
+    
                 promise->set_value(std::move(file));
             }
             catch (...)
@@ -208,7 +203,7 @@ private:
         try
         {
             m_owner.on_error_response(status_code, desc);
-            BOOST_THROW_EXCEPTION(http_exception(desc));
+            BOOST_THROW_EXCEPTION(http_response_error(status_code, desc));
         }
         catch (...)
         {

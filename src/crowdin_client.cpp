@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2015-2024 Vaclav Slavik
+ *  Copyright (C) 2015-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -336,8 +336,14 @@ dispatch::future<CrowdinClient::ProjectDetails> CrowdinClient::GetProjectDetails
         // Handle project info
         const json& d = r["data"];
 
+        if (get_value(d, "type", 0) != 0)
+        {
+            // TRANSLATORS: Crowdin has string-based and file-based project kinds (see https://support.crowdin.com/creating-project/#file-based-project)
+            BOOST_THROW_EXCEPTION(Exception(_("String-based Crowdin projects are not supported.")));
+        }
+
         if (get_value(d, "publicDownloads", false) == false)
-            throw Exception(_("Downloading translations is disabled in this project."));
+            BOOST_THROW_EXCEPTION(Exception(_("Downloading translations is disabled in this project.")));
 
         for (const auto& langCode: d.at("targetLanguageIds"))
             prj->languages.push_back(Language::FromLanguageTag(std::string(langCode)));
@@ -665,7 +671,8 @@ dispatch::future<void> CrowdinClient::UploadFile(const std::string& file_buffer,
                 "projects/" + std::to_string(meta->projectId) + "/translations/" + meta->lang.LanguageTag(),
                 json_data({
                     { "storageId", storageId },
-                    { "fileId", meta->fileId }
+                    { "fileId", meta->fileId },
+                    { "importEqSuggestions", true }
                 }))
                 .then([](json r) {
                     wxLogTrace("poedit.crowdin", "File uploaded: %s", r.dump().c_str());

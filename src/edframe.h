@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 1999-2024 Vaclav Slavik
+ *  Copyright (C) 1999-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -130,7 +130,7 @@ class PoeditFrame : public PoeditFrameBase
         /** Updates catalog and sets m_modified flag. Updates from POT
             if \a pot_file is not empty and from sources otherwise.
          */
-        bool UpdateCatalog(const wxString& pot_file = wxEmptyString);
+        void UpdateCatalog(const wxString& pot_file = wxEmptyString);
 
         void UpdateAfterPreferencesChange();
         static void UpdateAllAfterPreferencesChange();
@@ -219,10 +219,12 @@ class PoeditFrame : public PoeditFrameBase
 
         /// Updates statistics in statusbar.
         void UpdateStatusBar();
+        void InitStatusBar();
         /// Updates frame title.
         void UpdateTitle();
         /// Updates menu -- disables and enables items.
         void UpdateMenu();
+        void UpdateCloudSyncUI(bool isCrowdin);
 
         // Called when catalog's language possibly changed
         void UpdateTextLanguage();
@@ -268,10 +270,13 @@ private:
         void OnUpdateFromSourcesUpdate(wxUpdateUIEvent& event);
         void OnUpdateFromPOT(wxCommandEvent& event);
         void OnUpdateFromPOTUpdate(wxUpdateUIEvent& event);
-        void OnUpdateFromCrowdin(wxCommandEvent& event);
-        void OnUpdateFromCrowdinUpdate(wxUpdateUIEvent& event);
         void OnUpdateSmart(wxCommandEvent& event);
         void OnUpdateSmartUpdate(wxUpdateUIEvent& event);
+
+        void CloudSyncWithCrowdin();
+        void CloudSyncUpload();
+        void OnCloudSync(wxCommandEvent& event);
+        void OnCloudSyncUpdate(wxUpdateUIEvent& event);
 
         void OnValidate(wxCommandEvent& event);
         void OnListSel(wxDataViewEvent& event);
@@ -332,7 +337,7 @@ private:
 
         void OnCompileMO(wxCommandEvent& event);
         void OnExportToHTML(wxCommandEvent& event);
-        bool ExportCatalogToHTML(const wxString& filename);
+        void ExportCatalogToHTML(const wxString& filename);
 
         void OnSize(wxSizeEvent& event);
 

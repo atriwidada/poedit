@@ -45,6 +45,16 @@ remove_empty_lproj_string_files()
     done
 }
 
+# Create sr-Latn files from sr-Cyrl ones:
+build_sr_latin()
+{
+    recode-sr-latin <locales/sr.po >locales/sr@latin.po
+    recode-sr-latin <locales/win/windows_strings-Serbian_Cyrillic.rc >locales/win/windows_strings-Serbian_Latin.rc
+    recode-sr-latin <locales/macos/sr.lproj/InfoPlist.strings >locales/macos/sr-Latn.lproj/InfoPlist.strings
+    recode-sr-latin <locales/macos/sr.lproj/MoveApplication.strings >locales/macos/sr-Latn.lproj/MoveApplication.strings
+    recode-sr-latin <src/macos/nib/sr.lproj/MainToolbar.strings >src/macos/nib/sr-Latn.lproj/MainToolbar.strings
+}
+
 # Massage RC files from Crowdin to be actually usable:
 fixup_windows_rc_files()
 {
@@ -62,6 +72,7 @@ fixup_windows_rc_files()
         stripped=`basename "$i" .rc | cut -d- -f2 | tr [a-z] [A-Z]`
         lang=`echo $stripped | cut -d_ -f1`
         lang="${lang/KAZAKH/KAZAK}"
+        lang="${lang/UYGHUR/UIGHUR}"
         sublang=`echo $stripped | cut -s -d_ -f2`
         if [ "$lang" = "BOSNIAN" ] ; then
             sublang="BOSNIA_HERZEGOVINA_LATIN"
@@ -88,29 +99,62 @@ fixup_windows_rc_files()
     done
 }
 
+
+# remove changes that only touch refresh header and do nothing else:
+remove_date_only_changes()
+{
+    if ! git ls-files $1 --error-unmatch >/dev/null 2>&1 ; then
+        return
+    fi
+
+    changes=$(git diff --no-ext-diff $1 | grep '^[+-][^+-]' | grep -v '\(PO-Revision\|POT-Creation\)-Date' | wc -l)
+    if [ $changes -eq 0 ] ; then
+        git checkout $1
+    fi
+}
+
+
 # Remove some issues with Crowdin-generated files
 fixup_po_files()
 {
-    for i in locales/*.po ; do
-        # nothing currently
-        true
+    for p in locales/*.po ; do
+        msgmerge --quiet -o $p.tmp --no-fuzzy-matching $p locales/poedit.pot
+        msgattrib --no-obsolete -o $p $p.tmp
+        rm $p.tmp
+        remove_date_only_changes $p
+    done
+}
+
+# If not even the toolbar is (almost) fully translated, there's really no point
+# in shipping the translation, is there?
+remove_insufficient_macos_translations()
+{
+    full_labels_count=$(grep '\.label' src/macos/nib/en.lproj/MainToolbar.strings | wc -l)
+    cutoff=$(expr $full_labels_count - 1)
+    for i in src/macos/nib/*.lproj/MainToolbar.strings ; do
+        cnt=$(grep '\.label' "$i" | wc -l)
+        if [ $cnt -lt $cutoff ] ; then
+            rm -f "$i"
+        fi
     done
 }
 
 
+remove_insufficient_macos_translations
+
 remove_unsupported_languages
 
 remove_empty_lproj_string_files
+build_sr_latin
 fixup_windows_rc_files
-fixup_po_files
 
 scripts/refresh-pot.sh
+fixup_po_files
+
 scripts/do-update-translations-lists.sh
 
 git status
 echo ""
-exit_code=0
-for i in locales/*.po ; do
-    msgfmt -c -o /dev/null $i || exit_code=$?
-done
-exit $exit_code
+
+uv run --script scripts/check-translations.py
+

@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2000-2024 Vaclav Slavik
+ *  Copyright (C) 2000-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -52,6 +52,10 @@
 #include <wx/xrc/xmlres.h>
 #include <wx/numformatter.h>
 
+#ifdef __WXOSX__
+    #include <wx/private/bmpbndl.h>
+#endif
+
 #include "app_updates.h"
 #include "edapp.h"
 #include "edframe.h"
@@ -61,40 +65,38 @@
 #include "configuration.h"
 #include "crowdin_gui.h"
 #include "hidpi.h"
+#include "menus.h"
 #include "tm/transmem.h"
 #include "tm/tmx_io.h"
 #include "uilang.h"
 #include "errors.h"
 #include "extractors/extractor_legacy.h"
+#include "progress_ui.h"
 #include "spellchecking.h"
 #include "str_helpers.h"
 #include "utility.h"
 #include "customcontrols.h"
+#include "layout_helpers.h"
 #include "unicode_helpers.h"
-
-
-// Handling of different page icons
-#ifdef __WXOSX__
-inline wxBitmap MacPageIcon(const char *macos10, const char *macos11)
-{
-    (void)macos11;
-    if (@available(macOS 11.0, *))
-        return wxBitmap([NSImage imageWithSystemSymbolName:str::to_NS(macos11) accessibilityDescription:nil]);
-    else
-        return wxArtProvider::GetBitmap(macos10);
-}
-#else
-inline wxBitmap MacPageIcon(const char*, const char*) { return wxNullBitmap; }
-#endif
 
 namespace
 {
 
-class PrefsPanel : public WindowWith2DSizingConstraints<wxPanel>
+#ifdef __WXOSX__
+inline wxBitmapBundle MacPageIcon(const char *symbol)
+{
+    return wxOSXMakeBundleFromImage([NSImage imageWithSystemSymbolName:str::to_NS(symbol) accessibilityDescription:nil]);
+}
+#else
+inline wxBitmap MacPageIcon(const char*) { return wxNullBitmap; }
+#endif
+
+
+class PrefsPanel : public WindowWith2DSizingConstraints<StandardLayout<wxPanel>>
 {
 public:
     PrefsPanel(wxWindow *parent)
-        : WindowWith2DSizingConstraints<wxPanel>(parent), m_suppressDataTransfer(0)
+        : WindowWith2DSizingConstraints<StandardLayout<wxPanel>>(parent), m_suppressDataTransfer(0)
     {
 #ifdef __WXOSX__
         // Refresh the content of prefs panels when re-opening it.
@@ -161,12 +163,8 @@ class GeneralPageWindow : public PrefsPanel
 public:
     GeneralPageWindow(wxWindow *parent) : PrefsPanel(parent)
     {
-        wxSizer *topsizer = new wxBoxSizer(wxVERTICAL);
-        topsizer->SetMinSize(PX(400), -1);
-
-        wxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-        topsizer->Add(sizer, wxSizerFlags(1).Expand().PXDoubleBorderAll());
-        SetSizer(topsizer);
+        auto sizer = ContentSizer();
+        sizer->SetMinSize(PX(400), -1);
 
         sizer->Add(new HeadingLabel(this, _("Information about the translator")));
         sizer->AddSpacer(PX(10));
@@ -200,8 +198,6 @@ public:
 
         m_compileMo = new wxCheckBox(this, wxID_ANY, _("Automatically compile MO file when saving"));
         sizer->Add(m_compileMo);
-        m_showSummary = new wxCheckBox(this, wxID_ANY, _("Show summary after updating files"));
-        sizer->Add(m_showSummary, wxSizerFlags().PXBorder(wxTOP));
 
         sizer->AddSpacer(PX(10));
 
@@ -214,7 +210,7 @@ public:
         explainFocus.Replace("Ctrl", "Cmd");
 #endif
         sizer->AddSpacer(PX(5));
-        sizer->Add(new ExplanationLabel(this, explainFocus), wxSizerFlags().Expand().Border(wxLEFT, PX(ExplanationLabel::CHECKBOX_INDENT)));
+        sizer->Add(new ExplanationLabel(this, explainFocus), wxSizerFlags().Expand().Border(wxLEFT, UnderCheckboxIndent()));
 
         sizer->AddSpacer(PX(10));
         sizer->Add(new HeadingLabel(this, _("Appearance")));
@@ -280,7 +276,6 @@ public:
         m_userName->SetValue(cfg.Read("translator_name", wxEmptyString));
         m_userEmail->SetValue(cfg.Read("translator_email", wxEmptyString));
         m_compileMo->SetValue(cfg.ReadBool("compile_mo", true));
-        m_showSummary->SetValue(cfg.ReadBool("show_summary", false));
         m_focusToText->SetValue(cfg.ReadBool("focus_to_text", false));
 
         if (IsSpellcheckingAvailable())
@@ -313,7 +308,6 @@ public:
         cfg.Write("translator_name", m_userName->GetValue());
         cfg.Write("translator_email", m_userEmail->GetValue());
         cfg.Write("compile_mo", m_compileMo->GetValue());
-        cfg.Write("show_summary", m_showSummary->GetValue());
         cfg.Write("focus_to_text", m_focusToText->GetValue());
 
         if (IsSpellcheckingAvailable())
@@ -341,7 +335,7 @@ public:
 
 private:
     wxTextCtrl *m_userName, *m_userEmail;
-    wxCheckBox *m_compileMo, *m_showSummary, *m_focusToText, *m_spellchecking;
+    wxCheckBox *m_compileMo, *m_focusToText, *m_spellchecking;
     wxCheckBox *m_useFontList, *m_useFontText;
     wxFontPickerCtrl *m_fontList, *m_fontText;
 #if NEED_CHOOSELANG_UI
@@ -353,7 +347,7 @@ class GeneralPage : public wxPreferencesPage
 {
 public:
     wxString GetName() const override { return _("General"); }
-    wxBitmap GetLargeIcon() const override { return MacPageIcon("Prefs-General", "gearshape"); }
+    wxBitmapBundle GetIcon() const override { return MacPageIcon("gearshape"); }
     wxWindow *CreateWindow(wxWindow *parent) override { return new GeneralPageWindow(parent); }
 };
 
@@ -364,16 +358,11 @@ class TMPageWindow : public PrefsPanel
 public:
     TMPageWindow(wxWindow *parent) : PrefsPanel(parent)
     {
-        wxSizer *topsizer = new wxBoxSizer(wxVERTICAL);
+        auto sizer = ContentSizer();
 #ifdef __WXOSX__
-        topsizer->SetMinSize(PX(430), -1); // for macOS look
+        sizer->SetMinSize(PX(430), -1); // for macOS look
 #endif
 
-        wxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-        topsizer->Add(sizer, wxSizerFlags(1).Expand().PXDoubleBorderAll());
-        SetSizer(topsizer);
-
-        sizer->AddSpacer(PX(5));
         m_useTM = new wxCheckBox(this, wxID_ANY, _("Use translation memory"));
         sizer->Add(m_useTM, wxSizerFlags().Expand());
 
@@ -414,12 +403,11 @@ public:
 
         auto explainTxt = _(L"Poedit can attempt to fill in new entries from only previous translations in the file or from your entire translation memory. Using the TM won’t be very effective if it’s near-empty, but it will get better as you add more translations to it.");
         auto explain = new ExplanationLabel(this, explainTxt);
-        sizer->Add(explain, wxSizerFlags().Expand().Border(wxLEFT, PX(ExplanationLabel::CHECKBOX_INDENT)));
+        sizer->Add(explain, wxSizerFlags().Expand().Border(wxLEFT, UnderCheckboxIndent()));
 
         auto learnMore = new LearnMoreLink(this, "https://poedit.net/trac/wiki/Doc/TranslationMemory");
         sizer->AddSpacer(PX(3));
-        sizer->Add(learnMore, wxSizerFlags().Border(wxLEFT, PX(ExplanationLabel::CHECKBOX_INDENT)));
-        sizer->AddSpacer(PX(10));
+        sizer->Add(learnMore, wxSizerFlags().Border(wxLEFT, UnderCheckboxIndent()));
 
 #ifdef __WXOSX__
         m_stats->SetWindowVariant(wxWINDOW_VARIANT_SMALL);
@@ -503,13 +491,18 @@ private:
 #ifdef __WXOSX__
         [menu.GetHMenu() setFont:[NSFont systemFontOfSize:13]];
 #endif
-        menu.Append(idLearn, MSW_OR_OTHER(_(L"Import translation files…"), _(L"Import Translation Files…")));
+        auto itemLearn = menu.Append(idLearn, MSW_OR_OTHER(_(L"Import translation files…"), _(L"Import Translation Files…")));
         menu.AppendSeparator();
-        menu.Append(idImportTMX, MSW_OR_OTHER(_(L"Import from TMX…"), _(L"Import From TMX…")));
-        menu.Append(idExportTMX, MSW_OR_OTHER(_(L"Export to TMX…"), _(L"Export To TMX…")));
+        auto itemImport = menu.Append(idImportTMX, MSW_OR_OTHER(_(L"Import from TMX…"), _(L"Import From TMX…")));
+        auto itemExport = menu.Append(idExportTMX, MSW_OR_OTHER(_(L"Export to TMX…"), _(L"Export To TMX…")));
         menu.AppendSeparator();
         // TRANSLATORS: This is a button that deletes everything in the translation memory (i.e. clears/resets it).
-        menu.Append(idReset, _("Reset"));
+        auto itemReset = menu.Append(idReset, _("Reset"));
+        
+        SetMacMenuIcon(itemLearn, "document.on.document");
+        SetMacMenuIcon(itemImport, "arrow.down.document");
+        SetMacMenuIcon(itemExport, "arrow.up.document");
+        SetMacMenuIcon(itemReset, "trash");
 
         menu.Bind(wxEVT_MENU, &TMPageWindow::OnImportIntoTM, this, idLearn);
         menu.Bind(wxEVT_MENU, &TMPageWindow::OnImportTMX, this, idImportTMX);
@@ -543,35 +536,16 @@ private:
             wxArrayString paths;
             dlg->GetPaths(paths);
 
-            wxProgressDialog progress(_("Translation Memory"),
-                                      _(L"Importing translations…"),
-                                      (int)paths.size() * 2 + 1,
-                                      this,
-                                      wxPD_APP_MODAL|wxPD_AUTO_HIDE|wxPD_CAN_ABORT);
             auto tm = TranslationMemory::Get().GetWriter();
-            int step = 0;
-            for (size_t i = 0; i < paths.size(); i++)
+
+            DoImportIntoTM(paths, [=](const wxString& p)
             {
-                try
-                {
-                    auto cat = Catalog::Create(paths[i]);
-                    if (!progress.Update(++step))
-                        break;
-                    tm->Insert(cat);
-                    if (!progress.Update(++step))
-                        break;
-                }
-                catch (...)
-                {
-                    wxLogError(_(L"Error loading translation file “%s”."), paths[i]);
-                    progress.Update(++step);
-                    if (!progress.Update(++step))
-                        break;
-                }
-            }
-            progress.Pulse(_(L"Finalizing…"));
-            tm->Commit();
-            UpdateStats();
+                Progress subprogress(1);
+                auto cat = Catalog::Create(p);
+                tm->Insert(cat);
+                tm->Commit();
+                return cat->GetCount();
+            });
         }
     }
 
@@ -595,45 +569,60 @@ private:
 
             wxArrayString paths;
             dlg->GetPaths(paths);
+            DoImportIntoTM(paths, [=](const wxString& p)
+            {
+                std::ifstream f;
+                f.open(p.fn_str());
+                int count = TMX::ImportFromFile(f, TranslationMemory::Get());
+                f.close();
+                return count;
+            });
+        }
+    }
 
-            wxProgressDialog progress(_("Translation Memory"),
-                                      _(L"Importing translations…"),
-                                      (int)paths.size() + 1,
-                                      this,
-                                      wxPD_APP_MODAL|wxPD_AUTO_HIDE|wxPD_CAN_ABORT);
-            progress.Pulse();
+    template<typename T>
+    void DoImportIntoTM(const wxArrayString& paths, T&& doImportFile)
+    {
+        auto cancellation = std::make_shared<dispatch::cancellation_token>();
+        wxWindowPtr<ProgressWindow> progress(new ProgressWindow(this, _(L"Importing translations…"), cancellation));
+        progress->SetErrorMessage(_("Importing translation memory failed."));
+
+        progress->RunTaskModal([=]() -> BackgroundTaskResult
+        {
+            Progress progress(paths.size());
+
+            int count = 0;
             for (auto p: paths)
             {
+                if (cancellation->is_cancelled())
+                    break;
+
+                auto pname = wxFileName(p).GetFullName();
+                Progress subprogress(1);
+                subprogress.message(wxString::Format(_(L"Importing from “%s”…"), pname));
+
                 try
                 {
-                    std::ifstream f;
-                    f.open(p.fn_str());
-                    TMX::ImportFromFile(f, TranslationMemory::Get());
-                    f.close();
-
-                    if (!progress.Pulse())
-                        break;
+                    count += doImportFile(p);
                 }
                 catch (...)
                 {
-                    wxWindowPtr<wxMessageDialog> err(new wxMessageDialog
-                    (
-                            this,
-                            wxString::Format(_(L"Importing translation memory from “%s” failed."), p),
-                            _("Import error"),
-                            wxOK | wxICON_ERROR
-                        ));
-                    err->SetExtendedMessage(DescribeCurrentException());
-                    // FIXME: can't use ShowWindowModalThenDo, as would be better, because multiple
-                    //        errors may occur in this loop. See https://github.com/vslavik/poedit/issues/748
-                    if (paths.size() == 1)
-                        err->ShowWindowModalThenDo([err](int){});
-                    else
-                        err->ShowModal();
+                    wxLogError(("%s: %s"), pname, DescribeCurrentException());
                 }
             }
-            UpdateStats();
-        }
+
+            if (count == 0)
+                return {};
+
+            return wxString::Format
+                   (
+                       // TRANSLATORS: %s is a (formatted) number here
+                       wxPLURAL("%s translation was imported.", "%s translations were imported.", count),
+                       wxNumberFormatter::ToString((long)count)
+                   );
+        });
+
+        UpdateStats();
     }
 
     void OnExportTMX(wxCommandEvent&)
@@ -655,32 +644,21 @@ private:
                 return;
 
             auto p = dlg->GetPath();
-            wxProgressDialog progress(_("Translation Memory"),
-                                      _(L"Exporting translations…"),
-                                      1,
-                                      this,
-                                      wxPD_APP_MODAL|wxPD_AUTO_HIDE|wxPD_CAN_ABORT);
-            progress.Pulse();
 
-            try
+            wxWindowPtr<ProgressWindow> progress(new ProgressWindow(this, _(L"Exporting translations…")));
+            progress->SetErrorMessage(wxString::Format(_(L"Exporting translation memory to “%s” failed."), wxFileName(p).GetFullName()));
+            progress->RunTaskModal([=]()
             {
+                TempOutputFileFor tempfile(p);
+
                 std::ofstream f;
-                f.open(p.fn_str());
+                f.open(tempfile.FileName().fn_str());
                 TMX::ExportToFile(TranslationMemory::Get(), f);
                 f.close();
-            }
-            catch (...)
-            {
-                wxWindowPtr<wxMessageDialog> err(new wxMessageDialog
-                (
-                        this,
-                        wxString::Format(_(L"Exporting translation memory to “%s” failed."), p),
-                        _("Export error"),
-                        wxOK | wxICON_ERROR
-                    ));
-                err->SetExtendedMessage(DescribeCurrentException());
-                err->ShowWindowModalThenDo([err](int){});
-            }
+
+                if ( !tempfile.Commit() )
+                    BOOST_THROW_EXCEPTION(Exception(wxString::Format(_(L"Couldn’t save file %s."), wxFileName(p).GetFullName())));
+            });
         }
     }
 
@@ -728,7 +706,7 @@ public:
         return _("Translation Memory");
 #endif
     }
-    wxBitmap GetLargeIcon() const override { return MacPageIcon("Prefs-TM", "internaldrive"); }
+    wxBitmapBundle GetIcon() const override { return MacPageIcon("internaldrive"); }
     wxWindow *CreateWindow(wxWindow *parent) override { return new TMPageWindow(parent); }
 };
 
@@ -739,17 +717,13 @@ class ExtractorsPageWindow : public PrefsPanel
 public:
     ExtractorsPageWindow(wxWindow *parent) : PrefsPanel(parent)
     {
-        wxSizer *topsizer = new wxBoxSizer(wxVERTICAL);
-
-        wxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-        topsizer->Add(sizer, wxSizerFlags(1).Expand().PXDoubleBorderAll());
-        SetSizer(topsizer);
+        auto sizer = ContentSizer();
 
         sizer->Add(new ExplanationLabel(this, _("Source code extractors are used to find translatable strings in the source code files and extract them so that they can be translated.")),
                    wxSizerFlags().Expand().PXDoubleBorder(wxBOTTOM));
 
-        // FIXME: Neither wxBORDER_ flag produces correct results on macOS or Windows, would need to paint manually
-        auto listPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL | MSW_OR_OTHER(wxBORDER_SIMPLE, wxBORDER_SUNKEN));
+        auto listPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL | BORDER_LISTLIKE);
+        SetupListlikeBorder(listPanel);
 
         auto listSizer = new wxBoxSizer(wxVERTICAL);
         listPanel->SetSizer(listSizer);
@@ -770,8 +744,7 @@ public:
         m_list->SetMinSize(wxSize(PX(400),PX(200)));
 #ifdef __WXOSX__
         m_list->SetWindowVariant(wxWINDOW_VARIANT_SMALL);
-        if (@available(macOS 11.0, *))
-            ((NSTableView*)[((NSScrollView*)m_list->GetHandle()) documentView]).style = NSTableViewStyleFullWidth;
+        ((NSTableView*)[((NSScrollView*)m_list->GetHandle()) documentView]).style = NSTableViewStyleFullWidth;
 #endif
         listSizer->Add(m_list, wxSizerFlags(1).Expand().Border(wxLEFT|wxRIGHT, PX(5)));
 
@@ -877,11 +850,27 @@ public:
     }
 
 private:
+    class ExtractorEditDialog : public StandardDialog
+    {
+    public:
+        ExtractorEditDialog(wxWindow *parent) : StandardDialog(parent, _("Extractor setup"))
+        {
+            auto sizer = ContentSizer();
+
+            auto panel = wxXmlResource::Get()->LoadPanel(this, "edit_extractor");
+            sizer->Add(panel, wxSizerFlags(1).Expand());
+
+            CreateButtons(wxOK | wxCANCEL);
+
+            FitSizer();
+        }
+    };
+
     /// Called to launch dialog for editing parser properties.
     template<typename TFunctor>
     void EditExtractor(int num, TFunctor completionHandler)
     {
-        wxWindowPtr<wxDialog> dlg(wxXmlResource::Get()->LoadDialog(this, "edit_extractor"));
+        wxWindowPtr<ExtractorEditDialog> dlg(new ExtractorEditDialog(this));
         dlg->Centre();
 
         auto extractor_language = XRCCTRL(*dlg, "extractor_language", wxTextCtrl);
@@ -1012,7 +1001,7 @@ class ExtractorsPage : public wxPreferencesPage
 {
 public:
     wxString GetName() const override { return _("Extractors"); }
-    wxBitmap GetLargeIcon() const override { return MacPageIcon("Prefs-Extractors", "doc.text.viewfinder"); }
+    wxBitmapBundle GetIcon() const override { return MacPageIcon("doc.text.viewfinder"); }
     wxWindow *CreateWindow(wxWindow *parent) override { return new ExtractorsPageWindow(parent); }
 };
 
@@ -1024,11 +1013,10 @@ class AccountsPageWindow : public PrefsPanel
 public:
     AccountsPageWindow(wxWindow *parent) : PrefsPanel(parent)
     {
-        wxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-        SetSizer(sizer);
+        auto sizer = ContentSizer();
 
         m_accounts = new AccountsPanel(this);
-        sizer->Add(m_accounts, wxSizerFlags(1).Expand().PXDoubleBorderAll());
+        sizer->Add(m_accounts, wxSizerFlags(1).Expand());
 
     #ifdef __WXOSX__
         // This window was possibly created on demand (pre-macOS 11), possibly
@@ -1070,7 +1058,7 @@ class AccountsPage : public wxPreferencesPage
 {
 public:
     wxString GetName() const override { return _("Accounts"); }
-    wxBitmap GetLargeIcon() const override { return MacPageIcon("Prefs-Accounts", "at"); }
+    wxBitmapBundle GetIcon() const override { return MacPageIcon("at"); }
     wxWindow *CreateWindow(wxWindow *parent) override { return new AccountsPageWindow(parent); }
 };
 #endif // HAVE_HTTP_CLIENT
@@ -1082,12 +1070,8 @@ class UpdatesPageWindow : public PrefsPanel
 public:
     UpdatesPageWindow(wxWindow *parent) : PrefsPanel(parent)
     {
-        wxSizer *topsizer = new wxBoxSizer(wxVERTICAL);
-        topsizer->SetMinSize(PX(400), -1); // for macOS look, wouldn't fit the toolbar otherwise
-
-        wxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-        topsizer->Add(sizer, wxSizerFlags().Expand().PXDoubleBorderAll());
-        SetSizer(topsizer);
+        auto sizer = ContentSizer();
+        sizer->SetMinSize(PX(400), -1); // for macOS look, wouldn't fit the toolbar otherwise
 
         m_updates = new wxCheckBox(this, wxID_ANY, _("Automatically check for updates"));
         sizer->Add(m_updates, wxSizerFlags().Expand().PXBorder(wxTOP|wxBOTTOM));
@@ -1096,8 +1080,7 @@ public:
         sizer->Add(m_beta, wxSizerFlags().Expand().PXBorder(wxBOTTOM));
 
         sizer->Add(new ExplanationLabel(this, _("Beta versions contain the latest new features and improvements, but may be a bit less stable.")),
-                   wxSizerFlags().Expand().Border(wxLEFT, PX(ExplanationLabel::CHECKBOX_INDENT)));
-        sizer->AddSpacer(PX(5));
+                   wxSizerFlags().Expand().Border(wxLEFT, UnderCheckboxIndent()));
 
         if (wxPreferencesEditor::ShouldApplyChangesImmediately())
             Bind(wxEVT_CHECKBOX, [=](wxCommandEvent&){ TransferDataFromWindow(); });
@@ -1125,7 +1108,7 @@ class UpdatesPage : public wxPreferencesPage
 {
 public:
     wxString GetName() const override { return _("Updates"); }
-    wxBitmap GetLargeIcon() const override { return MacPageIcon("Prefs-Updates", "arrow.down.circle"); }
+    wxBitmapBundle GetIcon() const override { return MacPageIcon("arrow.down.circle"); }
     wxWindow *CreateWindow(wxWindow *parent) override { return new UpdatesPageWindow(parent); }
 };
 #endif // HAS_UPDATES_CHECK
@@ -1136,11 +1119,7 @@ class AdvancedPageWindow : public PrefsPanel
 public:
     AdvancedPageWindow(wxWindow *parent) : PrefsPanel(parent)
     {
-        wxSizer *topsizer = new wxBoxSizer(wxVERTICAL);
-
-        wxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-        topsizer->Add(sizer, wxSizerFlags(1).Expand().PXDoubleBorderAll());
-        SetSizer(topsizer);
+        auto sizer = ContentSizer();
 
         sizer->Add(new ExplanationLabel(this, _("These settings affect internal formatting of PO files. Adjust them if you have specific requirements e.g. because of version control.")), wxSizerFlags().Expand().PXBorder(wxBOTTOM));
 
@@ -1218,7 +1197,7 @@ class AdvancedPage : public wxStockPreferencesPage
 public:
     AdvancedPage() : wxStockPreferencesPage(Kind_Advanced) {}
     wxString GetName() const override { return _("Advanced"); }
-    wxBitmap GetLargeIcon() const override { return MacPageIcon("Prefs-Advanced", "gearshape.2"); }
+    wxBitmapBundle GetIcon() const override { return MacPageIcon("gearshape.2"); }
     wxWindow *CreateWindow(wxWindow *parent) override { return new AdvancedPageWindow(parent); }
 };
 

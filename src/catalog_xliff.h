@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2018-2024 Vaclav Slavik
+ *  Copyright (C) 2018-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -115,16 +115,20 @@ public:
     Language GetLanguage() const override { return m_language; }
     void SetLanguage(Language lang) override { m_language = lang; }
 
-    // FIXME: PO specific
-    bool HasDeletedItems() const override { return false;}
-    void RemoveDeletedItems() override {}
-
     pugi::xml_node GetXMLRoot() const { return m_doc.child("xliff"); }
     std::string GetXPathValue(const char* xpath) const;
 
 protected:
     XLIFFCatalog(pugi::xml_document&& doc)
         : Catalog(Type::XLIFF), m_doc(std::move(doc)) {}
+
+    struct InstanceCreatorImpl
+    {
+        virtual ~InstanceCreatorImpl() {}
+        virtual std::shared_ptr<XLIFFCatalog> CreateFromDoc(pugi::xml_document&& doc, const std::string& xliff_version) = 0;
+    };
+
+    static std::shared_ptr<XLIFFCatalog> OpenImpl(const wxString& filename, InstanceCreatorImpl& creator);
 
     virtual void Parse(pugi::xml_node root) = 0;
 

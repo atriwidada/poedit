@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 1999-2024 Vaclav Slavik
+ *  Copyright (C) 1999-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -27,6 +27,7 @@
 #include <wx/clipbrd.h>
 #include <wx/config.h>
 #include <wx/cpp.h>
+#include <wx/evtloop.h>
 #include <wx/filedlg.h>
 #include <wx/fs_zip.h>
 #include <wx/image.h>
@@ -96,6 +97,7 @@
 #include "http_client.h"
 #include "icons.h"
 #include "version.h"
+#include "progress_ui.h"
 #include "recent_files.h"
 #include "str_helpers.h"
 #include "tm/transmem.h"
@@ -298,11 +300,11 @@ wxString PoeditApp::GetAppBuildNumber() const
 #elif defined(__WXMSW__)
     auto exe = wxStandardPaths::Get().GetExecutablePath();
     DWORD unusedHandle;
-    DWORD fiSize = GetFileVersionInfoSize(exe.wx_str(), &unusedHandle);
+    DWORD fiSize = GetFileVersionInfoSize(exe.wc_str(), &unusedHandle);
     if (fiSize == 0)
         return "";
     wxCharBuffer fi(fiSize);
-    if (!GetFileVersionInfo(exe.wx_str(), unusedHandle, fiSize, fi.data()))
+    if (!GetFileVersionInfo(exe.wc_str(), unusedHandle, fiSize, fi.data()))
         return "";
     void *ver;
     UINT sizeInfo;
@@ -494,7 +496,9 @@ bool PoeditApp::OnInit()
 void PoeditApp::OnEventLoopEnter(wxEventLoopBase *loop)
 {
     wxApp::OnEventLoopEnter(loop);
-    FileMonitor::EventLoopStarted();
+
+    if (loop && loop->IsMain())
+        FileMonitor::EventLoopStarted();
 }
 
 int PoeditApp::OnExit()
@@ -527,8 +531,6 @@ int PoeditApp::OnExit()
 #endif
 
     dispatch::cleanup();
-
-    u_cleanup();
 
     return wxApp::OnExit();
 }
@@ -584,6 +586,10 @@ void PoeditApp::SetupLanguage()
     }
 
     trans->SetLanguage(uilang.LanguageTag());
+
+    // gettext-tools is needed for parsing of a few strings, we add it with lowest priority
+    trans->AddCatalog("gettext-tools");
+    // wx and Poedit's translations are added with higher priority:
     trans->AddStdCatalog();
     trans->AddCatalog("poedit");
 
@@ -1216,7 +1222,7 @@ void PoeditApp::OnAbout(wxCommandEvent&)
     about.SetVersion(wxGetApp().GetAppVersion());
     about.SetDescription(_("Poedit is an easy to use translation editor."));
 #endif
-    about.SetCopyright(L"Copyright \u00a9 1999-2024 Václav Slavík");
+    about.SetCopyright(L"Copyright \u00a9 1999-2025 Václav Slavík");
 #ifdef __WXGTK__ // other ports would show non-native about dlg
     about.SetWebSite("https://poedit.net");
     about.SetIcon(wxArtProvider::GetIcon("net.poedit.Poedit", wxART_FRAME_ICON, wxSize(128, 128)));
@@ -1325,7 +1331,7 @@ void PoeditApp::OnHelp(wxCommandEvent&)
 
 void PoeditApp::OnGettextManual(wxCommandEvent&)
 {
-    wxLaunchDefaultBrowser("http://www.gnu.org/software/gettext/manual/html_node/");
+    wxLaunchDefaultBrowser("https://www.gnu.org/software/gettext/manual/html_node/");
 }
 
 

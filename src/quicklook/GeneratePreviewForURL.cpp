@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2015-2024 Vaclav Slavik
+ *  Copyright (C) 2015-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -81,9 +81,6 @@ extern "C"
 
 void Initialize_plugin(void)
 {
-    UErrorCode err = U_ZERO_ERROR;
-    u_init(&err);
-
     wxInitialize();
 
     CFBundleRef bundle = CFBundleGetBundleWithIdentifier(CFSTR("net.poedit.PoeditQuicklook"));
@@ -101,6 +98,8 @@ void Initialize_plugin(void)
 
             wxString bestTrans = trans->GetBestTranslation("poedit-quicklook");
             Language uiLang = Language::TryParse(bestTrans.ToStdWstring());
+
+            UErrorCode err = U_ZERO_ERROR;
             uloc_setDefault(uiLang.IcuLocaleName().c_str(), &err);
         }
         CFRelease(url);
@@ -110,7 +109,6 @@ void Initialize_plugin(void)
 void Uninitialize_plugin(void)
 {
     wxUninitialize();
-    u_cleanup();
 }
 
 

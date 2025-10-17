@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2021-2024 Vaclav Slavik
+ *  Copyright (C) 2021-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -75,7 +75,7 @@ public:
     bool SetBackgroundColour(const wxColour& clr) override;
 
     /// Returns sizer in the tabs portions of the control where custom controls can be added or NULL
-    wxSizer *GetTabsExtensibleArea() const;
+    wxSizer *GetTabsExtensibleArea() const { return m_tabsExtensibleArea; }
 
 protected:
     SegmentedNotebook(wxWindow* parent, SegmentStyle style);
@@ -89,7 +89,8 @@ private:
     class ButtonTabs;
     class TabButton;
 
-    TabsIface *m_tabs;
+    TabsIface *m_tabs = nullptr;
+    wxSizer *m_tabsExtensibleArea = nullptr;
 };
 
 #else

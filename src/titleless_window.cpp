@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2013-2024 Vaclav Slavik
+ *  Copyright (C) 2013-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -35,6 +35,10 @@
     #include <wx/msw/uxtheme.h>
     #include <dwmapi.h>
     #pragma comment(lib, "Dwmapi.lib")
+#endif
+
+#ifdef __WXOSX__
+    #include <wx/private/bmpbndl.h>
 #endif
 
 
@@ -118,11 +122,22 @@ class CloseButton : public wxBitmapButton
 public:
     CloseButton(wxWindow* parent, wxWindowID id)
     {
-        wxBitmap normal([NSImage imageNamed:@"CloseButtonTemplate"]);
-        wxBitmap hover([NSImage imageNamed:@"CloseButtonHoverTemplate"]);
-        wxBitmapButton::Create(parent, id, normal, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
-        SetBitmapHover(hover);
-    }
+        auto image = wxOSXMakeBundleFromImage([NSImage imageWithSystemSymbolName:@"xmark.circle.fill" accessibilityDescription:nil]);
+        wxBitmapButton::Create(parent, id, image, wxDefaultPosition, wxDefaultSize, wxBORDER_NONE);
+
+        NSButton *native = (NSButton*)GetHandle();
+        native.contentTintColor = NSColor.tertiaryLabelColor;
+
+        Bind(wxEVT_ENTER_WINDOW, [=](wxMouseEvent& e){
+            native.contentTintColor = NSColor.secondaryLabelColor;
+            e.Skip();
+        });
+
+        Bind(wxEVT_LEAVE_WINDOW, [=](wxMouseEvent& e){
+            native.contentTintColor = NSColor.tertiaryLabelColor;
+            e.Skip();
+        });
+    } 
 };
 
 #endif // __WXOSX__
@@ -234,6 +249,20 @@ void TitlelessWindowBase<T>::DoGetClientSize(int *width, int *height) const
 }
 
 template<typename T>
+void TitlelessWindowBase<T>::DoSetClientSize(int width, int height)
+{
+    if (m_isTitleless)
+    {
+        // I don't know anymore, but it is needed to properly size fitting windows.
+        // Without this, CloudSyncProgressWindow would be 1px too small and its static text cropped.
+        width += 2 * PX(1);
+        height += 2 * PX(1);
+    }
+
+    BaseClass::DoSetClientSize(width, height);
+}
+
+template<typename T>
 WXLRESULT TitlelessWindowBase<T>::MSWWindowProc(WXUINT nMsg, WXWPARAM wParam, WXLPARAM lParam)
 {
     if (m_isTitleless)
@@ -290,7 +319,7 @@ bool TitlelessWindowBase<T>::Layout()
     if (m_closeButton)
     {
 #ifdef __WXOSX__
-        m_closeButton->Move(4, 4);
+        m_closeButton->Move(8, 8);
 #else
         auto size = this->GetClientSize();
         m_closeButton->Move(size.x - m_closeButton->GetSize().x, 0);

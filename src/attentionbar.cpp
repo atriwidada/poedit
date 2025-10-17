@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2008-2024 Vaclav Slavik
+ *  Copyright (C) 2008-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -105,7 +105,7 @@ AttentionBar::AttentionBar(wxWindow *parent)
     auto buttonsAndCheckboxSizer = new wxBoxSizer(wxVERTICAL);
     sizer->Add(buttonsAndCheckboxSizer, wxSizerFlags().Center().Border(wxTOP, PX(1)));
     buttonsAndCheckboxSizer->Add(allButtonsSizer, wxSizerFlags().Expand());
-    buttonsAndCheckboxSizer->Add(m_checkbox, wxSizerFlags().Left().Border(wxTOP, MACOS_OR_OTHER(PX(2), PX(4))));
+    buttonsAndCheckboxSizer->Add(m_checkbox, wxSizerFlags().Left().Border(wxTOP, PX(4)));
     allButtonsSizer->Add(m_buttons);
     allButtonsSizer->AddStretchSpacer();
     allButtonsSizer->AddSpacer(SMALL_BORDER);
@@ -149,12 +149,12 @@ void AttentionBar::OnPaint(wxPaintEvent&)
 {
     wxPaintDC dc(this);
 
-    auto bg = GetBackgroundColour().ChangeLightness(80);
+    auto bg = GetBackgroundColour().ChangeLightness(90);
     dc.SetBrush(bg);
     dc.SetPen(bg);
 
     wxRect rect(GetSize());
-    dc.DrawRectangle(0, rect.height - MACOS_OR_OTHER(0, PX(1)), rect.width, PX(1));
+    dc.DrawRectangle(0, rect.height - PX(1), rect.width, PX(1));
 }
 
 
@@ -213,6 +213,9 @@ void AttentionBar::ShowMessage(const AttentionMessage& msg)
     m_explanation->SetAndWrapLabel(msg.m_explanation);
     m_explanation->GetContainingSizer()->Show(m_explanation, !msg.m_explanation.empty());
     m_checkbox->SetLabel(msg.m_checkbox);
+#ifdef __WXOSX__
+    m_checkbox->SetWindowVariant(wxWINDOW_VARIANT_SMALL);
+#endif
     m_checkbox->GetContainingSizer()->Show(m_checkbox, !msg.m_checkbox.empty());
 
     m_buttons->Clear(true/*delete_windows*/);

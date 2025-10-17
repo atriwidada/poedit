@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2013-2024 Vaclav Slavik
+ *  Copyright (C) 2013-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -106,7 +106,7 @@ public:
     PluralFormsExpr DefaultPluralFormsExpr() const;
 
     /// Count of plural forms for this language
-    int nplurals() const;
+    unsigned nplurals() const;
 
     /// Returns language's text writing direction
     TextDirection Direction() const { return m_direction; }
@@ -140,6 +140,8 @@ public:
         valid ISO 639/3166 codes.
      */
     static Language TryParseWithValidation(const std::wstring& s);
+    static Language TryParseWithValidation(const std::string& s)
+        { return TryParseWithValidation(std::wstring(s.begin(), s.end())); }
 
     /**
         Returns language object corresponding to given BCP 47 tag.
@@ -184,6 +186,12 @@ public:
         Checks if @a s has the form of language code.
      */
     static bool IsValidCode(const std::wstring& s);
+    /**
+        Checks if @a s has the form of language code, being more permissive and allowing
+        e.g. BCP 47 -- i..e something suitable for passing to TryParse().
+     */
+    static bool IsPlausibleCode(const std::wstring& s);
+
 
     bool operator==(const Language& other) const { return m_code == other.m_code; }
     bool operator!=(const Language& other) const { return m_code != other.m_code; }
@@ -220,17 +228,17 @@ public:
     bool operator!=(const PluralFormsExpr& other) const { return !(*this == other); }
     explicit operator bool() const { return !m_expr.empty() && calc() != nullptr; }
 
-    int nplurals() const;
+    unsigned nplurals() const;
 
-    int evaluate_for_n(int n) const;
+    unsigned evaluate_for_n(int n) const;
 
 private:
     std::shared_ptr<PluralFormsCalculator> calc() const;
 
     std::string m_expr;
-    int m_nplurals;
-    bool m_calcCreated;
-    std::shared_ptr<PluralFormsCalculator> m_calc;
+    mutable int m_nplurals;
+    mutable bool m_calcCreated;
+    mutable std::shared_ptr<PluralFormsCalculator> m_calc;
 };
 
 #endif // Poedit_language_h

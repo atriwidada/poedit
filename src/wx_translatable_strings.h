@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2016-2024 Vaclav Slavik
+ *  Copyright (C) 2016-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -82,6 +82,8 @@ wxTRANSLATE_IN_CONTEXT("macOS menu item", "Preferences...");
 // Windows
 // --------------------------------------------------------------------------
 
+// ...
+
 
 // --------------------------------------------------------------------------
 // Stock menu/button items
@@ -140,3 +142,11 @@ wxTRANSLATE_IN_CONTEXT("keyboard key", "ctrl");
 wxTRANSLATE_IN_CONTEXT("keyboard key", "alt");
 /// TRANSLATORS: Keyboard shortcut, must correspond to translation of "Shift+"
 wxTRANSLATE_IN_CONTEXT("keyboard key", "shift");
+
+
+// --------------------------------------------------------------------------
+// Other common strings
+// --------------------------------------------------------------------------
+
+_("Error: ");
+_("Warning: ");

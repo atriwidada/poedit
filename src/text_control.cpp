@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 1999-2024 Vaclav Slavik
+ *  Copyright (C) 1999-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -31,6 +31,10 @@
 #ifdef __WXOSX__
   #import <AppKit/NSTextView.h>
   #import <Foundation/NSUndoManager.h>
+#endif
+
+#ifdef __WXGTK__
+    #include <gtk/gtk.h>
 #endif
 
 #ifdef __WXMSW__
@@ -305,10 +309,16 @@ CustomizedTextCtrl::CustomizedTextCtrl(wxWindow *parent, wxWindowID winid, long 
 {
     wxTextCtrl::Create(parent, winid, "", wxDefaultPosition, wxDefaultSize, style | ALWAYS_USED_STYLE);
 
+#ifdef __WXGTK__
+    GtkTextView *tv = GTK_TEXT_VIEW(GetGtkTextView());
+    gtk_text_view_set_left_margin(tv, 5);
+    gtk_text_view_set_right_margin(tv, 5);
+#else
     wxTextAttr padding;
     padding.SetLeftIndent(9);
     padding.SetRightIndent(9);
     SetDefaultStyle(padding);
+#endif
 
     Bind(wxEVT_TEXT_COPY, &CustomizedTextCtrl::OnCopy, this);
     Bind(wxEVT_TEXT_CUT, &CustomizedTextCtrl::OnCut, this);
@@ -420,6 +430,10 @@ wxString CustomizedTextCtrl::DoCopyText(long from, long to)
 
 void CustomizedTextCtrl::DoPasteText(long from, long to, const wxString& s)
 {
+#ifdef __WXOSX__
+    DisableAutomaticSubstitutions disableAuto(this);
+#endif
+
     Replace(from, to, s);
 }
 
@@ -502,6 +516,26 @@ void CustomizedTextCtrl::Redo()
     SetInsertionPoint(m_history[m_historyIndex].insertionPoint);
     m_historyIndex++;
 }
+
+void *CustomizedTextCtrl::GetGtkTextView() const
+{
+    // helper function that finds GtkTextView of wxTextCtrl
+
+    GtkWidget *parent = m_widget;
+    GList *child = gtk_container_get_children(GTK_CONTAINER(parent));
+    while (child)
+    {
+        if (GTK_IS_TEXT_VIEW(child->data))
+        {
+            return GTK_TEXT_VIEW(child->data);
+        }
+        child = child->next;
+    }
+
+    wxFAIL_MSG( "couldn't find GtkTextView for text control" );
+    return nullptr;
+}
+
 #endif // __WXGTK__
 
 void CustomizedTextCtrl::ShowFindIndicator(int from, int length)
@@ -785,6 +819,10 @@ wxString AnyTranslatableTextCtrl::DoCopyText(long from, long to)
 
 void AnyTranslatableTextCtrl::DoPasteText(long from, long to, const wxString& s)
 {
+#ifdef __WXOSX__
+    DisableAutomaticSubstitutions disableAuto(this);
+#endif
+
     Replace(from, to, EscapePlainText(bidi::strip_pointless_control_chars(s, m_language.Direction())));
 }
 

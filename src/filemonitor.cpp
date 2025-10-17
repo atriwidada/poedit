@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2021-2024 Vaclav Slavik
+ *  Copyright (C) 2021-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -111,11 +111,17 @@ const int MONITORING_FLASG = wxFSW_EVENT_CREATE | wxFSW_EVENT_RENAME | wxFSW_EVE
 class FSWatcher
 {
 public:
-    static FSWatcher& Get()
+    static auto Get()
     {
+        static bool s_initialized = false;
         if (!ms_instance)
+        {
+            wxCHECK_MSG(!s_initialized, ms_instance, "using FSWatcher after cleanup");
+            
             ms_instance.reset(new FSWatcher);
-        return *ms_instance;
+            s_initialized = true;
+        }
+        return ms_instance;
     }
 
     void Add(const wxFileName& dir)
@@ -171,10 +177,10 @@ private:
     std::vector<wxFileName> m_pending;
     std::unique_ptr<wxFileSystemWatcher> m_watcher;
 
-    static std::unique_ptr<FSWatcher> ms_instance;
+    static std::shared_ptr<FSWatcher> ms_instance;
 };
 
-std::unique_ptr<FSWatcher> FSWatcher::ms_instance;
+std::shared_ptr<FSWatcher> FSWatcher::ms_instance;
 
 } // anonymous namespace
 
@@ -184,16 +190,23 @@ public:
     Impl(const wxFileName& fn)
     {
         m_dir = wxFileName::DirName(fn.GetPath());
-        FSWatcher::Get().Add(m_dir);
+        auto watcher = FSWatcher::Get();
+        if (watcher)
+            watcher->Add(m_dir);
+        m_watcher = watcher;
     }
 
     ~Impl()
     {
-        FSWatcher::Get().Remove(m_dir);
+        // we may be being destroyed after FSWatcher::CleanUp was called, in which
+        // case nothing needs to be done
+        if (auto watcher = m_watcher.lock())
+            watcher->Remove(m_dir);
     }
 
 private:
     wxFileName m_dir;
+    std::weak_ptr<FSWatcher> m_watcher;
 };
 
 #endif // !__WXOSX__
@@ -202,7 +215,9 @@ private:
 void FileMonitor::EventLoopStarted()
 {
 #ifndef __WXOSX__
-    FSWatcher::Get().EventLoopStarted();
+    auto watcher = FSWatcher::Get();
+    if (watcher)
+        watcher->EventLoopStarted();
 #endif
 }
 

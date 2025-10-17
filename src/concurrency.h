@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2010-2024 Vaclav Slavik
+ *  Copyright (C) 2010-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -101,33 +101,24 @@ public:
 
     void close() override
     {
-      std::lock_guard<std::mutex> lock(m_mutex);
-      m_closed = true;
+        m_closed.store(true, std::memory_order_release);
     }
 
     bool closed() override
     {
-      std::lock_guard<std::mutex> lock(m_mutex);
-      return m_closed;
+        return m_closed.load(std::memory_order_acquire);
     }
 
     bool try_executing_one() override { return false; }
 
 private:
-    std::mutex m_mutex;
-    bool m_closed;
+    std::atomic<bool> m_closed;
 };
 
 
 #if defined(HAVE_DISPATCH)
 
-enum class queue
-{
-    main,
-    priority_default
-};
-
-extern void dispatch_async_cxx(boost::executors::work&& f, queue q = queue::priority_default);
+extern void dispatch_async_cxx(boost::executors::work&& f);
 
 class background_queue_executor : public custom_executor
 {
@@ -136,6 +127,9 @@ public:
 
     void submit(work&& closure) override
     {
+        if (closed())
+            return;
+
         dispatch_async_cxx(std::forward<work>(closure));
     }
 };
@@ -149,6 +143,9 @@ public:
 
     void submit(work&& closure)
     {
+        if (closed())
+            return;
+
         pplx::create_task([f{std::move(closure)}]() mutable { f(); });
     }
 };
@@ -159,6 +156,14 @@ class background_queue_executor : public boost::basic_thread_pool
 {
 public:
     static background_queue_executor& get();
+
+    void submit(work&& closure)
+    {
+        if (closed())
+            return;
+
+        boost::basic_thread_pool::submit(std::forward<work>(closure));
+    }
 };
 
 #endif // HAVE_DISPATCH etc.
@@ -171,11 +176,22 @@ public:
 
     void submit(work&& closure)
     {
+        if (closed())
+            return;
+
 #ifdef HAVE_DISPATCH
-        dispatch_async_cxx(std::forward<work>(closure), queue::main);
-#else
-        wxTheApp->CallAfter(std::forward<work>(closure));
+        // Note that we intentially don't use dispatch_async_cxx() and dispatch_get_main_queue() here,
+        // but rather choose to channel everything through wxApp::CallAfter(). This is because
+        // the main queue is serial and won't process further blocks if it is already executing another.
+        // This leads to deadlocks when e.g. a modal dialog is shown, from .then_on_main() handler, and
+        // it then needs to schedule something on the main thread again.
+        // See e.g. https://www.thecave.com/2015/08/10/dispatch-async-to-main-queue-doesnt-work-with-modal-window-on-mac-os-x/
 #endif
+        if (wxTheApp)
+        {
+            wxTheApp->CallAfter(std::forward<work>(closure));
+        }
+        // else: deep in app shutdown, can't post to main thread's event loop anymore
     }
 };
 
@@ -637,6 +653,12 @@ inline auto on_main(F&& f) -> future<typename detail::future_unwrapper<typename 
 
 
 
+/// Helper exception for when the task was cancelled via cancellation_token
+class cancellation_exception : public std::exception
+{
+};
+
+
 /// MT-safe token for cancelling long-running async operations.
 class cancellation_token
 {
@@ -644,13 +666,26 @@ public:
     cancellation_token() : m_cancelled(false) {}
 
     /// Signal the operation to cancel when the return value is no longer wanted
-    void cancel() { m_cancelled = true; }
+    void cancel()
+    {
+        m_cancelled.store(true, std::memory_order_release);
+    }
 
     /// Should the operation be cancelled?
-    bool is_cancelled() const { return m_cancelled; }
+    bool is_cancelled() const
+    {
+        return m_cancelled.load(std::memory_order_acquire);
+    }
+
+    /// Throw execution_cancelled if the operation should be cancelled
+    void throw_if_cancelled() const
+    {
+        if (is_cancelled())
+            BOOST_THROW_EXCEPTION( cancellation_exception() );
+    }
 
 private:
-    std::atomic_bool m_cancelled;
+    std::atomic<bool> m_cancelled;
 };
 
 /// Pointer to cancellation_token

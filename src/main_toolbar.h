@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2014-2024 Vaclav Slavik
+ *  Copyright (C) 2014-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -26,6 +26,8 @@
 #ifndef Poedit_main_toolbar_h
 #define Poedit_main_toolbar_h
 
+#include "cloud_sync.h"
+
 #include <wx/frame.h>
 #include <memory>
 
@@ -35,12 +37,9 @@ class MainToolbar
 public:
     virtual ~MainToolbar() {}
 
-    virtual void EnableSyncWithCrowdin(bool on) = 0;
+    virtual void EnableCloudSync(std::shared_ptr<CloudSyncDestination> sync, bool isCrowdin) = 0;
 
     static std::unique_ptr<MainToolbar> Create(wxFrame *parent);
-
-protected:
-    static std::unique_ptr<MainToolbar> CreateWX(wxFrame *parent);
 
     MainToolbar() {}
 };

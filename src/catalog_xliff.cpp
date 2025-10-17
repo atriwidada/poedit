@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2018-2024 Vaclav Slavik
+ *  Copyright (C) 2018-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -44,12 +44,6 @@ using namespace pugi;
 namespace
 {
 
-// Flags required for correct parsing of XML files with no loss of information
-// FIXME: This includes parse_eol, which is undesirable: it converts files to Unix
-//        line endings on save. OTOH without it, we'd have to do the conversion
-//        manually both ways when extracting _and_ editing text.
-constexpr auto PUGI_PARSE_FLAGS = parse_full | parse_ws_pcdata | parse_fragment;
-
 // Skip over a tag, starting at its '<' with forward iterator or '>' with reverse;
 // return iterator right after the tag or end if malformed
 template<typename Iter>
@@ -73,13 +67,6 @@ inline Iter skip_over_tag(Iter begin, Iter end)
     return (i == end) ? end : ++i;
 }
 
-
-// does the node have any <elements> as children?
-inline bool has_child_elements(xml_node node)
-{
-    return node.find_child([](xml_node n){ return n.type() == node_element; });
-}
-
 inline bool is_self_closing(xml_node node)
 {
     return node.type() == node_element && !node.first_child();
@@ -98,61 +85,6 @@ std::string get_subtree_markup(xml_node node)
     for (auto c: node.children())
         c.print(s, "", format_raw);
     return s.str();
-}
-
-inline void remove_all_children(xml_node node)
-{
-    while (auto last = node.last_child())
-        node.remove_child(last);
-}
-
-inline xml_attribute attribute(xml_node node, const char *name)
-{
-    auto a = node.attribute(name);
-    return a ? a : node.append_attribute(name);
-}
-
-inline bool has_multiple_text_children(xml_node node)
-{
-    bool alreadyFoundOne = false;
-    for (auto child = node.first_child(); child; child = child.next_sibling())
-    {
-        if (child.type() == node_pcdata || child.type() == node_cdata)
-        {
-            if (alreadyFoundOne)
-                return true;
-            else
-                alreadyFoundOne = true;
-        }
-    }
-    return false;
-}
-
-inline std::string get_node_text(xml_node node)
-{
-    // xml_node::text() returns the first text child, but that's not enough,
-    // because some (weird) files in the wild mix text and CDATA content
-    if (has_multiple_text_children(node))
-    {
-        std::string s;
-        for (auto child = node.first_child(); child; child = child.next_sibling())
-            if (child.type() == node_pcdata || child.type() == node_cdata)
-                s.append(child.text().get());
-        return s;
-    }
-    else
-    {
-        return node.text().get();
-    }
-}
-
-inline void set_node_text(xml_node node, const std::string& text)
-{
-    // see get_node_text() for explanation
-    if (has_multiple_text_children(node))
-        remove_all_children(node);
-
-    node.text() = text.c_str();
 }
 
 inline std::string get_node_text_or_markup(xml_node node, bool isPlainText)
@@ -211,6 +143,31 @@ inline bool is_numeric_only(const std::string& s)
     return std::all_of(s.begin(), s.end(), [](char c){ return c >= '0' && c <= '9'; });
 }
 
+
+inline void xliff_prefix_id(std::string& id, xml_node node, const char *nameAttr)
+{
+    std::string prefix;
+    for (auto p = node.parent(); p; p = p.parent())
+    {
+        if (strcmp(p.name(), "group") == 0)
+        {
+            auto gid = p.attribute(nameAttr);
+            if (!gid)
+                gid = p.attribute("id");
+            if (gid)
+            {
+                prefix.insert(0, " / ");
+                prefix.insert(0, gid.value());
+                continue; // go to grandparent
+            }
+        }
+        // stop at first non-group or unnamed parent:
+        break;
+    }
+
+    if (!prefix.empty())
+        id.insert(0, prefix);
+}
 
 
 class MetadataExtractor : public pugi::xml_tree_walker
@@ -478,31 +435,47 @@ bool XLIFFCatalog::CanLoadFile(const wxString& extension)
 }
 
 
-std::shared_ptr<XLIFFCatalog> XLIFFCatalog::Open(const wxString& filename)
+std::shared_ptr<XLIFFCatalog> XLIFFCatalog::OpenImpl(const wxString& filename, InstanceCreatorImpl& creator)
 {
     xml_document doc;
     auto result = doc.load_file(filename.fn_str(), PUGI_PARSE_FLAGS);
     if (!result)
-        throw XLIFFReadException(result.description());
-
-    std::shared_ptr<XLIFFCatalog> cat;
+        BOOST_THROW_EXCEPTION(XLIFFReadException(result.description()));
 
     auto xliff_root = doc.child("xliff");
     std::string xliff_version = xliff_root.attribute("version").value();
-    if (xliff_version == "1.0")
-        cat.reset(new XLIFF1Catalog(std::move(doc), 0));
-    else if (xliff_version == "1.1")
-        cat.reset(new XLIFF1Catalog(std::move(doc), 1));
-    else if (xliff_version == "1.2")
-        cat.reset(new XLIFF1Catalog(std::move(doc), 2));
-    else if (xliff_version == "2.0" || xliff_version == "2.1")
-        cat.reset(new XLIFF2Catalog(std::move(doc)));
-    else
-        throw XLIFFReadException(wxString::Format(_("unsupported version (%s)"), xliff_version));
+
+    auto cat = creator.CreateFromDoc(std::move(doc), xliff_version);
+    if (!cat)
+        BOOST_THROW_EXCEPTION(XLIFFReadException(wxString::Format(_("unsupported version (%s)"), xliff_version)));
 
     cat->Parse(xliff_root);
 
     return cat;
+}
+
+
+std::shared_ptr<XLIFFCatalog> XLIFFCatalog::Open(const wxString& filename)
+{
+    struct Creator : public InstanceCreatorImpl
+    {
+        std::shared_ptr<XLIFFCatalog> CreateFromDoc(pugi::xml_document&& doc, const std::string& xliff_version) override
+        {
+            if (xliff_version == "1.0")
+                return std::make_shared<XLIFF1Catalog>(std::move(doc), 0);
+            else if (xliff_version == "1.1")
+                return std::make_shared<XLIFF1Catalog>(std::move(doc), 1);
+            else if (xliff_version == "1.2")
+                return std::make_shared<XLIFF1Catalog>(std::move(doc), 2);
+            else if (xliff_version == "2.0" || xliff_version == "2.1")
+                return std::make_shared<XLIFF2Catalog>(std::move(doc));
+            else
+                return nullptr;
+        }
+    };
+
+    Creator c;
+    return OpenImpl(filename, c);
 }
 
 
@@ -575,7 +548,10 @@ public:
             id = node.attribute("id").value();
         // some tools (e.g. Xcode, tool-id="com.apple.dt.xcode") use ID same as text; numeric only is useless to translator too
         if (!id.empty() && id != m_string && !is_numeric_only(id))
+        {
+            xliff_prefix_id(id, node, "resname");
             m_symbolicId = str::to_wx(id);
+        }
 
         auto target = node.child("target");
         if (target)
@@ -586,7 +562,7 @@ public:
             std::string state = target.attribute("state").value();
             if (state == "needs-adaptation" || state == "needs-l10n")
                 m_isFuzzy = true;
-            else if (m_isTranslated && (state == "new" || state == "needs-translation"))
+            else if (m_isTranslated && (state == "new" || state == "needs-translation" || state == "needs-review-translation" || state == "needs-review-l10n"))
                 m_isFuzzy = true;
         }
         else
@@ -758,7 +734,10 @@ public:
             id = unit().attribute("id").value();
         // some tools (e.g. Xcode, tool-id="com.apple.dt.xcode") use ID same as text; numeric only is useless to translator too
         if (!id.empty() && id != m_string && !is_numeric_only(id))
+        {
+            xliff_prefix_id(id, unit(), "name");
             m_symbolicId = str::to_wx(id);
+        }
 
         auto target = node.child("target");
         if (target)

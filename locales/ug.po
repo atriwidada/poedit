@@ -1,0 +1,3410 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: poedit\n"
+"Report-Msgid-Bugs-To: help@poedit.net\n"
+"POT-Creation-Date: 2025-10-14 13:45+0200\n"
+"PO-Revision-Date: 2025-10-14 10:17\n"
+"Last-Translator: \n"
+"Language-Team: Uyghur\n"
+"Language: ug_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: poedit\n"
+"X-Crowdin-Project-ID: 53425\n"
+"X-Crowdin-Language: ug\n"
+"X-Crowdin-File: /locales/poedit.pot\n"
+"X-Crowdin-File-ID: 3\n"
+
+#: src/attentionbar.cpp:82
+msgid "Hide this notification message"
+msgstr "بۇ ئۇقتۇرۇش ئۇچۇرىنى يوشۇر"
+
+#: src/attentionbar.cpp:297
+msgid "Don’t Show Again"
+msgstr "قايتا كۆرسەتمە"
+
+#: src/attentionbar.cpp:297
+msgid "Don’t show again"
+msgstr "قايتا كۆرسەتمە"
+
+#: src/cat_update.cpp:99
+msgid "Update Summary"
+msgstr "قىسقىچە مەزمۇننى يېڭىلا"
+
+#. TRANSLATORS: Title of window showing summary (added/removed strings, issues) of updating translations from sources or POT file
+#: src/cat_update.cpp:99
+msgid "Update summary"
+msgstr "قىسقىچە مەزمۇننى يېڭىلا"
+
+#: src/cat_update.cpp:132 src/findframe.cpp:148 src/titleless_window.cpp:86
+#: src/wx_translatable_strings.h:96
+msgid "Close"
+msgstr "ياپ"
+
+#: src/cat_update.cpp:162
+msgid "Issues"
+msgstr "مەسىلە"
+
+#. TRANSLATORS: Column header in the list of issues where rows are filename:line:text of issue
+#: src/cat_update.cpp:165 src/cloud_accounts_ui.cpp:265 src/manager.cpp:392
+#: src/recent_files.cpp:586 src/wx_translatable_strings.h:104
+msgid "File"
+msgstr "ھۆججەت"
+
+#. TRANSLATORS: Column header in the list of issues where rows are filename:line:text of issue
+#: src/cat_update.cpp:167
+msgid "Line"
+msgstr "قۇر"
+
+#. TRANSLATORS: Column header in the list of issues where rows are filename:line:text of issue
+#: src/cat_update.cpp:169
+msgid "Issue"
+msgstr "مەسىلە"
+
+#: src/cat_update.cpp:192 src/cat_update.cpp:194
+msgid "New Strings"
+msgstr "يېڭى ھەرپ تىزىقى"
+
+#: src/cat_update.cpp:192 src/cat_update.cpp:194
+msgid "New strings"
+msgstr "يېڭى ھەرپ تىزمىسى"
+
+#: src/cat_update.cpp:205 src/cat_update.cpp:207
+msgid "Removed Strings"
+msgstr "چىقىرىۋېتىلگەن ھەرپ تىزىقى"
+
+#: src/cat_update.cpp:205 src/cat_update.cpp:207
+msgid "Removed strings"
+msgstr "چىقىرىۋېتىلگەن ھەرپ تىزىقى"
+
+#: src/cat_update.cpp:231
+msgid "Collecting source files…"
+msgstr "مەنبە ھۆججىتىنى توپلاۋاتىدۇ…"
+
+#: src/cat_update.cpp:247
+#, c-format
+msgid "Extracting translatable strings from %s file…"
+msgid_plural "Extracting translatable strings from %s files…"
+msgstr[0] "تەرجىمە تىزىقىنى %s ھۆججەتتىن ئاجرىتىۋاتىدۇ…"
+msgstr[1] "تەرجىمە تىزىقىنى %s ھۆججەتتىن ئاجرىتىۋاتىدۇ…"
+
+#: src/cat_update.cpp:269 src/cat_update.cpp:405
+msgid "Failed to load file with extracted translations."
+msgstr "ئاجراتقان تەرجىمە ھۆججەتنى يۈكلىيەلمىدى."
+
+#: src/cat_update.cpp:293
+#, c-format
+msgid "In: %s"
+msgstr "ئورنى: %s"
+
+#: src/cat_update.cpp:300 src/edframe.cpp:1608
+msgid "Source code not available."
+msgstr "مەنبە كودىنى ئىشلەتكىلى بولمايدۇ."
+
+#: src/cat_update.cpp:301 src/edframe.cpp:1612
+msgid ""
+"Translations couldn’t be updated from the source code, because no code was "
+"found in the location specified in the file’s Properties."
+msgstr ""
+"تەرجىمىنى مەنبە كودتىن يېڭىلىيالمايدۇ، چۈنكى ھۆججەتتە بەلگىلەنگەن ئورۇندىن "
+"كود تېپىلمىدى."
+
+#: src/cat_update.cpp:305
+msgid "Permission denied."
+msgstr "ھوقۇق رەت قىلىندى."
+
+#: src/cat_update.cpp:306
+msgid ""
+"You don’t have permission to read source code files from the location "
+"specified in the file’s Properties."
+msgstr ""
+"ھۆججەت خاسلىقىدا بەلگىلەنگەن ئورۇندىكى مەنبە كود ھۆججىتىنى ئوقۇيدىغان "
+"ھوقۇقىڭىز يوق."
+
+#. TRANSLATORS: The System Settings etc. references macOS 13 Ventura or newer system settings and should be translated EXACTLY as in macOS. If you don't use macOS and can't check, please leave it untranslated.
+#: src/cat_update.cpp:311
+msgid ""
+"If you previously denied access to your files, you can allow it in System "
+"Settings > Privacy & Security > Files & Folders."
+msgstr ""
+"ئەگەر ئىلگىرى ھۆججىتىڭىزنى زىيارەت قىلىش ھوقۇقىنى رەت قىلغان بولسىڭىز، "
+"سىستېما تەڭشەكلەر › شەخسىيەت ۋە بىخەتەرلىك › ھۆججەت ۋە قىسقۇچتىن قايتىدىن "
+"زىيارەت قىلىشقا يول قويۇڭ."
+
+#. TRANSLATORS: The System Preferences etc. references macOS system settings and should be translated EXACTLY as in macOS. If you don't use macOS and can't check, please leave it untranslated.
+#: src/cat_update.cpp:316
+msgid ""
+"If you previously denied access to your files, you can allow it in System "
+"Preferences > Security & Privacy > Privacy > Files & Folders."
+msgstr ""
+"ئەگەر ئىلگىرى ھۆججىتىڭىزنى زىيارەت قىلىش ھوقۇقىنى رەت قىلغان بولسىڭىز، "
+"سىستېما مايىللىقلار › بىخەتەرلىك ۋە شەخسىيەت › شەخسىيەت › ھۆججەت ۋە "
+"قىسقۇچتىن قايتىدىن زىيارەت قىلىشقا يول قويۇڭ."
+
+#: src/cat_update.cpp:322
+msgid "Failed to extract strings from source code."
+msgstr "ئەسلى كودتىن ھەرپ تىزىقىنى ئاجرىتالمىدى."
+
+#: src/cat_update.cpp:356 src/edapp.cpp:1101 src/edframe.cpp:929
+#: src/edframe.cpp:2524
+#, c-format
+msgid "The file “%s” couldn’t be opened."
+msgstr "ھۆججەت «%s» نى ئاچقىلى بولمىدى."
+
+#: src/cat_update.cpp:374
+msgid "Updating translations"
+msgstr "تەرجىمىلەرنى يېڭىلاۋاتىدۇ"
+
+#: src/cat_update.cpp:394
+msgid "Determining differences…"
+msgstr "پەرقنى سېلىشتۇرۇۋاتىدۇ…"
+
+#: src/cat_update.cpp:402 src/cat_update.cpp:455
+msgid "Merging differences…"
+msgstr "پەرقنى بىرلەشتۈرۈۋاتىدۇ…"
+
+#: src/cat_update.cpp:415
+msgid ""
+"Translation file is already up to date, no changes to strings were made."
+msgstr ""
+"تەرجىمە ھۆججەت ئاللىبۇرۇن يېڭىلاندى، ھەرپ تىزىقىدا ھېچقانداق ئۆزگىرىش "
+"بولمىدى."
+
+#: src/cat_update.cpp:421
+#, c-format
+msgid "Translation file was updated with %s change."
+msgid_plural "Translation file was updated with %s changes."
+msgstr[0] "تەرجىمە ھۆججەتتىكى %s ئۆزگىرىش يېڭىلاندى."
+msgstr[1] "تەرجىمە ھۆججەتتىكى %s ئۆزگىرىش يېڭىلاندى."
+
+#: src/cat_update.cpp:424
+msgid "New strings to translate:"
+msgstr "تەرجىمە قىلىدىغان يېڭى ھەرپ تىزىقى:"
+
+#: src/cat_update.cpp:425
+msgid "Removed strings (no longer used):"
+msgstr "چىقىرىۋېتىلگەن ھەرپ تىزىقى(ئەمدى ئىشلىتىلمەيدۇ):"
+
+#: src/cat_update.cpp:513
+#, c-format
+msgid "%d issue with the source strings was detected."
+msgid_plural "%d issues with the source strings were detected."
+msgstr[0] "ئەسلى ھەرپ تىزىقىدىكى %d مەسىلە بايقالدى."
+msgstr[1] "ئەسلى ھەرپ تىزىقىدىكى %d مەسىلە بايقالدى."
+
+#: src/cat_update.cpp:540
+msgid "View Details…"
+msgstr "تەپسىلاتىنى كۆرسىتىدۇ…"
+
+#: src/cat_update.cpp:540
+msgid "View details…"
+msgstr "تەپسىلاتىنى كۆرسىتىدۇ…"
+
+#: src/catalog.cpp:127
+#, c-format
+msgid "Malformed header: “%s”"
+msgstr "باش قىسمى كۆرۈمسىز: «%s»"
+
+#: src/catalog.cpp:591
+msgid "PO Translation Files"
+msgstr "PO تەرجىمە ھۆججەتلەر"
+
+#: src/catalog.cpp:593
+msgid "POT Translation Templates"
+msgstr "POT تەرجىمە ھۆججەتلەر"
+
+#: src/catalog.cpp:595
+msgid "XLIFF Translation Files"
+msgstr "XLIFF تەرجىمە ھۆججەتلەر"
+
+#: src/catalog.cpp:597
+msgid "Xcode Localization Catalog"
+msgstr "Xcode يەرلىكلەشتۈرۈش كاتالوگى"
+
+#: src/catalog.cpp:599
+msgid "JSON Translation Files"
+msgstr "JSON تەرجىمە ھۆججەتلەر"
+
+#. TRANSLATORS: "Flutter" is proper noun, name of a developer tool
+#: src/catalog.cpp:602
+msgid "Flutter Translation Files"
+msgstr "Flutter تەرجىمە ھۆججەتلەر"
+
+#: src/catalog.cpp:604
+msgid "RESX Resource Files"
+msgstr "RESX مەنبە ھۆججەت"
+
+#: src/catalog.cpp:606
+msgid "Qt Translation Files"
+msgstr "Qt تەرجىمە ھۆججەت"
+
+#: src/catalog.cpp:615
+msgid "All Translation Files"
+msgstr "ھەممە تەرجىمە ھۆججەتلەر"
+
+#: src/catalog.cpp:1183
+msgid "The file is in a format not recognized by Poedit."
+msgstr "بۇ ھۆججەتنىڭ پىچىمىنى Poedit تونىمىغان."
+
+#: src/catalog_json.cpp:91
+msgid ""
+"This JSON file isn’t a translations file and cannot be edited in Poedit."
+msgstr ""
+"بۇ JSON ھۆججىتى تەرجىمە ھۆججىتى ئەمەس ھەمدە Poedit تا تەھرىرلىگىلى بولمايدۇ."
+
+#: src/catalog_json.cpp:141
+#, c-format
+msgid "Reading file content failed with the following error: %s"
+msgstr "تۆۋەندىكى خاتالىق تۈپەيلىدىن ھۆججەت مەزمۇنى ئوقۇيالمىدى:  %s"
+
+#: src/catalog_json.cpp:152 src/catalog_po.cpp:1143 src/catalog_qt.cpp:329
+#: src/catalog_resx.cpp:198 src/catalog_xliff.cpp:488
+#, c-format
+msgid ""
+"File “%s” is read-only and cannot be saved.\n"
+"Please save it under different name."
+msgstr ""
+"ھۆججەت «%s» نى ئوقۇشقىلا بولىدۇ ۋە ساقلىغىلى بولمايدۇ. باشقا ئىسىمدا ساقلاڭ."
+
+#: src/catalog_json.cpp:166 src/catalog_po.cpp:1179 src/catalog_po.cpp:1261
+#: src/catalog_po.cpp:1335 src/catalog_po.cpp:1344 src/catalog_po.cpp:1401
+#: src/catalog_po.cpp:1432 src/catalog_po.cpp:1630 src/catalog_qt.cpp:341
+#: src/catalog_resx.cpp:209 src/catalog_xliff.cpp:499 src/edframe.cpp:1317
+#: src/prefsdlg.cpp:660
+#, c-format
+msgid "Couldn’t save file %s."
+msgstr "%s ھۆججەتنى ساقلىيالمىدى."
+
+#: src/catalog_json.cpp:506
+msgid "Screenshots:"
+msgstr "ئېكران كەسمىسى:"
+
+#: src/catalog_po.cpp:134
+#, c-format
+msgid "%i line of file “%s” was not loaded correctly."
+msgid_plural "%i lines of file “%s” were not loaded correctly."
+msgstr[0] "ھۆججەت «%2$s» نىڭ %1$i-قۇرىنى توغرا يۈكلىيەلمىدى."
+msgstr[1] "ھۆججەت «%2$s» نىڭ %1$i-قۇرىنى توغرا يۈكلىيەلمىدى."
+
+#: src/catalog_po.cpp:149
+#, c-format
+msgid "Line %d of file “%s” is corrupted (not valid %s data)."
+msgstr ""
+"ھۆججەت «%2$s» نىڭ %1$d-قۇرى بۇزۇلغان (ئىناۋەتلىك %3$s سانلىق مەلۇماتى يوق)."
+
+#: src/catalog_po.cpp:336
+msgid "Broken PO file: singular form msgstr used together with msgid_plural"
+msgstr ""
+"PO ھۆججىتى بۇزۇلغان: بىرلىك شەكلىدە msgstr بىلەن msgid_plural بىللە "
+"ئىشلىتىلگەن"
+
+#: src/catalog_po.cpp:388
+msgid "Broken PO file: plural form msgstr used without msgid_plural"
+msgstr ""
+"PO ھۆججىتى بۇزۇلغان: كۆپلۈك سان شەكلىدە msgstr ئىشلىتىپ msgid_plural "
+"ئىشلەتمىگەن"
+
+#: src/catalog_po.cpp:910 src/catalog_po.cpp:924 src/catalog_po.cpp:937
+#: src/catalog_po.cpp:949
+msgid "Couldn’t load the file, it is probably damaged."
+msgstr "ھۆججەتنى يۈكلىيەلمىدى، ئۇ بۇزۇلغان بولۇشى مۇمكىن."
+
+#: src/catalog_po.cpp:929
+msgid ""
+"There were errors when loading the file. Some data may be missing or "
+"corrupted as the result."
+msgstr ""
+"ھۆججەتنى يۈكلەۋاتقاندا خاتالىق كۆرۈلدى. شۇ سەۋەپتىن بىر قىسىم سانلىق مەلۇمات "
+"يوقاپ كېتىشى ياكى بۇزۇلۇشى مۇمكىن."
+
+#: src/catalog_po.cpp:1270
+msgid ""
+"There was a problem formatting the file nicely (but it was saved all right)."
+msgstr "ھۆججەت فورماتىدا مەسىلە بار(ئەمما ئۇ مۇۋەپپەقىيەتلىك ساقلاندى)."
+
+#: src/catalog_po.cpp:1549
+#, c-format
+msgid ""
+"The file couldn’t be saved in “%s” charset as specified in translation "
+"settings.\n"
+"\n"
+"It was saved in UTF-8 instead and the setting was modified accordingly."
+msgstr ""
+"تەرجىمە تەڭشىكىدە بەلگىلەنگەندەك ھۆججەتنى «%s» ھەرپ توپلىمىدا ساقلىيالمايدۇ. "
+"ئۇنى ‪UTF-8 ھەرپ توپلىمىدا ‬ساقلىغاندىمۇ، تەڭشەك مۇناسىپ ئۆزگىرىدۇ."
+
+#: src/catalog_po.cpp:1551 src/edframe.cpp:2821
+msgid "Error saving file"
+msgstr "ھۆججەتنى ساقلاشتا خاتالىق كۆرۈلدى"
+
+#: src/catalog_po.cpp:1706
+#, c-format
+msgid "“%s” is not a valid POT file."
+msgstr "«%s» ئىناۋەتلىك POT ھۆججىتى ئەمەس."
+
+#: src/catalog_qt.cpp:70
+#, c-format
+msgid "Error while loading Qt translation file: %s"
+msgstr "Qt تەرجىمە ھۆججەتنى يۈكلەشتە خاتالىق كۆرۈلدى: %s"
+
+#: src/catalog_qt.cpp:273 src/catalog_resx.cpp:83 src/catalog_resx.cpp:159
+msgid "The file is malformed."
+msgstr "بۇ ھۆججەتنىڭ پىچىمى خاتا."
+
+#: src/catalog_resx.cpp:66
+#, c-format
+msgid "Error while loading RESX file: %s"
+msgstr "RESX ھۆججىتىنى يۈكلەۋاتقاندا خاتالىق كۆرۈلدى: %s"
+
+#: src/catalog_xcloc.cpp:85 src/catalog_xcloc.cpp:88
+msgid "Unexpectedly missing content in the XCLOC file."
+msgstr "XCLOC ھۆججىتىدە ئويلىشىلمىغان كەم مەزمۇن بار."
+
+#: src/catalog_xcloc.cpp:99
+msgid "Saving in a different location is not supported for XCLOC files."
+msgstr "XCLOC ھۆججەت پەرقلىق ئورۇندا ساقلاشنى قوللىمايدۇ."
+
+#: src/catalog_xliff.cpp:405
+#, c-format
+msgid "Error while loading XLIFF file: %s"
+msgstr "XLIFF ھۆججىتىنى يۈكلەۋاتقاندا خاتالىق كۆرۈلدى: %s"
+
+#: src/catalog_xliff.cpp:450
+#, c-format
+msgid "unsupported version (%s)"
+msgstr "قوللىمايدىغان نەشرى (%s)"
+
+#. TRANSLATORS: Shown as error if a translation of XLIFF markup is not valid XML
+#: src/catalog_xliff.cpp:611 src/catalog_xliff.cpp:798
+msgid "Broken markup in translation string."
+msgstr "تەرجىمە تىزىقىدىكى بەلگە خاتا."
+
+#: src/cloud_accounts_ui.cpp:82
+msgid ""
+"Connect Poedit with supported cloud localization platforms to seamlessly "
+"sync translations managed on them."
+msgstr ""
+"Poedit نى قوللايدىغان بۇلۇت يەرلىكلەشتۈرۈش سۇپىلىرى بىلەن باغلاپ ئۇنىڭدىكى "
+"تەرجىمىلەرنى يوچۇقسىز قەدەمداشلىيالايسىز."
+
+#: src/cloud_accounts_ui.cpp:85 src/welcomescreen.cpp:295
+msgid "How does cloud sync work?"
+msgstr "بۇلۇت قەدەمداش قانداق ئىشلەيدۇ؟"
+
+#: src/cloud_accounts_ui.cpp:92
+msgid "Account"
+msgstr "ھېسابات"
+
+#: src/cloud_accounts_ui.cpp:163
+msgid "(not signed in)"
+msgstr "(تىزىمغا كىرمىگەن)"
+
+#: src/cloud_accounts_ui.cpp:355
+msgid "Open cloud translation"
+msgstr "بۇلۇت تەرجىمىسىنى ئاچ"
+
+#: src/cloud_accounts_ui.cpp:366
+msgid "Manage accounts"
+msgstr "ھېسابات باشقۇر"
+
+#: src/cloud_accounts_ui.cpp:375 src/export_html.cpp:77
+msgid "Project:"
+msgstr "قۇرۇلۇش:"
+
+#: src/cloud_accounts_ui.cpp:379 src/export_html.cpp:79
+#: src/resources/prefs.xrc:10 src/resources/prefs.xrc:14
+#: src/resources/properties.xrc:45
+msgid "Language:"
+msgstr "تىل:"
+
+#: src/cloud_accounts_ui.cpp:428
+msgid "Sign in to Cloud Account"
+msgstr "بۇلۇت ھېساباتقا تىزىمغا كىر"
+
+#: src/cloud_accounts_ui.cpp:428
+msgid "Sign in to cloud account"
+msgstr "بۇلۇت ھېساباتقا تىزىمغا كىر"
+
+#: src/cloud_accounts_ui.cpp:519
+msgid "No translation projects listed in your account."
+msgstr "ھېساباتىڭىزدا ھېچقانداق تەرجىمە قۇرۇلۇشى تېپىلمىدى."
+
+#: src/cloud_accounts_ui.cpp:628 src/crowdin_gui.cpp:407
+msgid "Downloading latest translations…"
+msgstr "ئاخىرقى تەرجىمىنى چۈشۈرۈۋاتىدۇ…"
+
+#. TRANSLATORS: "%s" is a name of online service, e.g. "Crowdin" or "Localazy"
+#: src/cloud_accounts_ui.cpp:724
+#, c-format
+msgid "Sign in to %s"
+msgstr "%s‎ غا تىزىمغا كىر"
+
+#: src/cloud_sync.h:101
+msgid "Syncing"
+msgstr "قەدەمداشلاۋاتىدۇ"
+
+#. TRANSLATORS: %s is a cloud destination, e.g. "Crowdin" or ftp.wordpress.com etc.
+#: src/cloud_sync.h:126 src/crowdin_gui.cpp:378
+#, c-format
+msgid "Uploading translations to %s…"
+msgstr "تەرجىمىلەرنى %s غا يۈكلەۋاتىدۇ…"
+
+#. TRANSLATORS: %s is a cloud destination, e.g. "Crowdin" or ftp.wordpress.com etc.
+#: src/cloud_sync.h:176
+#, c-format
+msgid "Uploading translations to %s failed."
+msgstr "تەرجىمىلەرنى %s غا يۈكلىيەلمىدى."
+
+#: src/cloud_sync.h:177
+msgid "Syncing error"
+msgstr "قەدەمداش خاتالىقى"
+
+#: src/commentdlg.cpp:39 src/edframe.cpp:3035 src/sidebar.cpp:247
+msgid "Edit comment"
+msgstr "ئىزاھات تەھرىر"
+
+#: src/commentdlg.cpp:43
+msgid "Comment:"
+msgstr "ئىزاھات:"
+
+#: src/commentdlg.cpp:49
+msgid "Update"
+msgstr "يېڭىلا"
+
+#: src/commentdlg.cpp:51
+msgid "Delete the comment"
+msgstr "ئىزاھاتنى ئۆچۈر"
+
+#: src/commentdlg.cpp:64
+msgid "Add"
+msgstr "قوش"
+
+#: src/crowdin_client.cpp:143
+msgid "Unknown Crowdin error."
+msgstr "يوچۇن Crowdin خاتالىقى."
+
+#: src/crowdin_client.cpp:153
+msgid "Not authorized, please sign in again."
+msgstr "ھوقۇق بېرىلمىگەن، قايتا تىزىمغا كىرىڭ."
+
+#. TRANSLATORS: Crowdin has string-based and file-based project kinds (see https://support.crowdin.com/creating-project/#file-based-project)
+#: src/crowdin_client.cpp:342
+msgid "String-based Crowdin projects are not supported."
+msgstr "ھەرپ تىزىقى ئاساسىدىكى Crowdin قۇرۇلۇشىنى قوللىمايدۇ."
+
+#: src/crowdin_client.cpp:346
+msgid "Downloading translations is disabled in this project."
+msgstr "بۇ قۇرۇلۇشتا تەرجىمە چۈشۈرۈش چەكلەنگەن."
+
+#: src/crowdin_gui.cpp:71
+msgid "Recommended"
+msgstr "تەۋسىيە"
+
+#: src/crowdin_gui.cpp:159 src/localazy_gui.cpp:100
+msgid "Sign In"
+msgstr "تىزىمغا كىر"
+
+#: src/crowdin_gui.cpp:159 src/localazy_gui.cpp:100
+msgid "Sign in"
+msgstr "تىزىمغا كىرىڭ"
+
+#: src/crowdin_gui.cpp:161 src/localazy_gui.cpp:102
+msgid "Sign Out"
+msgstr "تىزىمدىن چىق"
+
+#: src/crowdin_gui.cpp:161 src/localazy_gui.cpp:102
+msgid "Sign out"
+msgstr "تىزىمدىن چىق"
+
+#: src/crowdin_gui.cpp:168
+msgid "Learn more about Crowdin"
+msgstr "Crowdin ھەققىدە تېخىمۇ كۆپ بىلدۈرگۈ"
+
+#: src/crowdin_gui.cpp:195
+msgid ""
+"Crowdin is an online translation management platform and collaborative "
+"translation tool. We use Crowdin ourselves to translate Poedit into many "
+"languages, and we love it."
+msgstr ""
+"Crowdin توردىكى تەرجىمە باشقۇرۇش سۇپىسى ۋە ھەمكارلىشىپ تەرجىمە قىلىش قورالى. "
+"بىزمۇ Crowdin نى ئىشلىتىپ Poedit نى نۇرغۇن تىللارغا تەرجىمە قىلىمىز، بىز "
+"ئۇنى ياخشى كۆرىمىز."
+
+#: src/crowdin_gui.cpp:259 src/localazy_gui.cpp:201
+msgid "Waiting for authentication…"
+msgstr "دەلىللەشنى ساقلاۋاتىدۇ…"
+
+#: src/crowdin_gui.cpp:260 src/localazy_gui.cpp:202
+msgid "Updating user information…"
+msgstr "ئىشلەتكۈچى ئۇچۇرىنى يېڭىلاۋاتىدۇ…"
+
+#: src/crowdin_gui.cpp:368
+msgid "Sign in to Crowdin"
+msgstr "Crowdin غا تىزىمغا كىر"
+
+#: src/crowdin_gui.cpp:388
+msgid "Syncing with Crowdin failed."
+msgstr "Crowdin بىلەن قەدامداشلىيالمىدى."
+
+#: src/crowdin_gui.cpp:389
+msgid "Crowdin error"
+msgstr "Crowdin خاتالىقى"
+
+#: src/customcontrols.cpp:282 src/wx_translatable_strings.h:98
+msgid "&Copy"
+msgstr "كۆچۈر(&C)"
+
+#: src/customcontrols.cpp:326
+msgid "Learn more"
+msgstr "تەپسىلات بىلدۈرگۈسى"
+
+#: src/edapp.cpp:453 src/resources/menus.xrc:336 src/resources/menus.xrc:441
+#: src/wx_translatable_strings.h:105
+msgid "&Help"
+msgstr "ياردەم(&H)"
+
+#: src/edapp.cpp:730
+msgid "MO files can’t be directly edited in Poedit."
+msgstr "Poedit تا MO ھۆججەتنى بىۋاسىتە تەھرىرلىگىلى بولمايدۇ."
+
+#: src/edapp.cpp:731
+msgid "Error opening file"
+msgstr "ھۆججەت ئېچىش خاتالىقى"
+
+#: src/edapp.cpp:733
+msgid ""
+"Please open and edit the corresponding PO file instead. When you save it, "
+"the MO file will be updated as well."
+msgstr ""
+"مۇناسىپ PO ھۆججەتنى ئېچىپ تەھرىرلەڭ. ئۇنى ساقلىغاندا، MO ھۆججىتىمۇ "
+"يېڭىلىنىدۇ."
+
+#: src/edapp.cpp:774
+msgid "don’t delete temporary files (for debugging)"
+msgstr "ۋاقىتلىق ھۆججەتلەرنى ئۆچۈرمە (سازلاش ئۈچۈن)"
+
+#: src/edapp.cpp:776
+msgid "handle a poedit:// URI"
+msgstr "poedit:// URI بىر تەرەپ قىلىش"
+
+#: src/edapp.cpp:778
+msgid "go to item at given line number"
+msgstr "بەلگىلەنگەن قۇرغا يۆتكەل"
+
+#: src/edapp.cpp:801
+msgid "Failed to communicate with Poedit process."
+msgstr "Poedit جەريانى بىلەن ئالاقە قىلالمىدى."
+
+#: src/edapp.cpp:914 src/edapp.cpp:919
+#, c-format
+msgid "Unhandled exception occurred: %s"
+msgstr "بىر تەرەپ قىلغىلى بولمايدىغان مۇستەسنا يۈز بەردى: %s"
+
+#: src/edapp.cpp:1071
+msgid "Select translation template"
+msgstr "تەرجىمە قېلىپىنى تاللاڭ"
+
+#: src/edapp.cpp:1102 src/edframe.cpp:930 src/edframe.cpp:2322
+#: src/edframe.cpp:2525
+msgid "Invalid file"
+msgstr "ھۆججەت ئىناۋەتسىز"
+
+#: src/edapp.cpp:1122
+msgid "Select translation file"
+msgstr "تەرجىمە ھۆججىتىنى تاللاڭ"
+
+#: src/edapp.cpp:1223
+msgid "Poedit is an easy to use translation editor."
+msgstr "Poedit ئىشلىتىش ئوڭاي تەرجىمە تەھرىرلىگۈچ."
+
+#: src/edframe.cpp:424
+msgid "You can’t drop more than one file on Poedit window."
+msgstr "Poedit كۆزنىكىگە بىردىن ئارتۇق ھۆججەت تاشلىيالمايسىز."
+
+#: src/edframe.cpp:431
+#, c-format
+msgid "File “%s” is not a translation file."
+msgstr "ھۆججەت «%s» تەرجىمە قىلىدىغان ھۆججەت ئەمەس."
+
+#: src/edframe.cpp:438 src/recent_files.cpp:380
+#, c-format
+msgid "File “%s” doesn’t exist."
+msgstr "ھۆججەت «%s» مەۋجۇت ئەمەس."
+
+#: src/edframe.cpp:455
+msgid "Poedit"
+msgstr "Poedit"
+
+#. TRANSLATORS: %s is language name in its basic form (as you
+#. would see e.g. in a list of supported languages). You may need
+#. to rephrase it, e.g. to an equivalent of "for language %s".
+#: src/edframe.cpp:867
+#, c-format
+msgid ""
+"Spellchecking is disabled, because the dictionary for %s isn’t installed."
+msgstr "ئىملا تەكشۈرۈش چەكلەندى، چۈنكى %s ئۈچۈن لۇغەت ئورنىتىلمىغان."
+
+#: src/edframe.cpp:871
+msgid "Install"
+msgstr "ئورنات"
+
+#: src/edframe.cpp:963 src/edframe.cpp:1138
+#, c-format
+msgid "The file “%s” has been changed by another application."
+msgstr "بۇ «%s» ھۆججەت باش ئەپتە ئۆزگەرتىلدى."
+
+#: src/edframe.cpp:964 src/edframe.cpp:968
+msgid "Reload file"
+msgstr "ھۆججەتنى قايتا يۈكلە"
+
+#: src/edframe.cpp:967
+msgid ""
+"Do you want to reload the file from disk? Your unsaved edits in Poedit will "
+"be lost if you do."
+msgstr ""
+"ھۆججەتنى دىسكىدىن قايتا يۈكلەمسىز؟ ئەگەر بۇنداق قىلسىڭىز Poedit تا "
+"ساقلىمىغان ئۆزگەرتىشلەر ساقلانمايدۇ."
+
+#: src/edframe.cpp:968
+msgid "Ignore"
+msgstr "پەرۋا قىلما"
+
+#: src/edframe.cpp:968
+msgid "Reload File"
+msgstr "ھۆججەتنى قايتا يۈكلە"
+
+#: src/edframe.cpp:1072
+msgid "The file has been modified. Do you want to save changes?"
+msgstr "ھۆججەت ئۆزگەرتىلدى. ئۆزگەرتكەننى ساقلامسىز؟"
+
+#: src/edframe.cpp:1073
+msgid "Save changes"
+msgstr "ئۆزگەرتكەننى ساقلا"
+
+#: src/edframe.cpp:1076
+msgid "Your changes will be lost if you don’t save them."
+msgstr "ئەگەر ساقلىمىسىڭىز ئۆزگەرتىشلەر يوقىلىدۇ."
+
+#: src/edframe.cpp:1079 src/edframe.cpp:1139 src/wx_translatable_strings.h:115
+msgid "Save"
+msgstr "ساقلا"
+
+#: src/edframe.cpp:1081
+msgid "Do&n’t save"
+msgstr "ساقلىما(&N)"
+
+#: src/edframe.cpp:1083
+msgid "Don’t Save"
+msgstr "ساقلىما"
+
+#: src/edframe.cpp:1142
+msgid "The changes made by the other application will be lost if you save."
+msgstr "ئەگەر ساقلىسىڭىز باشقا ئەپتىكى ئۆزگەرتىشلەر يوقىلىدۇ."
+
+#: src/edframe.cpp:1143 src/prefsdlg.cpp:673 src/prefsdlg.cpp:971
+#: src/wx_translatable_strings.h:94
+msgid "Cancel"
+msgstr "ۋاز كەچ"
+
+#: src/edframe.cpp:1143
+msgid "Save Anyway"
+msgstr "ساقلاۋەر"
+
+#: src/edframe.cpp:1143
+msgid "Save anyway"
+msgstr "ساقلاۋەر"
+
+#: src/edframe.cpp:1196
+msgid "Save as…"
+msgstr "باشقا ئاتتا ساقلا…"
+
+#: src/edframe.cpp:1245
+msgid "Compile to…"
+msgstr "ھاسىللا…"
+
+#: src/edframe.cpp:1248
+msgid "Compiled Translation Files"
+msgstr "تەرجىمە ھۆججەت ھاسىللاندى"
+
+#: src/edframe.cpp:1289
+msgid "Export to HTML…"
+msgstr "HTML غا چىقار…"
+
+#: src/edframe.cpp:1292
+msgid "HTML Files"
+msgstr "HTML ھۆججەت"
+
+#: src/edframe.cpp:1307
+msgid "Exporting to HTML"
+msgstr "HTML غا چىقىرىۋاتىدۇ"
+
+#: src/edframe.cpp:1609
+msgid "Updating failed"
+msgstr "يېڭىلىيالمىدى"
+
+#: src/edframe.cpp:1674
+msgid "Open reference file"
+msgstr "پايدىلانما ھۆججەتنى ئاچ"
+
+#: src/edframe.cpp:1708 src/resources/menus.xrc:238
+msgid "Update from &POT File…"
+msgstr "&POT ھۆججەتتىن يېڭىلا…"
+
+#: src/edframe.cpp:1708 src/resources/menus.xrc:237
+msgid "Update from &POT file…"
+msgstr "&POT ھۆججەتتىن يېڭىلا…"
+
+#: src/edframe.cpp:1791 src/resources/menus.xrc:53
+msgid "Sync with Crowdin"
+msgstr "Crowdin بىلەن قەدەمداشلا"
+
+#. TRANSLATORS: this is the menu action to upload to server/cloud; %s is hostname or service (Crowdin, ftp.foo.com etc.)
+#: src/edframe.cpp:1796
+#, c-format
+msgid "Upload to %s"
+msgstr "%s غا يۈكلە"
+
+#: src/edframe.cpp:1862
+#, c-format
+msgid "%d issue with the translation found."
+msgid_plural "%d issues with the translation found."
+msgstr[0] "تەرجىمىدە %d مەسىلە بايقالدى."
+msgstr[1] "تەرجىمىدە %d مەسىلە بايقالدى."
+
+#: src/edframe.cpp:1867 src/edframe.cpp:1913
+msgid "Validation results"
+msgstr "دەلىللەش نەتىجىلىرى"
+
+#: src/edframe.cpp:1870
+msgid ""
+"Entries with errors were marked in red in the list. Details of the error "
+"will be shown when you select such an entry."
+msgstr ""
+"خاتالىق بار تۈرلەر تىزىمدا قىزىل رەڭدە بەلگە سېلىنىدۇ. بۇ خىل تۈرنى "
+"تاللىسىڭىز خاتالىقنىڭ تەپسىلاتىنى كۆرسىتىدۇ."
+
+#: src/edframe.cpp:1879
+msgid "The file was saved safely."
+msgstr "ھۆججەت بىخەتەر ساقلاندى."
+
+#: src/edframe.cpp:1882
+msgid ""
+"The file was saved safely and compiled into the MO format, but it will "
+"probably not work correctly."
+msgstr ""
+"ھۆججەت بىخەتەر ساقلاندى ھەمدە MO پىچىمىدا ھاسىللاندى، ئەمما ئۇ ئادەتتىكىدەك "
+"توغرا ئىشلىمەسلىكى مۇمكىن."
+
+#: src/edframe.cpp:1885
+msgid ""
+"The file was saved safely, but it cannot be compiled into the MO format and "
+"used."
+msgstr ""
+"ھۆججەت بىخەتەر ساقلاندى ئەمما MO پىچىمىغا ھاسىللاپ ئىشلەتكىلى بولمايدۇ."
+
+#: src/edframe.cpp:1894
+msgid ""
+"The file was compiled into the MO format, but it will probably not work "
+"correctly."
+msgstr ""
+"ھۆججەت MO پىچىمىدا ھاسىللاندى، ئەمما ئۇ ئادەتتىكىدەك توغرا ئىشلىمەسلىكى "
+"مۇمكىن."
+
+#: src/edframe.cpp:1898
+msgid "The file cannot be compiled into the MO format and used."
+msgstr "ھۆججەتنى MO پىچىمىغا ھاسىللاپ ۋە ئىشلەتكىلى بولمايدۇ."
+
+#: src/edframe.cpp:1912
+msgid "No problems with the translation found."
+msgstr "تەرجىمىدە مەسىلە بايقالمىدى."
+
+#: src/edframe.cpp:1922
+#, c-format
+msgid "The translation is ready for use, but %d entry is not translated yet."
+msgid_plural ""
+"The translation is ready for use, but %d entries are not translated yet."
+msgstr[0] ""
+"تەرجىمە ئىشلىتىشكە تەييار بولدى، ئەمما %d تۈرتېخى تەرجىمە قىلىنمىغان."
+msgstr[1] ""
+"تەرجىمە ئىشلىتىشكە تەييار بولدى، ئەمما %d تۈرتېخى تەرجىمە قىلىنمىغان."
+
+#: src/edframe.cpp:1927
+msgid "The translation is ready for use."
+msgstr "تەرجىمە ئىشلىتىشكە تەييار بولدى."
+
+#: src/edframe.cpp:2321
+#, c-format
+msgid "Poedit automatically fixed invalid content in the file “%s”."
+msgstr "بۇ «%s» ھۆججەتتىكى ئىناۋەتسىز مەزمۇننى Poedit ئۆزلۈكىدىن تۈزەتتى."
+
+#: src/edframe.cpp:2326
+msgid ""
+"The file contained duplicate items, which is not allowed in PO files and "
+"would prevent the file from being used. Poedit fixed the issue, but you "
+"should review translations of any items marked as needing work and correct "
+"them if necessary."
+msgstr ""
+"بۇ ھۆججەتتە تەكرار تۈر بار، بۇنىڭغا يول قويۇلمايدۇ ھەمدە ئۇنىڭ ئىشلىتىلىشىگە "
+"تەسىر كۆرسىتىدۇ. بۇ مەسىلىنى Poedit ھەل قىلدى، ئەمما سىز «ئىشلەش زۆرۈر» "
+"بەلگىسى قويۇلغان ھەر قانداق تەرجىمىنى ئەگەر زۆرۈر بولسا تەكشۈرۈپ تۈزىتىڭ."
+
+#: src/edframe.cpp:2342
+msgid "Language of the translation isn’t set."
+msgstr "تەرجىمە تىلى تەڭشەلمىگەن."
+
+#: src/edframe.cpp:2344
+msgid "Set Language"
+msgstr "تىل تەڭشەش"
+
+#: src/edframe.cpp:2344
+msgid "Set language"
+msgstr "تىل تەڭشەش"
+
+#. TRANSLATORS: This is shown underneath "Language of the translation isn't set (or ...is the same as source language)."
+#: src/edframe.cpp:2347 src/edframe.cpp:2363
+msgid ""
+"Suggestions are not available if the translation language is not set "
+"correctly. Other features, such as plural forms, may be affected as well."
+msgstr ""
+"ئەگەر تەرجىمە تىلى توغرا تەڭشەلمىگەن بولسا تەۋسىيەنى ئىشلەتكىلى بولمايدۇ. "
+"كۆپلۈك شەكىلگە ئوخشاش باشقا ئىقتىدارلارمۇ تەسىرگە ئۇچرىشى مۇمكىن."
+
+#: src/edframe.cpp:2361
+msgid "Language of the translation is the same as source language."
+msgstr "تەرجىمە تىلى ئەسلى تىل بىلەن ئوخشاش."
+
+#: src/edframe.cpp:2364
+msgid "Fix Language"
+msgstr "تىل ئوڭشا"
+
+#: src/edframe.cpp:2364
+msgid "Fix language"
+msgstr "تىل ئوڭشا"
+
+#: src/edframe.cpp:2381
+msgid ""
+"This file has entries with plural forms, but doesn’t have Plural-Forms "
+"header configured."
+msgstr ""
+"بۇ ھۆججەتنىڭ كۆپلۈك شەكلىدىكى تۈرلىرى بار ئىكەن ئەمما كۆپلۈك شەكلىنىڭ ھۆججەت "
+"بېشىدىكى سەپلىمىسى يوقكەن."
+
+#: src/edframe.cpp:2385
+msgid ""
+"Entries in this file have different plural forms count from what the file’s "
+"Plural-Forms header says"
+msgstr ""
+"ھۆججەت كۆپلۈك شەكىل بېشىدا ھۆججەت تۈرلىرىنىڭ ئوخشاش بولمىغان كۆپلۈك "
+"شەكلىدىكى سانىغۇچ تۈرلىرى بار ئىكەن"
+
+#: src/edframe.cpp:2394
+msgid "Required header Plural-Forms is missing."
+msgstr "ھۆججەت بېشىدىكى زۆرۈر بولغان كۆپلۈك شەكلى كەم."
+
+#: src/edframe.cpp:2398
+#, c-format
+msgid "Syntax error in Plural-Forms header (\"%s\")."
+msgstr "كۆپلۈل شەكلىنىڭ باشى(\"%s\")دا گرامماتىكىلىق خاتالىق بار."
+
+#: src/edframe.cpp:2410
+msgid "Fix the Header"
+msgstr "باشنى ئوڭشا"
+
+#: src/edframe.cpp:2410
+msgid "Fix the header"
+msgstr "باشنى ئوڭشا"
+
+#. TRANSLATORS: %s is language name in its basic form (as you
+#. would see e.g. in a list of supported languages). You may need
+#. to rephrase it, e.g. to an equivalent of "for language %s".
+#: src/edframe.cpp:2428
+#, c-format
+msgid "Plural forms expression used by the file is unusual for %s."
+msgstr "بۇ ھۆججەتتە ئىشلىتىلگەن كۆپلۈك شەكلى %s غا نىسبەتەن ئالاھىدە."
+
+#. TRANSLATORS: A verb, shown as action button with ""Plural forms expression used by the file is unusual for %s.")"
+#: src/edframe.cpp:2433
+msgid "Review"
+msgstr "تەكشۈر"
+
+#: src/edframe.cpp:2497
+msgid "Would you like to use English for source text?"
+msgstr "مەنبە تېكىستكە ئىنگلىزچە ئىشلىتىشنى خالامسىز؟"
+
+#: src/edframe.cpp:2499
+#, c-format
+msgid ""
+"This file uses string IDs instead of source text. Poedit can load English "
+"texts from the “%s” file for you."
+msgstr ""
+"بۇ ھۆججەت مەنبە تېكىستنىڭ ئورنىغا ھەرپ تىزىقى ID نى ئىشلىتىدۇ. Poedit سىز "
+"ئۈچۈن «%s» ھۆججىتىدىن ئىنگلىزچە تېكىستنى يۈكلىيەلەيدۇ."
+
+#. TRANSLATORS: Shown as action button when asking if the user wants to replace string IDs with English text; "load" as in "load from file"
+#: src/edframe.cpp:2501
+msgid "Load English"
+msgstr "ئىنگلىزچە يۈكلە"
+
+#: src/edframe.cpp:2618 src/export_html.cpp:103
+#, c-format
+msgid "Translated: %d of %d (%d %%)"
+msgstr "تەرجىمە قىلىنغان: %d / %d (%d %%)"
+
+#: src/edframe.cpp:2622 src/export_html.cpp:105
+#, c-format
+msgid "Remaining: %d"
+msgstr "قالغىنى: %d"
+
+#: src/edframe.cpp:2627
+#, c-format
+msgid "%d error"
+msgid_plural "%d errors"
+msgstr[0] "%d خاتالىق"
+msgstr[1] "%d خاتالىق"
+
+#: src/edframe.cpp:2632 src/export_html.cpp:117
+#, c-format
+msgid "%d entry"
+msgid_plural "%d entries"
+msgstr[0] "%d تىزىق"
+msgstr[1] "%d تىزىق"
+
+#: src/edframe.cpp:2665
+msgid " (unsaved)"
+msgstr " (ساقلانمىغان)"
+
+#: src/edframe.cpp:2703
+msgid " (modified)"
+msgstr " (ئۆزگەرتىلگەن)"
+
+#: src/edframe.cpp:2788 src/edframe.cpp:2792
+#, c-format
+msgid "Failed to update translation memory: %s"
+msgstr "تەرجىمە خاتىرىسىنى يېڭىلىيالمىدى: %s"
+
+#: src/edframe.cpp:2820
+#, c-format
+msgid "The file “%s” couldn’t be saved."
+msgstr "ھۆججەت «%s» نى ساقلىغىلى بولمىدى."
+
+#: src/edframe.cpp:2930 src/resources/menus.xrc:252
+msgid "Remove same-as-source translations"
+msgstr "مەنبە بىلەن ئوخشاش تەرجىمىلەرنى چىقىرىۋېتىدۇ"
+
+#: src/edframe.cpp:2932
+msgid ""
+"Do you want to remove all translations that are identical to the source text?"
+msgstr "ئەسلى تېكىستكە ئوخشايدىغان بارلىق تەرجىمىلەرنى ئۆچۈرەەمسىز؟"
+
+#: src/edframe.cpp:2933
+msgid ""
+"This action will delete any translations that match the source text exactly. "
+"This cannot be undone."
+msgstr ""
+"بۇ مەشغۇلات ئەسلى تېكىستكە دەل ماس كېلىدىغان تەرجىمىلەرنى ئۆچۈرۈۋېتىدۇ. بۇ "
+"مەشغۇلاتتىن يانغىلى بولمايدۇ."
+
+#: src/edframe.cpp:2937 src/edframe.cpp:2964
+msgid "Keep"
+msgstr "ساقلاپ قال"
+
+#: src/edframe.cpp:2937
+msgid "Remove"
+msgstr "چىقىرىۋەت"
+
+#: src/edframe.cpp:2956
+msgid "Purge deleted translations"
+msgstr "ئۆچۈرۈلگەن تەرجىمىنى تازىلا"
+
+#: src/edframe.cpp:2958
+msgid "Do you want to remove all translations that are no longer used?"
+msgstr "ئىشلىتىلمەيدىغان ھەممە تەرجىمىنى ئۆچۈرەمسىز؟"
+
+#: src/edframe.cpp:2960
+msgid ""
+"If you continue with purging, all translations marked as deleted will be "
+"permanently removed. You will have to translate them again if they are added "
+"back in the future."
+msgstr ""
+"ئەگەر تازىلاشنى داۋاملاشتۇرسىڭىز، ئۆچۈرۈلدى بەلگىسى سېلىنغان ھەممە تەرجىمە "
+"مەڭگۈلۈك ئۆچۈرۈلىدۇ. ئەگەر كەلگۈسىدە ئۇلارنى قايتا قوشسىڭىز يەنە باشتىن "
+"تەرجىمە قىلىشقا توغرا كېلىدۇ."
+
+#: src/edframe.cpp:2964
+msgid "Purge"
+msgstr "تازىلا"
+
+#: src/edframe.cpp:3021 src/resources/menus.xrc:103
+msgid "Copy from Source Text"
+msgstr "ئەسلى تېكىستتىن كۆچۈر"
+
+#: src/edframe.cpp:3021 src/resources/menus.xrc:102
+msgid "Copy from source text"
+msgstr "ئەسلى تېكىستتىن كۆچۈر"
+
+#. TRANSLATORS: This is the key shortcut used in menus on Windows, some languages call them differently
+#. TRANSLATORS: Keyboard shortcut for display in Windows menus
+#: src/edframe.cpp:3022 src/edframe.cpp:3029 src/edframe.cpp:3036
+#: src/sidebar.cpp:361 src/sidebar.cpp:731 src/sidebar.cpp:756
+#: src/sidebar.cpp:758 src/wx_translatable_strings.h:123
+msgctxt "keyboard key"
+msgid "Ctrl+"
+msgstr "Ctrl+"
+
+#: src/edframe.cpp:3028 src/resources/menus.xrc:98
+msgid "Clear Translation"
+msgstr "تەرجىمە تازىلا"
+
+#: src/edframe.cpp:3028 src/resources/menus.xrc:97
+msgid "Clear translation"
+msgstr "تەرجىمە تازىلا"
+
+#: src/edframe.cpp:3035 src/sidebar.cpp:250
+msgid "Edit Comment"
+msgstr "ئىزاھات تەھرىر"
+
+#. TRANSLATORS: Meaning occurrences of the string in source code
+#: src/edframe.cpp:3044 src/fileviewer.cpp:100
+msgid "Code Occurrences"
+msgstr "كود كۆرۈنىدىغان ئورۇن"
+
+#. TRANSLATORS: Meaning occurrences of the string in source code
+#: src/edframe.cpp:3044
+msgid "Code occurrences"
+msgstr "كود كۆرۈنىدىغان ئورۇن"
+
+#: src/edframe.cpp:3261
+msgid "Hide Sidebar"
+msgstr "يان بالداقنى يوشۇر"
+
+#: src/edframe.cpp:3263 src/resources/menus.xrc:217
+msgid "Show Sidebar"
+msgstr "يان بالداقنى كۆرسەت"
+
+#: src/edframe.cpp:3294
+msgid "Hide Status Bar"
+msgstr "ھالەت بالداقنى يوشۇر"
+
+#: src/edframe.cpp:3296 src/resources/menus.xrc:223
+msgid "Show Status Bar"
+msgstr "ھالەت بالداق كۆرسەت"
+
+#: src/editing_area.cpp:357
+msgid "String length in characters: translation | source"
+msgstr "ھەرپ تىزىقى ئۇزۇنلۇقى: تەرجىمە | مەنبە"
+
+#: src/editing_area.cpp:360
+msgid "String length in characters"
+msgstr "ھەرپ تىزىقى ئۇزۇنلۇقى"
+
+#: src/editing_area.cpp:407 src/editing_area.cpp:750 src/edlistctrl.cpp:662
+#: src/edlistctrl.cpp:716 src/export_html.cpp:143
+msgid "Source text"
+msgstr "مەنبە تېكىست"
+
+#: src/editing_area.cpp:429 src/editing_area.cpp:816 src/editing_area.cpp:832
+msgid "Singular"
+msgstr "بىرلىك"
+
+#: src/editing_area.cpp:434 src/editing_area.cpp:837
+msgid "Plural"
+msgstr "كۆپلۈك"
+
+#: src/editing_area.cpp:489
+msgid "Translation"
+msgstr "تەرجىمىسى"
+
+#: src/editing_area.cpp:498
+msgid "Pre-translated"
+msgstr "ئالدىن تەرجىمە قىلىندى"
+
+#: src/editing_area.cpp:521
+msgid "Needs Work"
+msgstr "ئىشلەش زۆرۈر"
+
+#. TRANSLATORS: This indicates that the string's translation isn't final
+#. and has known problems.  For example, it might be machine translated or
+#. fuzzy matched from an older string. The translation should be short and
+#. convey this. If it's problematic to translate it, "Needs review" is
+#. acceptable substitute, but note that the meaning is subtly different:
+#. "needs review" implies that somebody else should review the string after
+#. I am done with it (i.e. consider it good), while "needs work" implies I
+#. need to return to it and finish the translation.
+#: src/editing_area.cpp:521
+msgid "Needs work"
+msgstr "ئىشلەش زۆرۈر"
+
+#: src/editing_area.cpp:578
+msgid ""
+"POT files are only templates and don’t contain any translations themselves.\n"
+"To make a translation, create a new PO file based on the template."
+msgstr ""
+"POT ھۆججەتلىرى پەقەتلا قېلىپ بولۇپ، ئۆزى ھېچقانداق تەرجىمىنى ئۆز ئىچىگە "
+"ئالمايدۇ.\n"
+"\n"
+" تەرجىمە قىلىش ئۈچۈن، قېلىپ ئاساسىدىكى يېڭى بىر PO ھۆججىتى قۇرۇڭ."
+
+#: src/editing_area.cpp:585
+msgid "Create new translation"
+msgstr "يېڭى تەرجىمە قۇر"
+
+#: src/editing_area.cpp:586
+msgid "Make a new translation from this POT file."
+msgstr "بۇ POT ھۆججەتتىن يېڭى تەرجىمە قۇرىدۇ."
+
+#: src/editing_area.cpp:618
+msgid "Use the Edit menu to perform bulk actions on selected strings."
+msgstr "تەھرىر تىزىملىكى ئارقىلىق تاللانغان تىزىققا توپ مەشغۇلات ئېلىپ بارىدۇ."
+
+#. TRANSLATORS: Refers to symbolic ID of source text, i.e. when something like "button.label" is used instead of English text
+#: src/editing_area.cpp:748 src/edlistctrl.cpp:710 src/export_html.cpp:137
+msgid "Source text ID"
+msgstr "مەنبە تېكىست ID"
+
+#: src/editing_area.cpp:803
+msgid "Everything"
+msgstr "ھەممىسى"
+
+#: src/editing_area.cpp:808
+#, c-format
+msgid "Form %i"
+msgstr "شەكىل %i"
+
+#: src/editing_area.cpp:810
+#, c-format
+msgid "Form %i (unused)"
+msgstr "شەكىل %i (ئىشلەتمىگەن)"
+
+#: src/editing_area.cpp:821
+msgid "Zero"
+msgstr "نۆل"
+
+#: src/editing_area.cpp:823
+msgid "One"
+msgstr "بىر"
+
+#: src/editing_area.cpp:825
+msgid "Two"
+msgstr "ئىككى"
+
+#: src/editing_area.cpp:839
+msgid "Other"
+msgstr "باشقا"
+
+#. TRANSLATORS: Tooltip on message context tag in the editing area, '%s' is the context text
+#: src/editing_area.cpp:1015
+#, c-format
+msgid "String context: %s"
+msgstr "ھەرپ تىزىقى مەزمۇنى: %s"
+
+#. TRANSLATORS: Tooltip on string ID tag in the editing area, '%s' contains the ID
+#: src/editing_area.cpp:1022
+#, c-format
+msgid "String identifier: %s"
+msgstr "ھەرپ تىزىقى پەرقلەندۈرگۈچ: %s"
+
+#: src/editing_area.cpp:1030
+#, c-format
+msgid "%s Format"
+msgstr "%s پىچىم"
+
+#. TRANSLATORS: %s is replaced with language name, e.g. "PHP" or "C", so "PHP Format" etc."
+#: src/editing_area.cpp:1030
+#, c-format
+msgid "%s format"
+msgstr "%s پىچىم"
+
+#: src/edlistctrl.cpp:667 src/edlistctrl.cpp:739 src/export_html.cpp:145
+#, c-format
+msgid "Translation — %s"
+msgstr "تەرجىمە - %s"
+
+#: src/edlistctrl.cpp:671
+msgid "ID"
+msgstr "ID"
+
+#: src/edlistctrl.cpp:715 src/export_html.cpp:142
+#, c-format
+msgid "Source text — %s"
+msgstr "مەنبە تېكىست - %s"
+
+#: src/edlistctrl.cpp:738 src/export_html.cpp:146
+msgid "unknown language"
+msgstr "يوچۇن تىل"
+
+#: src/errors.cpp:84
+#, c-format
+msgid "Network error: %s (%d)"
+msgstr "تور خاتالىقى %s(%d)."
+
+#: src/errors.cpp:93
+msgid "Unknown error"
+msgstr "يوچۇن خاتالىق"
+
+#: src/extractors/extractor.cpp:366
+msgid "Failed to merge gettext catalogs."
+msgstr "gettext كاتالوگىنى بىرلەشتۈرۈش مەغلۇپ بولدى."
+
+#: src/fileviewer.cpp:132
+msgid "Open in Editor"
+msgstr "تەھرىرلىگۈچتە ئاچ"
+
+#: src/fileviewer.cpp:132
+msgid "Open in editor"
+msgstr "تەھرىرلىگۈچتە ئاچ"
+
+#: src/fileviewer.cpp:259
+msgid ""
+"No information about this string’s occurrences in the source code is "
+"provided in the file."
+msgstr ""
+"ھۆججەتتە بۇ ھەرپ تىزىقىنىڭ ئەسلى كودتا كۆرۈنىدىغان ئورۇن ئۇچۇرى "
+"تەمىنلەنمىگەن."
+
+#: src/fileviewer.cpp:259
+msgid "No usage information"
+msgstr "ئىشلىتىش ئۇسۇلى ئۇچۇرى يوق"
+
+#: src/fileviewer.cpp:265
+#, c-format
+msgid "%d code occurrence"
+msgid_plural "%d code occurrences"
+msgstr[0] "%d كودنىڭ كۆرۈنىدىغان ئورنى"
+msgstr[1] "%d كودنىڭ كۆرۈنىدىغان ئورنى"
+
+#: src/fileviewer.cpp:285
+msgid "Source code not found"
+msgstr "مەنبە كودى تېپىلمىدى"
+
+#: src/fileviewer.cpp:286
+msgid ""
+"Poedit cannot show source code where the string is used, because the file is "
+"either not available in the referenced location or it is a symbolic "
+"reference that doesn’t point to a real file."
+msgstr ""
+"ھەرپ تىزىقىنىڭ ئەسلى كودنىڭ قايسى جايىدا ئىشلىتىلگەنلىكىنى Poedit "
+"كۆرسىتەلمەيدۇ، چۈنكى ھۆججەتنى نەقىل ئورنىدىنمۇ ئىشلەتكىلى بولمايدۇ ياكى ئۇ "
+"ئەمەلىي ھۆججەتنى نىشانلىمىغان بەلگە نەقىلى بولۇشى مۇمكىن."
+
+#: src/fileviewer.cpp:300
+msgid "File cannot be opened"
+msgstr "ھۆججەتنى ئاچالمىدى"
+
+#: src/fileviewer.cpp:301
+#, c-format
+msgid "Poedit was unable to open the “%s” file."
+msgstr "Poedit بۇ «%s» ھۆججەتنى ئاچالمىغان."
+
+#: src/findframe.cpp:83 src/findframe.cpp:101 src/findframe.cpp:300
+#: src/resources/menus.xrc:145
+msgid "Find"
+msgstr "ئىزدە"
+
+#: src/findframe.cpp:102 src/findframe.cpp:300
+msgid "Replace"
+msgstr "ئالماشتۇر"
+
+#. TRANSLATORS: Expander in Find window for additional options (case sensitive etc.)
+#: src/findframe.cpp:118
+msgid "Options"
+msgstr "تاللانمىلار"
+
+#: src/findframe.cpp:122
+msgid "Ignore case"
+msgstr "چوڭ كىچىك يېزىلىشىغا پەرۋا قىلما"
+
+#: src/findframe.cpp:123
+msgid "Wrap around"
+msgstr "تولۇق ماسلاش"
+
+#: src/findframe.cpp:124
+msgid "Whole words only"
+msgstr "بارلىق سۆزلەرلا"
+
+#: src/findframe.cpp:125
+msgid "Find in source texts"
+msgstr "ئەسلى تېكستتىن ئىزدە"
+
+#: src/findframe.cpp:126
+msgid "Find in translations"
+msgstr "تەرجىمىدىن ئىزدە"
+
+#: src/findframe.cpp:127
+msgid "Find in comments"
+msgstr "ئىزاھاتتىن ئىزدە"
+
+#: src/findframe.cpp:149
+msgid "Replace &All"
+msgstr "ھەممىنى ئالماشتۇر(&A)"
+
+#: src/findframe.cpp:149
+msgid "Replace &all"
+msgstr "ھەممىنى ئالماشتۇر(&A)"
+
+#: src/findframe.cpp:150
+msgid "&Replace"
+msgstr "ئالماشتۇر(&R)"
+
+#: src/findframe.cpp:151
+msgid "< &Previous"
+msgstr "< ئالدىنقى(&P)"
+
+#: src/findframe.cpp:152
+msgid "&Next >"
+msgstr "‹ كەينى(&N)"
+
+#: src/findframe.cpp:235
+msgid "String to find"
+msgstr "ئىزدەيدىغان ھەرپ تىزىقى"
+
+#: src/findframe.cpp:236
+msgid "Replacement string"
+msgstr "ئالمىشىدىغان تېكىست"
+
+#: src/gexecute.cpp:132 src/gexecute.cpp:153 src/gexecute.cpp:202
+msgid "warning: "
+msgstr "ئاگاھلاندۇرۇش: "
+
+#: src/gexecute.cpp:203
+msgid "error: "
+msgstr "خاتالىق: "
+
+#. TRANSLATORS: placeholder/hint in language controls
+#: src/languagectrl.cpp:138
+msgid "Language name or code"
+msgstr "تىل ئىسمى ياكى كودى"
+
+#: src/languagectrl.cpp:208
+msgid "Translation Language"
+msgstr "تەرجىمە تىلى"
+
+#: src/languagectrl.cpp:215
+msgid "Language of the translation:"
+msgstr "تەرجىمە تىلى:"
+
+#: src/localazy_client.cpp:381
+msgid "All strings"
+msgstr "ھەممە ھەرپ تىزىقى"
+
+#: src/localazy_client.cpp:397
+msgid "Couldn’t download Localazy project details."
+msgstr "Localazy قۇرۇلۇشىنىڭ تەپسىلاتىنى چۈشۈرەلمەيدۇ."
+
+#: src/localazy_client.cpp:469 src/localazy_client.cpp:483
+msgid "There was an error when uploading translations to Localazy."
+msgstr "Localazy غا تەرجىمە يۈكلىگەندە خاتالىق كۆرۈلدى."
+
+#: src/localazy_gui.cpp:98
+msgid "Projects"
+msgstr "قۇرۇلۇشلار"
+
+#. TRANSLATORS: %s is online service name, e.g. "Crowdin" or "Localazy"
+#: src/localazy_gui.cpp:110
+#, c-format
+msgid "Learn more about %s"
+msgstr "%s ھەققىدىكى تەپسىلات"
+
+#: src/localazy_gui.cpp:137
+msgid ""
+"Localazy is a highly automated localization platform allowing anyone to "
+"translate their products and content into multiple languages easily."
+msgstr ""
+"Localazy زور دەرىجىدە ئاپتوماتلاشتۇرۇلغان يەرلىكلەشتۈرۈش سۇپىسى بولۇپ ھەر "
+"قانداق كىشىنىڭ مەھسۇلات ۋە مەزمۇنلىرىنى كۆپ خىل تىلغا تەرجىمە قىلىشنى "
+"قۇلايلاشتۇرىدۇ."
+
+#: src/localazy_gui.cpp:231
+msgid "Add Project"
+msgstr "قۇرۇلۇش قوش"
+
+#: src/localazy_gui.cpp:231
+msgid "Add project"
+msgstr "قۇرۇلۇش قوش"
+
+#: src/manager.cpp:110
+msgid "Poedit - Catalogs manager"
+msgstr "Poedit - كاتالوگ باشقۇرغۇچ"
+
+#: src/manager.cpp:154 src/prefsdlg.cpp:766
+msgid "Edit…"
+msgstr "تەھرىر…"
+
+#: src/manager.cpp:159
+msgid "Create new translations project"
+msgstr "يېڭى تەرجىمە قۇرۇلۇشى قۇر"
+
+#: src/manager.cpp:160
+msgid "Delete the project"
+msgstr "قۇرۇلۇش ئۆچۈر"
+
+#: src/manager.cpp:161
+msgid "Edit the project"
+msgstr "بۇ قۇرۇلۇشنى تەھرىرلە"
+
+#: src/manager.cpp:191
+msgid "Update all"
+msgstr "ھەممىنى يېڭىلا"
+
+#: src/manager.cpp:192
+msgid "Update all catalogs in the project"
+msgstr "قۇرۇلۇشتىكى بارلىق كاتالوگنى يېڭىلا"
+
+#: src/manager.cpp:393
+msgid "Total"
+msgstr "جەمئى"
+
+#: src/manager.cpp:394
+msgid "Untrans"
+msgstr "تەرجىمە قىلىنمىغان"
+
+#: src/manager.cpp:395
+msgctxt "column/row header"
+msgid "Needs Work"
+msgstr "ئىشلەش زۆرۈر"
+
+#: src/manager.cpp:396
+msgid "Errors"
+msgstr "خاتالىق"
+
+#: src/manager.cpp:397
+msgid "Last modified"
+msgstr "ئاخىرقى ئۆزگەرتىش"
+
+#: src/manager.cpp:418
+msgid "Edit project"
+msgstr "قۇرۇلۇش تەھرىر"
+
+#: src/manager.cpp:441 src/propertiesdlg.cpp:424
+msgid "Select directory"
+msgstr "مۇندەرىجە تاللا"
+
+#: src/manager.cpp:460
+msgid "Directories:"
+msgstr "مۇندەرىجە:"
+
+#: src/manager.cpp:531
+msgid "<unnamed>"
+msgstr "<ئاتسىز>"
+
+#: src/manager.cpp:567
+#, c-format
+msgid "Do you want to delete project “%s”?"
+msgstr "قۇرۇلۇش «%s» نى ئۆچۈرەمسىز؟"
+
+#: src/manager.cpp:568
+msgid "Delete project"
+msgstr "قۇرۇلۇش ئۆچۈر"
+
+#: src/manager.cpp:571
+msgid "Deleting the project will not delete any translation files."
+msgstr "بۇ قۇرۇلۇش ئۆچۈرۈلسە ھېچقانداق تەرجىمە ھۆججىتىنى ئۆچۈرمەيدۇ."
+
+#: src/manager.cpp:599
+msgid "Confirmation"
+msgstr "جەزملە"
+
+#: src/manager.cpp:599
+msgid "Update all catalogs in this project?"
+msgstr "بۇ قۇرۇلۇشتىكى بارلىق كاتالوگنى يېڭىلامدۇ؟"
+
+#: src/manager.cpp:600
+msgid "Performs update from source code on all files in the project."
+msgstr "بۇ قۇرۇلۇشتىكى ھەممە ھۆججەتنى ئەسلى كودتىن يېڭىلايدۇ."
+
+#: src/manager.cpp:607
+msgid "Updating project catalogs"
+msgstr "قۇرۇلۇش مۇندەرىجىسىنى يېڭىلاۋاتىدۇ"
+
+#: src/menus.cpp:166
+msgid "Check for Updates…"
+msgstr "يېڭىلاشنى تەكشۈر…"
+
+#: src/menus.cpp:168
+msgid "Catalogs Manager"
+msgstr "كاتالوگ باشقۇرغۇچ"
+
+#: src/menus.cpp:181
+msgid "&Preferences…"
+msgstr "مايىللىق(&P)…"
+
+#: src/menus.cpp:198 src/resources/menus.xrc:84 src/resources/menus.xrc:402
+#: src/wx_translatable_strings.h:102
+msgid "&Edit"
+msgstr "تەھرىر(&E)"
+
+#: src/menus.cpp:218 src/wx_translatable_strings.h:118
+msgid "Undo"
+msgstr "يېنىۋال"
+
+#: src/menus.cpp:219 src/wx_translatable_strings.h:113
+msgid "Redo"
+msgstr "قايتىلا"
+
+#: src/menus.cpp:228
+msgid "Paste and Match Style"
+msgstr "چاپلاپ ئۇسلۇبقا ماسلاش"
+
+#: src/menus.cpp:231 src/prefsdlg.cpp:971 src/wx_translatable_strings.h:100
+msgid "Delete"
+msgstr "ئۆچۈر"
+
+#: src/menus.cpp:240
+msgid "Spelling and Grammar"
+msgstr "ئىملا ۋە گرامماتىكا"
+
+#: src/menus.cpp:242
+msgid "Show Spelling and Grammar"
+msgstr "ئىملا ۋە گرامماتىكا كۆرسەت"
+
+#: src/menus.cpp:243
+msgid "Check Document Now"
+msgstr "پۈتۈكنى ھازىر تەكشۈر"
+
+#: src/menus.cpp:245
+msgid "Check Spelling While Typing"
+msgstr "خەت كىرگۈزۈۋاتقاندا ئىملا تەكشۈر"
+
+#: src/menus.cpp:246
+msgid "Check Grammar With Spelling"
+msgstr "ئىملا ۋە گرامماتىكا تەكشۈر"
+
+#: src/menus.cpp:247
+msgid "Correct Spelling Automatically"
+msgstr "ئىملانى ئۆزلۈكىدىن توغرىلا"
+
+#: src/menus.cpp:250
+msgid "Substitutions"
+msgstr "ئالماشتۇرىدىغان"
+
+#: src/menus.cpp:252
+msgid "Show Substitutions"
+msgstr "ئالماشتۇرىدىغاننى كۆرسەت"
+
+#: src/menus.cpp:254
+msgid "Smart Copy/Paste"
+msgstr "ئىدراكلىق كۆچۈر/چاپلا"
+
+#: src/menus.cpp:255
+msgid "Smart Quotes"
+msgstr "ئىدراكلىق قوش پەش"
+
+#: src/menus.cpp:256
+msgid "Smart Dashes"
+msgstr "ئىدراكلىق سىزىقچە"
+
+#: src/menus.cpp:257
+msgid "Smart Links"
+msgstr "ئىدراكلىق ئۇلانما"
+
+#: src/menus.cpp:258
+msgid "Text Replacement"
+msgstr "تېكىست ئالماشتۇرۇش"
+
+#: src/menus.cpp:261
+msgid "Transformations"
+msgstr "ئۆزگىرىش"
+
+#: src/menus.cpp:263
+msgid "Make Upper Case"
+msgstr "چوڭ ھەرپكە ئۆزگەرت"
+
+#: src/menus.cpp:264
+msgid "Make Lower Case"
+msgstr "كىچىك ھەرپكە ئۆزگەرت"
+
+#: src/menus.cpp:265
+msgid "Capitalize"
+msgstr "چوڭ ھەرپ"
+
+#: src/menus.cpp:268
+msgid "Speech"
+msgstr "تاۋۇش"
+
+#: src/menus.cpp:270
+msgid "Start Speaking"
+msgstr "سۆزلەشنى باشلا"
+
+#: src/menus.cpp:271
+msgid "Stop Speaking"
+msgstr "سۆزلەشنى توختات"
+
+#: src/menus.cpp:274 src/resources/menus.xrc:166 src/resources/menus.xrc:412
+msgid "&View"
+msgstr "ﻛﯚﺭﯛﻧﯜﺵ(&V)"
+
+#. TRANSLATORS: This must be the same as OS X's translation of this View menu item
+#: src/menus.cpp:279
+msgid "Show Toolbar"
+msgstr "قورال بالداقنى كۆرسەت"
+
+#. TRANSLATORS: This must be the same as OS X's translation of this View menu item
+#: src/menus.cpp:282
+msgid "Customize Toolbar…"
+msgstr "ئىختىيارىچە قورال بالداق"
+
+#. TRANSLATORS: This must be the same as OS X's translation of this View menu item
+#: src/menus.cpp:285
+msgid "Enter Full Screen"
+msgstr "پۈتۈن ئېكرانغا كىر"
+
+#: src/menus.cpp:292 src/menus.cpp:379 src/resources/menus.xrc:316
+#: src/resources/menus.xrc:421
+msgid "Window"
+msgstr "كۆزنەك"
+
+#: src/menus.cpp:293
+msgid "Minimize"
+msgstr "كىچىكلەت"
+
+#: src/menus.cpp:294
+msgid "Zoom"
+msgstr "يېقىنلات يىراقلات"
+
+#: src/menus.cpp:296 src/welcomescreen.cpp:220 src/welcomescreen.cpp:269
+msgid "Welcome to Poedit"
+msgstr "Poedit غا مەرھابا"
+
+#: src/menus.cpp:301
+msgid "Bring All to Front"
+msgstr "ھەممىسىنى ئەڭ ئالدىغا قوي"
+
+#: src/prefsdlg.cpp:169
+msgid "Information about the translator"
+msgstr "تەرجىمان ھەققىدىكى ئۇچۇر"
+
+#: src/prefsdlg.cpp:176
+msgid "Name:"
+msgstr "ئاتى:"
+
+#: src/prefsdlg.cpp:179
+msgid "Your Name"
+msgstr "ئاتىڭىز"
+
+#: src/prefsdlg.cpp:181
+msgid "Email:"
+msgstr "ئېلخەت:"
+
+#: src/prefsdlg.cpp:184
+msgid "you@example.com"
+msgstr "you@example.com"
+
+#: src/prefsdlg.cpp:187
+msgid ""
+"Your name and email address are only used to set the Last-Translator header "
+"of GNU gettext files."
+msgstr ""
+"ئات ۋە ئېلخەت ئادرېسىڭىز GNU gettext ھۆججىتىنىڭ بېشىدىكى ئاخىرقى تەرجىمە "
+"قىلغۇچى ئۇچۇرى ئۈچۈن ئىشلىتىلىدۇ."
+
+#: src/prefsdlg.cpp:196
+msgid "Editing"
+msgstr "تەھرىرلەۋاتىدۇ"
+
+#: src/prefsdlg.cpp:199
+msgid "Automatically compile MO file when saving"
+msgstr "ھۆججەت ساقلىغاندا ئۆزلۈكىدىن .mo ھۆججىتى ھاسىل قىلسۇن"
+
+#: src/prefsdlg.cpp:204
+msgid "Check spelling"
+msgstr "ئىملا تەكشۈرۈش"
+
+#: src/prefsdlg.cpp:206
+msgid "Always change focus to text input field"
+msgstr "خەت كىرگۈزۈش رايونىدىكى مەركىزى نۇقتىسىنى دائىم ئۆزگەرت"
+
+#: src/prefsdlg.cpp:208
+msgid ""
+"Never let the list of strings take focus. If enabled, you must use Ctrl-"
+"arrows for keyboard navigation but you can also type text immediately, "
+"without having to press Tab to change focus."
+msgstr ""
+"مەركىزى نۇقتىنى ھەرپ تىزمىسى جەدۋىلىدە توختاتماڭ. ئەگەر قوزغاتسىڭىز، چوقۇم "
+"Ctrl بىلەن يۆنىلىش كۇنۇپكىسىنى ئىشلىتىپ يول باشلىيالايسىز، ئەمما بۇنداق "
+"قىلسىڭىز دەرھال تېكست كىرگۈزەلەيسىز، Tab نى بېسىپ مەركىزىي نۇقتىنى "
+"يۆتكىمىسىڭىزمۇ بولىدۇ."
+
+#: src/prefsdlg.cpp:216
+msgid "Appearance"
+msgstr "كۆرۈنۈشى"
+
+#: src/prefsdlg.cpp:223
+msgid "Use custom list font:"
+msgstr "ئىختىيارىچە خەت نۇسخا ئىشلىتىش:"
+
+#: src/prefsdlg.cpp:226
+msgid "Use custom text fields font:"
+msgstr "ئىختىيارىچە تېكىست بۆلىكى خەت نۇسخا ئىشلىتىش:"
+
+#: src/prefsdlg.cpp:236
+msgid "Change UI language"
+msgstr "كۆرۈنۈش تىلىنى ئۆزگەرت"
+
+#. TRANSLATORS: This is a note appended to "Check spelling" when running on older Windows versions
+#: src/prefsdlg.cpp:246
+msgid "(requires Windows 8 or newer)"
+msgstr "(Windows 8 ياكى يېڭى نەشرى زۆرۈر)"
+
+#: src/prefsdlg.cpp:349
+msgid "General"
+msgstr "ئادەتتىكى"
+
+#: src/prefsdlg.cpp:366
+msgid "Use translation memory"
+msgstr "تەرجىمە خاتىرىسىنى ئىشلەت"
+
+#: src/prefsdlg.cpp:376
+msgid "Manage…"
+msgstr "باشقۇرۇش…"
+
+#. TRANSLATORS: Followed by "match translations within the file" or "pre-translate from TM"
+#: src/prefsdlg.cpp:383
+msgid "When updating from sources"
+msgstr "مەنبەدىن يېڭىلىغاندا"
+
+#. TRANSLATORS: Preceded by "When updating from sources"
+#: src/prefsdlg.cpp:386
+msgid "fuzzy match within the file"
+msgstr "ھۆججەتتىكى مۈجىمەل ماس كەلگىنى"
+
+#. TRANSLATORS: Preceded by "When updating from sources"
+#: src/prefsdlg.cpp:388
+msgid "pre-translate from TM"
+msgstr "تەرجىمە خاتىرىسىدىن ئالدىن تەرجىمە"
+
+#: src/prefsdlg.cpp:404
+msgid ""
+"Poedit can attempt to fill in new entries from only previous translations in "
+"the file or from your entire translation memory. Using the TM won’t be very "
+"effective if it’s near-empty, but it will get better as you add more "
+"translations to it."
+msgstr ""
+"Poedit ئىلگىرىكى تەرجىمە ھۆججىتى ياكى پۈتكۈل تەرجىمە خاتىرىڭىزگە ئاساسەن "
+"يېڭى بۆلەكنى تولدۇرۇشنى سىنايدۇ. ئاساسەن بوش بولغان تەرجىمە خاتىرىسىنى "
+"ئىشلىتىشنىڭ ئانچە ئۈنۈمى بولمايدۇ، بىراق ئۇنىڭغا تېخىمۇ كۆپ تەرجىمە قوشسىڭىز "
+"ئۇ ياخشىلىنىدۇ."
+
+#: src/prefsdlg.cpp:478
+msgid "Stored translations:"
+msgstr "ساقلانغان تەرجىمە:"
+
+#: src/prefsdlg.cpp:479
+msgid "Database size on disk:"
+msgstr "دىسكىدىكى ساندان چوڭلۇقى:"
+
+#: src/prefsdlg.cpp:494
+msgid "Import Translation Files…"
+msgstr "تەرجىمە ھۆججىتىنى ئەكىر…"
+
+#: src/prefsdlg.cpp:494
+msgid "Import translation files…"
+msgstr "تەرجىمە ھۆججىتىنى ئەكىر…"
+
+#: src/prefsdlg.cpp:496
+msgid "Import From TMX…"
+msgstr "TMX تىن ئەكىر…"
+
+#: src/prefsdlg.cpp:496
+msgid "Import from TMX…"
+msgstr "TMX تىن ئەكىر…"
+
+#: src/prefsdlg.cpp:497
+msgid "Export To TMX…"
+msgstr "TMX كە چىقار…"
+
+#: src/prefsdlg.cpp:497
+msgid "Export to TMX…"
+msgstr "TMX كە چىقار…"
+
+#. TRANSLATORS: This is a button that deletes everything in the translation memory (i.e. clears/resets it).
+#: src/prefsdlg.cpp:500 src/prefsdlg.cpp:673
+msgid "Reset"
+msgstr "ئەسلىگە قايتۇر"
+
+#: src/prefsdlg.cpp:524
+msgid "Select translation files to import"
+msgstr "ئەكىرىدىغان تەرجىمە ھۆججىتىنى تاللاڭ"
+
+#: src/prefsdlg.cpp:557
+msgid "Select TMX files to import"
+msgstr "ئەكىرىدىغان TMX ھۆججىتىنى تاللاڭ"
+
+#: src/prefsdlg.cpp:560 src/prefsdlg.cpp:636
+msgid "TMX Files"
+msgstr "TMX ھۆججەتلەر"
+
+#: src/prefsdlg.cpp:587
+msgid "Importing translations…"
+msgstr "تەرجىمىنى ئەكىرىۋاتىدۇ…"
+
+#: src/prefsdlg.cpp:588
+msgid "Importing translation memory failed."
+msgstr "تەرجىمە خاتىرىسىنى ئەكىرەلمىدى."
+
+#: src/prefsdlg.cpp:602
+#, c-format
+msgid "Importing from “%s”…"
+msgstr "«%s» دىن ئەكىرىۋاتىدۇ…"
+
+#. TRANSLATORS: %s is a (formatted) number here
+#: src/prefsdlg.cpp:620
+#, c-format
+msgid "%s translation was imported."
+msgid_plural "%s translations were imported."
+msgstr[0] "%s تەرجىمە ئەكىرىلگەن."
+msgstr[1] "%s تەرجىمە ئەكىرىلگەن."
+
+#: src/prefsdlg.cpp:633
+msgid "Export as…"
+msgstr "سۈپىتىدە چىقار…"
+
+#: src/prefsdlg.cpp:648
+msgid "Exporting translations…"
+msgstr "تەرجىمىنى چىقىرىۋاتىدۇ…"
+
+#: src/prefsdlg.cpp:649
+#, c-format
+msgid "Exporting translation memory to “%s” failed."
+msgstr "تەرجىمە خاتىرىسىنى «%s» غا چىقىرالمىدى."
+
+#: src/prefsdlg.cpp:667
+msgid "Reset translation memory"
+msgstr "تەرجىمە خاتىرىسىنى ئەسلىگە قايتۇر"
+
+#: src/prefsdlg.cpp:668
+msgid "Are you sure you want to reset the translation memory?"
+msgstr "تەرجىمە خاتىرىسىنى راستلا ئەسلىگە قايتۇرامسىز؟"
+
+#: src/prefsdlg.cpp:669
+msgid ""
+"Resetting the translation memory will irrevocably delete all stored "
+"translations from it. You can’t undo this operation."
+msgstr ""
+"تەرجىمە خاتىرىسى ئەسلىگە قايتۇرۇلسا ساقلانغان بارلىق تەرجىمىنىڭ ھەممىسى "
+"پۈتۈنلەي ئۆچۈرۈلىدۇ. بۇ مەشغۇلاتتىن يېنىۋالالمايسىز."
+
+#. TRANSLATORS: This is abbreviation of "Translation Memory" used in Preferences on macOS.
+#. Long text looks weird there, too short (like TM) too, but less so. "General" is about ideal
+#. length there.
+#: src/prefsdlg.cpp:704
+msgid "TM"
+msgstr "TM"
+
+#: src/prefsdlg.cpp:706
+msgid "Translation Memory"
+msgstr "تەرجىمە خاتىرىسى"
+
+#: src/prefsdlg.cpp:722
+msgid ""
+"Source code extractors are used to find translatable strings in the source "
+"code files and extract them so that they can be translated."
+msgstr ""
+"مەنبە كود ئاجراتقۇچ مەنبە كودتىكى تەرجىمە قىلغىلى بولىدىغان ھەرپ تىزىقىنى "
+"ئىزدەپ ۋە ئۇلارنى ئاجرىتىشقا ئىشلىتىلىدۇ، شۇڭلاشقا ئۇلارنى تەرجىمە قىلغىلى "
+"بولىدۇ."
+
+#: src/prefsdlg.cpp:733
+msgid "Custom Extractors:"
+msgstr "ئىختىيارىچە ئاجراتقۇچ:"
+
+#: src/prefsdlg.cpp:733
+msgid "Custom extractors:"
+msgstr "ئىختىيارىچە ئاجراتقۇچ:"
+
+#: src/prefsdlg.cpp:818
+msgid "GNU gettext"
+msgstr "GNU gettext"
+
+#: src/prefsdlg.cpp:824
+msgid ""
+"Supports all programming languages recognized by GNU gettext tools (PHP, C/C+"
+"+, C#, Perl, Python, Java, JavaScript and others)."
+msgstr ""
+"GNU gettext قورالى تونۇيالايدىغان بارلىق پىروگرامما تىللىرى (PHP, C/C++, C#, "
+"Perl, Python, Java, JavaScript ۋە باشقىلار) نى قوللايدۇ."
+
+#: src/prefsdlg.cpp:856
+msgid "Extractor setup"
+msgstr "ئاجراتقۇچ ئورنات"
+
+#: src/prefsdlg.cpp:964
+msgid "Delete extractor"
+msgstr "ئاجراتقۇچنى ئۆچۈر"
+
+#: src/prefsdlg.cpp:965
+#, c-format
+msgid "Are you sure you want to delete the “%s” extractor?"
+msgstr "«%s» يەشكۈچنى راستلا ئۆچۈرەمسىز؟"
+
+#: src/prefsdlg.cpp:1003
+msgid "Extractors"
+msgstr "ئاجراتقۇچ"
+
+#: src/prefsdlg.cpp:1060
+msgid "Accounts"
+msgstr "ھېساباتلار"
+
+#: src/prefsdlg.cpp:1076
+msgid "Automatically check for updates"
+msgstr "يېڭىلاشنى ئاپتوماتىك تەكشۈرسۇن"
+
+#: src/prefsdlg.cpp:1079
+msgid "Include beta versions"
+msgstr "سىناق نەشرىمۇ ئىچىدە"
+
+#: src/prefsdlg.cpp:1082
+msgid ""
+"Beta versions contain the latest new features and improvements, but may be a "
+"bit less stable."
+msgstr ""
+"سىناق نەشرىدە ئەڭ يېڭى ئىقتىدار ۋە ياخشىلاشنى ئۆز ئىچىگە ئالىدۇ، ئەمما "
+"ئازراق مۇقىم بولماسلىقى مۇمكىن."
+
+#: src/prefsdlg.cpp:1110
+msgid "Updates"
+msgstr "يېڭىلانمىلار"
+
+#: src/prefsdlg.cpp:1124
+msgid ""
+"These settings affect internal formatting of PO files. Adjust them if you "
+"have specific requirements e.g. because of version control."
+msgstr ""
+"بۇ تەڭشەكلەر PO ھۆججەتلەرنىڭ ئىچكى پىچىمىغا تەسىر كۆرسىتىدۇ. ئەگەر سىزنىڭ "
+"مۇئەييەن تەلىپىڭىز مەسىلەن نەشر تىزگىنلەش، ئۇلارنى تەڭشەڭ."
+
+#: src/prefsdlg.cpp:1128
+msgid "Line endings:"
+msgstr "قۇر ئاخىرى:"
+
+#: src/prefsdlg.cpp:1131
+msgid "Unix (recommended)"
+msgstr "Unix (تەۋسىيە)"
+
+#: src/prefsdlg.cpp:1132
+msgid "Windows"
+msgstr "كۆزنەكلەر"
+
+#. TRANSLATORS: Followed by text control for entering number; wraps text at given width
+#: src/prefsdlg.cpp:1136
+msgid "Wrap at:"
+msgstr "قۇر قاتلاش ئورنى:"
+
+#: src/prefsdlg.cpp:1147
+msgid "Preserve formatting of existing files"
+msgstr "مەۋجۇت ھۆججەتنىڭ پىچىمىنى ساقلاپ قالىدۇ"
+
+#: src/prefsdlg.cpp:1199
+msgid "Advanced"
+msgstr "ئالىي"
+
+#: src/prefsdlg.cpp:1227
+msgid "Settings"
+msgstr "تەڭشەكلەر"
+
+#: src/pretranslate.cpp:99
+msgid "Preparing strings…"
+msgstr "ھەرپ تىزىقىنى تەييارلاۋاتىدۇ…"
+
+#: src/pretranslate.cpp:171
+msgid "Pre-translating from translation memory…"
+msgstr "تەرجىمە خاتىرىسىدىن ئالدىن تەرجىمە قىلىۋاتىدۇ…"
+
+#: src/pretranslate.cpp:181
+#, c-format
+msgid "Pre-translated %u string"
+msgid_plural "Pre-translated %u strings"
+msgstr[0] "ئالدىن تەرجىمە قىلىنغىنى %u تىزىق"
+msgstr[1] "ئالدىن تەرجىمە قىلىنغىنى %u تىزىق"
+
+#: src/pretranslate.cpp:199
+msgid "Pre-translating…"
+msgstr "ئالدىن تەرجىمە قىلىۋاتىدۇ…"
+
+#: src/pretranslate.cpp:208
+#, c-format
+msgid "%d entry was pre-translated."
+msgid_plural "%d entries were pre-translated."
+msgstr[0] "%d تىزىق ئالدىن تەرجىمە قىلىندى."
+msgstr[1] "%d تىزىق ئالدىن تەرجىمە قىلىندى."
+
+#: src/pretranslate.cpp:214
+msgid ""
+"The translations were marked as needing work, because they may be "
+"inaccurate. You should review them for correctness."
+msgstr ""
+"تەرجىمىگە ئىشلەش زۆرۈر بەلگىسى سېلىنغان، چۈنكى ئۇلار توغرا بولماسلىقى "
+"مۇمكىن. ئۇلارنىڭ توغرىلىقىنى تەكشۈرۈڭ."
+
+#: src/pretranslate.cpp:217
+msgid "Exact matches from TM"
+msgstr "تەرجىمە خاتىرىسىدىن دەل ماس كەلگىنى"
+
+#: src/pretranslate.cpp:218
+msgid "Approximate matches from TM"
+msgstr "تەرجىمە خاتىرىسىدىن تەخمىنەن ماس كەلگىنى"
+
+#: src/pretranslate.cpp:222
+msgid "No entries could be pre-translated."
+msgstr "ئالدىن تەرجىمە قىلغىلى بولىدىغان تۈر يوق."
+
+#: src/pretranslate.cpp:225
+msgid "All strings were already translated."
+msgstr "بارلىق تىزىق تەرجىمە قىلىنغان."
+
+#: src/pretranslate.cpp:229
+msgid ""
+"The TM doesn’t contain any strings similar to the content of this file. It "
+"is only effective for semi-automatic translations after Poedit learns enough "
+"from files that you translated manually."
+msgstr ""
+"تەرجىمە خاتىرىسىدە بۇ ھۆججەت مەزمۇنىغا ئوخشاپ كېتىدىغان ھېچقانداق ھەرپ "
+"تىزىقىنى ئۆز ئىچىگە ئالمىغان. Poedit تەرجىمىڭىزدىن يېتەرلىك ئۆگەنگەندىن "
+"كېيىن ئاندىن يېرىم ئاپتوماتىك تەرجىمىدە رولىنى جارى قىلدۇرىدۇ."
+
+#: src/pretranslate.cpp:259
+msgid "Cannot pre-translate without source text."
+msgstr "مەنبە تېكىستسىز ئالدىن تەرجىمە قىلالمايدۇ."
+
+#. TRANSLATORS: This is a somewhat common term describing the action where
+#. you apply the translation memory and/or machine translation to all of the
+#. strings you're translating as the first step, followed by correcting,
+#. improving etc., i.e. actually translating the strings. This may be tricky
+#. to express in other languages as simply as in English, but please try to
+#. keep it similarly concise. Please try to avoid, if possible, describing it
+#. as "auto-translation" and similar, because such terminology would mislead
+#. some users into thinking it's all that needs to be done (spoken from
+#. experience). "Pre-translate" nicely expresses that it's only the step done
+#. *before* actual translation.
+#: src/pretranslate.cpp:260 src/pretranslate.cpp:275 src/pretranslate.cpp:284
+#: src/pretranslate.cpp:293 src/pretranslate.cpp:319
+#: src/wx/main_toolbar.cpp:131
+msgid "Pre-translate"
+msgstr "ئالدىن تەرجىمە"
+
+#: src/pretranslate.cpp:264
+msgid ""
+"Pre-translation requires that source text is available. It doesn’t work if "
+"only IDs without the actual text are used."
+msgstr ""
+"ئالدىن تەرجىمە قىلىش ئۈچۈن مەنبە تېكىستىنى ئىشلەتكىلى بولۇشى كېرەك. ئەگەر "
+"ئەمەلىي تېكىست بولماي ID لا ئىشلىتىلسە ئىشلىمەيدۇ."
+
+#: src/pretranslate.cpp:274
+msgid "Cannot pre-translate from unknown language."
+msgstr "نامەلۇم تىلدىن ئالدىن تەرجىمە قىلالمايدۇ."
+
+#: src/pretranslate.cpp:279
+msgid ""
+"Pre-translation requires that source text’s language is known. Poedit "
+"couldn’t detect it in this file."
+msgstr ""
+"ئالدىن تەرجىمە قىلىش ئۈچۈن مەنبە تېكىستنىڭ تىلى ئېنىق بولۇشى كېرەك. Poedit "
+"بۇ ھۆججەتتىن ئۇنى بايقىيالمىدى."
+
+#: src/pretranslate.cpp:287
+msgid "Only fill in exact matches"
+msgstr "تولۇق ماس كەلگەننىلا تولدۇر"
+
+#: src/pretranslate.cpp:288
+msgid ""
+"By default, inaccurate results are also included, but marked as needing "
+"work. Check this option to only include perfect matches."
+msgstr ""
+"كۆڭۈلدىكى ھالەتتە، خاتا نەتىجىلەرمۇ بار، ئەمما ئىشلەش زۆرۈر بەلگىسى قويۇلدى. "
+"پەقەت مۇكەممەل ماسلاشتۇرۇش ئۈچۈن بۇ تاللانما تاللىنىدۇ."
+
+#: src/pretranslate.cpp:289
+msgid "Don’t mark exact matches as needing work"
+msgstr "دەل ماسلاشقانغا ئىشلەش زۆرۈر بەلگىسى سالمايدۇ"
+
+#: src/pretranslate.cpp:290
+msgid ""
+"Only enable if you trust the quality of your TM. By default, all matches "
+"from the TM are marked as needing work and should be reviewed before use."
+msgstr ""
+"پەقەت ئۆزىڭىزنىڭ تەرجىمە خاتىرە سۈپىتىڭىزگە ئىشەنگەندىلا ئاندىن قوزغىتىڭ. "
+"كۆڭۈلدىكى ئەھۋالدا، تەرجىمە خاتىرىسىدە ماس كەلگەن ھەممىسىگە ئىشلەش زۆرۈر "
+"بەلگىسى قويۇلىدۇ ھەمدە ئىشلىتىشتىن ئىلگىرى قايتا تەكشۈرۈش كېرەك."
+
+#: src/pretranslate.cpp:295
+msgid ""
+"Pre-translation automatically finds exact or fuzzy matches for untranslated "
+"strings in the translation memory and fills in their translations."
+msgstr ""
+"ئالدىن تەرجىمە تەرجىمە خاتىرىسىدىكى دەل ياكى مۈجمەل ماس كەلگەن تەرجىمە "
+"قىلمىغان تىزىقلارنى ئۆزلۈكىدىن ئىزدەپ تېپىپ ۋە ئۇلارنىڭ تەرجىمىسىنى "
+"تولدۇرىدۇ."
+
+#: src/progress_ui.cpp:175 src/wx_translatable_strings.h:151
+msgid "Error: "
+msgstr "خاتالىق: "
+
+#: src/progress_ui.cpp:179
+#, c-format
+msgid "%d error occurred:"
+msgid_plural "%d errors occurred:"
+msgstr[0] "%d خاتالىق كۆرۈلدى:"
+msgstr[1] "%d خاتالىق كۆرۈلدى:"
+
+#: src/progress_ui.cpp:287
+msgid "An error occurred."
+msgstr "بىر خاتالىق كۆرۈلدى."
+
+#: src/progress_ui.cpp:293
+#, c-format
+msgid "%d error occurred."
+msgid_plural "%d errors occurred."
+msgstr[0] "%d خاتالىق كۆرۈلدى."
+msgstr[1] "%d خاتالىق كۆرۈلدى."
+
+#: src/progress_ui.cpp:440
+msgid "Cancelling…"
+msgstr "ۋاز كېچىۋاتىدۇ…"
+
+#: src/propertiesdlg.cpp:308
+msgid "Drag Folders or Files Here"
+msgstr "قىسقۇچ ياكى ھۆججەتنى بۇ جايغا سۆرەڭ"
+
+#: src/propertiesdlg.cpp:308
+msgid "Drag folders or files here"
+msgstr "قىسقۇچ ياكى ھۆججەتنى بۇ جايغا سۆرەڭ"
+
+#: src/propertiesdlg.cpp:412
+msgid "Add Folders…"
+msgstr "قىسقۇچ قوش…"
+
+#: src/propertiesdlg.cpp:412
+msgid "Add folders…"
+msgstr "قىسقۇچ قوش…"
+
+#: src/propertiesdlg.cpp:414
+msgid "Add Files…"
+msgstr "ھۆججەت قوش…"
+
+#: src/propertiesdlg.cpp:414
+msgid "Add files…"
+msgstr "ھۆججەت قوش…"
+
+#: src/propertiesdlg.cpp:418
+msgid "Add Wildcard…"
+msgstr "ئورتاق بەلگە قوش…"
+
+#: src/propertiesdlg.cpp:418
+msgid "Add wildcard…"
+msgstr "ئورتاق بەلگە قوش…"
+
+#. TRANSLATORS: Used on macOS, should match standard translation of this in other apps (incl. name of the Finder app)
+#: src/propertiesdlg.cpp:488
+msgid "Reveal in Finder"
+msgstr "ئىزدىگۈچتە كۆرسەت"
+
+#. TRANSLATORS: Used on Windows to show in the Explorer file manager, should match standard translation of "Explorer"
+#: src/propertiesdlg.cpp:491
+msgid "Show in Explorer"
+msgstr "مەنبە باشقۇرغۇچتا كۆرسەت"
+
+#: src/propertiesdlg.cpp:493
+msgid "Show in Folder"
+msgstr "قىسقۇچتا كۆرسەت"
+
+#: src/propertiesdlg.cpp:526
+msgid "Paths"
+msgstr "يول"
+
+#: src/propertiesdlg.cpp:537
+msgid "Excluded paths"
+msgstr "مۇستەسنا يول"
+
+#: src/propertiesdlg.cpp:554
+msgid "Advanced extraction settings"
+msgstr "ئالىي ئاجرىتىش تەڭشەكلەر"
+
+#: src/propertiesdlg.cpp:558
+msgid "Extract notes for translators from:"
+msgstr "تەرجىمانغا ئىزاھاتنى ئاجرىتىش ئورنى:"
+
+#: src/propertiesdlg.cpp:560
+msgid "Comments prefixed with:"
+msgstr "ئالدى قوشۇلغۇچى ئىزاھاتى:"
+
+#: src/propertiesdlg.cpp:569
+msgid "All comments"
+msgstr "ھەممە ئىزاھاتلار"
+
+#: src/propertiesdlg.cpp:572
+msgid "Additional xgettext flags:"
+msgstr "قوشۇمچە xgettext بەلگىسى:"
+
+#: src/propertiesdlg.cpp:666 src/propertiesdlg.cpp:681
+msgid "Translation Properties"
+msgstr "تەرجىمە خاسلىقى"
+
+#: src/propertiesdlg.cpp:681
+msgid "Translation properties"
+msgstr "تەرجىمە خاسلىقى"
+
+#: src/propertiesdlg.cpp:684
+msgid "Sources Paths"
+msgstr "مەنبە يول"
+
+#: src/propertiesdlg.cpp:684
+msgid "Sources paths"
+msgstr "مەنبە يول"
+
+#: src/propertiesdlg.cpp:687
+msgid "Sources Keywords"
+msgstr "مەنبە ئاچقۇچلۇق سۆز"
+
+#: src/propertiesdlg.cpp:687
+msgid "Sources keywords"
+msgstr "مەنبە ئاچقۇچلۇق سۆز"
+
+#: src/propertiesdlg.cpp:718
+msgid "Additional keywords"
+msgstr "قوشۇمچە ئاچقۇچلۇق سۆز"
+
+#: src/propertiesdlg.cpp:758
+msgid "Name of the project the translation is for"
+msgstr "تەرجىمە قىلىدىغان قۇرۇلۇشنىڭ ئىسمى"
+
+#: src/propertiesdlg.cpp:759
+msgid "Team name and email address or URL"
+msgstr "قوشۇن ئىسمى ۋە ئېلخەت ئادرېسى ياكى تور ئادرېسى"
+
+#: src/propertiesdlg.cpp:760
+msgid "e.g. nplurals=2; plural=(n > 1);"
+msgstr "مەسىلەن: nplurals=2; plural=(n > 1);"
+
+#: src/propertiesdlg.cpp:816
+msgid "UTF-8 (recommended)"
+msgstr "UTF-8 (تەۋسىيە)"
+
+#: src/propertiesdlg.cpp:997
+msgid "Please save the file first. This section cannot be edited until then."
+msgstr ""
+"ئالدى بىلەن ھۆججەتنى ساقلاڭ. تۆۋەندىكى مەزمۇنلارنى ئۇنىڭدىن ئىلگىرى "
+"تەھرىرلىگىلى بولمايدۇ."
+
+#: src/qa_checks.cpp:63
+msgid "Placeholders correctness"
+msgstr "ئورۇن بەلگىسى توغرىلىقى"
+
+#: src/qa_checks.cpp:118
+#, c-format
+msgid "Placeholder “%s” is missing from translation."
+msgstr "تەرجىمىدە ئورۇن بەلگىسى «%s»  كەم."
+
+#: src/qa_checks.cpp:130
+#, c-format
+msgid "Superfluous placeholder “%s” that isn’t in source text."
+msgstr "مەنبە تېكىستتە بولمىغان ئارتۇقچە ئورۇن بەلگىسى «%s»."
+
+#: src/qa_checks.cpp:166
+msgid "Plural form translations"
+msgstr "كۆپلۈك شەكلى تەرجىمىسى"
+
+#: src/qa_checks.cpp:187
+msgid "Not all plural forms are translated."
+msgstr "كۆپلۈك شەكىللىرىنىڭ ھەممىسىنى تەرجىمە قىلمىسىڭىزمۇ بولىدۇ."
+
+#: src/qa_checks.cpp:199
+msgid "Inconsistent upper/lower case"
+msgstr "چوڭ/كىچىك ھەرپ بىردەك ئەمەس"
+
+#: src/qa_checks.cpp:215
+msgid "The translation should start as a sentence."
+msgstr "تەرجىمە جۈملە بىلەن باشلىنىدۇ."
+
+#: src/qa_checks.cpp:223
+msgid "The translation should start with a lowercase character."
+msgstr "تەرجىمە كىچىك ھەرپ بىلەن باشلىنىدۇ."
+
+#: src/qa_checks.cpp:241
+msgid "Inconsistent whitespace"
+msgstr "باغلاشمىغان بوشلۇق"
+
+#: src/qa_checks.cpp:255
+msgid "The translation doesn’t start with a space."
+msgstr "تەرجىمە بوشلۇقتىن باشلانمايدۇ."
+
+#: src/qa_checks.cpp:261
+msgid "The translation starts with a space, but the source text doesn’t."
+msgstr "تەرجىمە بوشلۇق بىلەن باشلانغان، ئەمما ئەسلى تېكىست ئۇنداق ئەمەس."
+
+#: src/qa_checks.cpp:267
+msgid "The translation is missing a newline at the end."
+msgstr "تەرجىمە ئاخىرىدا يېڭى بىر قۇر كەم."
+
+#: src/qa_checks.cpp:273
+msgid "The translation ends with a newline, but the source text doesn’t."
+msgstr "تەرجىمە يېڭى قۇر بىلەن ئاخىرلاشقان، ئەمما ئەسلى تېكىستتە ئۇنداق ئەمەس."
+
+#: src/qa_checks.cpp:279
+msgid "The translation is missing a space at the end."
+msgstr "تەرجىمە ئاخىرىدا بىر بوشلۇق كەم."
+
+#: src/qa_checks.cpp:285
+msgid "The translation ends with a space, but the source text doesn’t."
+msgstr "تەرجىمە بوشلۇق بىلەن ئاخىرلاشقان، ئەمما ئەسلى تېكىست ئۇنداق ئەمەس."
+
+#: src/qa_checks.cpp:300
+msgid "Punctuation checks"
+msgstr "تىنىش بەلگە تەكشۈرۈش"
+
+#: src/qa_checks.cpp:365
+#, c-format
+msgid "The translation should end with “%s”."
+msgstr "تەرجىمە «%s» بىلەن ئاخىرلىشىشى كېرەك."
+
+#: src/qa_checks.cpp:377
+#, c-format
+msgid "The translation should not end with “%s”."
+msgstr "تەرجىمە «%s» بىلەن ئاخىرلاشماسلىقى كېرەك."
+
+#: src/qa_checks.cpp:398
+#, c-format
+msgid "The translation ends with “%s”, but the source text ends with “%s”."
+msgstr ""
+"تەرجىمە «%s» بىلەن ئاخىرلاشقان، ئەمما ئەسلى تېكىست «%s» بىلەن ئاخىرلاشقان."
+
+#: src/recent_files.cpp:216
+msgid "Cloud"
+msgstr "بۇلۇت"
+
+#: src/recent_files.cpp:435
+msgid "Clear Menu"
+msgstr "تىزىملىكنى تازىلا"
+
+#: src/recent_files.cpp:435
+msgid "Clear menu"
+msgstr "تىزىملىكنى تازىلا"
+
+#: src/resources/manager.xrc:8
+msgid "Project name:"
+msgstr "قۇرۇلۇش ئاتى:"
+
+#: src/resources/manager.xrc:35
+msgid "Browse"
+msgstr "كۆز يۈگۈرت"
+
+#: src/resources/manager.xrc:37
+msgid "Add directory to the list"
+msgstr "تىزىملىككە مۇندەرىجە قوش"
+
+#: src/resources/menus.xrc:5 src/resources/menus.xrc:343
+#: src/wx_translatable_strings.h:104
+msgid "&File"
+msgstr "ھۆججەت(&F)"
+
+#: src/resources/menus.xrc:8 src/resources/menus.xrc:346
+msgid "&New…"
+msgstr "يېڭى(&N)…"
+
+#: src/resources/menus.xrc:12 src/resources/menus.xrc:350
+msgid "New from &POT/PO file…"
+msgstr "&POT/PO ھۆججەتتىن يېڭىدىن قۇر…"
+
+#: src/resources/menus.xrc:13 src/resources/menus.xrc:351
+msgid "New From &POT/PO File…"
+msgstr "&POT/PO ھۆججەتتىن يېڭىدىن قۇر…"
+
+#: src/resources/menus.xrc:17 src/resources/menus.xrc:355
+#: src/wx_translatable_strings.h:109
+msgid "&Open…"
+msgstr "ئاچ(&O)…"
+
+#: src/resources/menus.xrc:21 src/resources/menus.xrc:359
+msgid "Open Recent"
+msgstr "يېقىنقىنى ئاچ"
+
+#: src/resources/menus.xrc:22 src/resources/menus.xrc:360
+msgid "Open recent"
+msgstr "يېقىنقىنى ئاچ"
+
+#: src/resources/menus.xrc:25 src/resources/menus.xrc:363
+msgid "Open cloud translation…"
+msgstr "بۇلۇت تەرجىمىسىنى ئاچ…"
+
+#: src/resources/menus.xrc:26 src/resources/menus.xrc:364
+msgid "Open Cloud Translation…"
+msgstr "بۇلۇت تەرجىمىسىنى ئاچ…"
+
+#: src/resources/menus.xrc:30 src/resources/menus.xrc:368
+msgid "&Start window"
+msgstr "باشلاش كۆزنىكى(&S)"
+
+#: src/resources/menus.xrc:31 src/resources/menus.xrc:369
+msgid "&Start Window"
+msgstr "باشلاش كۆزنىكى(&S)"
+
+#: src/resources/menus.xrc:35 src/resources/menus.xrc:374
+msgid "Catalogs &manager"
+msgstr "كاتالوگ باشقۇرغۇچ(&M)"
+
+#: src/resources/menus.xrc:36 src/resources/menus.xrc:375
+msgid "Catalogs &Manager"
+msgstr "كاتالوگ باشقۇرغۇچ(&M)"
+
+#: src/resources/menus.xrc:40 src/resources/menus.xrc:379
+#: src/wx_translatable_strings.h:96
+msgid "&Close"
+msgstr "ياپ(&C)"
+
+#: src/resources/menus.xrc:44 src/wx_translatable_strings.h:115
+msgid "&Save"
+msgstr "ساقلا(&S)"
+
+#: src/resources/menus.xrc:48
+msgid "Save &as…"
+msgstr "باشقا ئاتتا ساقلا(&A)…"
+
+#: src/resources/menus.xrc:49
+msgid "Save &As…"
+msgstr "باشقا ئاتتا ساقلا(&A)…"
+
+#: src/resources/menus.xrc:57
+msgid "Compile to MO…"
+msgstr "MO ھاسىللا…"
+
+#: src/resources/menus.xrc:60
+msgid "E&xport to HTML…"
+msgstr "HTML چىقار(&X)…"
+
+#: src/resources/menus.xrc:65 src/resources/menus.xrc:383
+msgid "Check for updates…"
+msgstr "يېڭىلاشنى تەكشۈر…"
+
+#: src/resources/menus.xrc:68 src/resources/menus.xrc:386
+msgid "Settings…"
+msgstr "تەڭشەكلەر…"
+
+#: src/resources/menus.xrc:72 src/resources/menus.xrc:390
+#: src/wx_translatable_strings.h:112
+msgid "&Preferences"
+msgstr "مايىللىق(&P)"
+
+#: src/resources/menus.xrc:79 src/resources/menus.xrc:397
+msgid "E&xit"
+msgstr "ﭼﯧﻜﯩﻦ(&X)"
+
+#: src/resources/menus.xrc:80 src/resources/menus.xrc:398
+#: src/wx_translatable_strings.h:103
+msgid "Quit"
+msgstr "چېكىن"
+
+#: src/resources/menus.xrc:107
+msgid "Copy from singular"
+msgstr "بىرلىكتىن كۆچۈر"
+
+#: src/resources/menus.xrc:108
+msgid "Copy From Singular"
+msgstr "بىرلىكتىن كۆچۈر"
+
+#: src/resources/menus.xrc:113
+msgid "Translation needs &work"
+msgstr "تەرجىمىگە ئىشلەش زۆرۈر(&W)"
+
+#: src/resources/menus.xrc:114
+msgid "Translation Needs &Work"
+msgstr "تەرجىمىگە ئىشلەش زۆرۈر(&W)"
+
+#: src/resources/menus.xrc:119
+msgid "Edit &comment"
+msgstr "ئىزاھات تەھرىر(&C)"
+
+#: src/resources/menus.xrc:120
+msgid "Edit &Comment"
+msgstr "ئىزاھات تەھرىر(&C)"
+
+#. TRANSLATORS: as in: translation suggestions, suggested translations; should be similarly short
+#: src/resources/menus.xrc:125 src/sidebar.cpp:541
+msgid "Suggestions"
+msgstr "تەۋسىيەلەر"
+
+#: src/resources/menus.xrc:128 src/resources/menus.xrc:147
+msgid "&Find…"
+msgstr "ئىزدە…(&F)"
+
+#: src/resources/menus.xrc:133
+msgid "Replace…"
+msgstr "ئالماشتۇر…"
+
+#: src/resources/menus.xrc:137
+msgid "Find next"
+msgstr "تېكىستتىن ئىزدە"
+
+#: src/resources/menus.xrc:141
+msgid "Find previous"
+msgstr "ئالدىنقىنى ئىزدە"
+
+#: src/resources/menus.xrc:151
+msgid "Find and Replace…"
+msgstr "ئىزدە ۋە ئالماشتۇر…"
+
+#: src/resources/menus.xrc:155
+msgid "Find Next"
+msgstr "كېيىنكىنى ئىزدە"
+
+#: src/resources/menus.xrc:159
+msgid "Find Previous"
+msgstr "ئالدىنقىنى ئىزدە"
+
+#: src/resources/menus.xrc:168
+msgid "Show string &ID"
+msgstr "تىزىق &ID نى كۆرسەت"
+
+#: src/resources/menus.xrc:169
+msgid "Show String &ID"
+msgstr "تىزىق &ID نى كۆرسەت"
+
+#: src/resources/menus.xrc:173
+msgid "Show warnings"
+msgstr "ئاگاھلاندۇرۇشنى كۆرسەت"
+
+#: src/resources/menus.xrc:174
+msgid "Show Warnings"
+msgstr "ئاگاھلاندۇرۇشنى كۆرسەت"
+
+#: src/resources/menus.xrc:179
+msgid "Sort by &file order"
+msgstr "ھۆججەت تەرتىپى بويىچە تەرتىپلە(&A)"
+
+#: src/resources/menus.xrc:180
+msgid "Sort by &File Order"
+msgstr "ھۆججەت تەرتىپى بويىچە تەرتىپلە(&A)"
+
+#: src/resources/menus.xrc:184
+msgid "Sort by &source"
+msgstr "مەنبە بويىچە تەرتىپلە(&S)"
+
+#: src/resources/menus.xrc:185
+msgid "Sort by &Source"
+msgstr "مەنبە بويىچە تەرتىپلە(&S)"
+
+#: src/resources/menus.xrc:189
+msgid "Sort by &translation"
+msgstr "تەرجىمە بويىچە تەرتىپلە(&T)"
+
+#: src/resources/menus.xrc:190
+msgid "Sort by &Translation"
+msgstr "تەرجىمە بويىچە تەرتىپلە(&T)"
+
+#: src/resources/menus.xrc:195
+msgid "&Group by context"
+msgstr "تىل مۇھىتى بويىچە گۇرۇپپىلا(&G)"
+
+#: src/resources/menus.xrc:196
+msgid "&Group By Context"
+msgstr "تىل مۇھىتى بويىچە گۇرۇپپىلا(&G)"
+
+#: src/resources/menus.xrc:200
+msgid "Entries with errors first"
+msgstr "خاتالىق بار تۈرلەر ئالدىدا"
+
+#: src/resources/menus.xrc:201
+msgid "Entries with Errors First"
+msgstr "خاتالىق بار تۈرلەر ئالدىدا"
+
+#: src/resources/menus.xrc:205
+msgid "&Untranslated entries first"
+msgstr "تەرجىمە قىلىنمىغان بىرىنچى تۈر(&U)"
+
+#: src/resources/menus.xrc:206
+msgid "&Untranslated Entries First"
+msgstr "تەرجىمە قىلىنمىغان بىرىنچى تۈر(&U)"
+
+#: src/resources/menus.xrc:211
+msgid "&Show code occurrences"
+msgstr "كودنىڭ كۆرۈنىدىغان ئورنىنى كۆرسەت(&S)"
+
+#: src/resources/menus.xrc:212
+msgid "&Show Code Occurrences"
+msgstr "كودنىڭ كۆرۈنىدىغان ئورنىنى كۆرسەت(&S)"
+
+#: src/resources/menus.xrc:216
+msgid "Show sidebar"
+msgstr "يان بالداقنى كۆرسەت"
+
+#: src/resources/menus.xrc:222
+msgid "Show status bar"
+msgstr "ھالەت بالداقنى كۆرسەت"
+
+#: src/resources/menus.xrc:230 src/resources/menus.xrc:415
+msgid "&Translation"
+msgstr "تەرجىمە(&T)"
+
+#: src/resources/menus.xrc:233
+msgid "&Update from source code"
+msgstr "ئەسلى كودتىن يېڭىلا(&U)"
+
+#: src/resources/menus.xrc:234
+msgid "&Update from Source Code"
+msgstr "ئەسلى كودتىن يېڭىلا(&U)"
+
+#: src/resources/menus.xrc:242 src/resources/menus.xrc:243
+msgid "Pre-&translate…"
+msgstr "ئالدىن تەرجىمە(&T)…"
+
+#: src/resources/menus.xrc:247
+msgid "&Validate translations"
+msgstr "تەرجىمىلەرنى دەلىللە(&V)"
+
+#: src/resources/menus.xrc:248
+msgid "&Validate Translations"
+msgstr "تەرجىمىلەرنى دەلىللە(&V)"
+
+#: src/resources/menus.xrc:253
+msgid "Remove Same-as-Source Translations"
+msgstr "مەنبە بىلەن ئوخشاش تەرجىمىلەرنى چىقىرىۋەت"
+
+#: src/resources/menus.xrc:256
+msgid "&Purge deleted translations"
+msgstr "ئۆچۈرۈلگەن تەرجىمىنى تازىلا(&P)"
+
+#: src/resources/menus.xrc:257
+msgid "&Purge Deleted Translations"
+msgstr "ئۆچۈرۈلگەن تەرجىمىنى تازىلا(&P)"
+
+#: src/resources/menus.xrc:261
+msgid "&Properties…"
+msgstr "خاسلىق(&P)…"
+
+#: src/resources/menus.xrc:268 src/resources/menus.xrc:418
+msgid "&Go"
+msgstr "يۆتكەل(&G)"
+
+#: src/resources/menus.xrc:271
+msgid "&Done and next"
+msgstr "تامام ۋە كېيىنكى(&D)"
+
+#: src/resources/menus.xrc:272
+msgid "&Done and Next"
+msgstr "تامام ۋە كېيىنكى(&D)"
+
+#: src/resources/menus.xrc:278
+msgid "Previously edited"
+msgstr "ئىلگىرى تەھرىرلەنگەن"
+
+#: src/resources/menus.xrc:279
+msgid "Previously Edited"
+msgstr "ئىلگىرى تەھرىرلەنگەن"
+
+#: src/resources/menus.xrc:284
+msgid "&Previous translation"
+msgstr "ئالدىنقى تەرجىمە(&P)"
+
+#: src/resources/menus.xrc:285
+msgid "&Previous Translation"
+msgstr "ئالدىنقى تەرجىمە(&P)"
+
+#: src/resources/menus.xrc:289
+msgid "&Next translation"
+msgstr "كېيىنكى تەرجىمە(&N)"
+
+#: src/resources/menus.xrc:290
+msgid "&Next Translation"
+msgstr "كېيىنكى تەرجىمە(&N)"
+
+#: src/resources/menus.xrc:294
+msgid "P&revious unfinished"
+msgstr "ئالدىنقى تاماملانمىغىنى(&R)"
+
+#: src/resources/menus.xrc:295
+msgid "P&revious Unfinished"
+msgstr "ئالدىنقى تاماملانمىغىنى(&R)"
+
+#: src/resources/menus.xrc:299
+msgid "Ne&xt unfinished"
+msgstr "كېيىنكى تاماملانمىغىنى(&X)"
+
+#: src/resources/menus.xrc:300
+msgid "Ne&xt Unfinished"
+msgstr "كېيىنكى تاماملانمىغىنى(&X)"
+
+#: src/resources/menus.xrc:305
+msgid "Previous plural form"
+msgstr "ئالدىنقى كۆپلۈك شەكلى"
+
+#: src/resources/menus.xrc:306
+msgid "Previous Plural Form"
+msgstr "ئالدىنقى كۆپلۈك شەكلى"
+
+#: src/resources/menus.xrc:310
+msgid "Next plural form"
+msgstr "كېيىنكى كۆپلۈك شەكلى"
+
+#: src/resources/menus.xrc:311
+msgid "Next Plural Form"
+msgstr "كېيىنكى كۆپلۈك شەكلى"
+
+#: src/resources/menus.xrc:320 src/resources/menus.xrc:425
+msgid "&Online help"
+msgstr "توردىكى ياردەم(&O)"
+
+#: src/resources/menus.xrc:321 src/resources/menus.xrc:426
+msgid "&Online Help"
+msgstr "توردىكى ياردەم(&O)"
+
+#: src/resources/menus.xrc:327 src/resources/menus.xrc:432
+msgid "&GNU gettext manual"
+msgstr "&GNU gettext قوللانمىسى"
+
+#: src/resources/menus.xrc:328 src/resources/menus.xrc:433
+msgid "&GNU gettext Manual"
+msgstr "&GNU gettext قوللانمىسى"
+
+#: src/resources/menus.xrc:332 src/resources/menus.xrc:437
+msgid "&About Poedit"
+msgstr "Poedit ھەققىدە(&A)"
+
+#: src/resources/menus.xrc:333 src/resources/menus.xrc:334
+#: src/resources/menus.xrc:438 src/resources/menus.xrc:439
+msgid "&About"
+msgstr "ھەققىدە(&A)"
+
+#: src/resources/prefs.xrc:26
+msgid "List of extensions separated by semicolons (e.g. *.cpp;*.h):"
+msgstr "تىزىملىكتىكى كېڭەيتىلگەن نام پەش بىلەن ئايرىلىدۇ (مەسىلەن: *.cpp;*.h):"
+
+#: src/resources/prefs.xrc:41
+msgid "Invocation:"
+msgstr "يۆتكەپ ئىشلىتىش جەريانى:"
+
+#: src/resources/prefs.xrc:45
+msgid "Command to extract translations:"
+msgstr "تەرجىمە ئاجرىتىش بۇيرۇقى:"
+
+#: src/resources/prefs.xrc:59
+msgid ""
+"This is the command used to launch the extractor.\n"
+"%o expands to the name of output file, %K to list\n"
+"of keywords, %F to list of input files,\n"
+"%C to charset flag (see below)."
+msgstr ""
+"بۇ يەشكۈچ بۇيرۇقىنى ئىجرا قىلىشقا ئىشلىتىلىدۇ\n"
+"\n"
+"%o چىقىرىدىغان ھۆججەتنىڭ ئىسمى،\n"
+"%K ھالقىلىق سۆز تىزىملىكى،\n"
+" %F كىرگۈزگەن ھۆججەت تىزىملىكى،\n"
+" \n"
+"%C ھەرپ بەلگە تىزمىسى بەلگىسى (تۆۋەندىكىنى كۆرۈڭ)."
+
+#: src/resources/prefs.xrc:68
+msgid "An item in keywords list:"
+msgstr "ھالقىلىق سۆز تىزىملىكىدىكى بىر تۈر:"
+
+#: src/resources/prefs.xrc:82
+msgid ""
+"This will be attached to the command line once\n"
+"for each keyword. %k expands to the keyword."
+msgstr ""
+"ھەر بىر ھالقىلىق سۆزگە قارىتا يۇقىرىدىكى مەزمۇن بۇيرۇق قۇرىنىڭ كەينىگە "
+"قوشۇلىدۇ. %k ھالقىلىق سۆز بولۇپ يېشىلىدۇ."
+
+#: src/resources/prefs.xrc:91
+msgid "An item in input files list:"
+msgstr "ھۆججەت تىزىملىكى كىرگۈزۈشتىكى بىر تۈر:"
+
+#: src/resources/prefs.xrc:105
+#, c-format
+msgid ""
+"This will be attached to the command line once\n"
+"for each input file. %f expands to the filename."
+msgstr ""
+"كىرگۈزگەن ھەر بىر ھۆججەتكە نىسبەتەن يۇقىرىدىكى مەزمۇن بۇيرۇق قۇرىنىڭ  "
+"كەينىگە قوشۇلىدۇ. %f  ھۆججەت نامى  بولۇپ يېشىلىدۇ."
+
+#: src/resources/prefs.xrc:114 src/resources/properties.xrc:115
+msgid "Source code charset:"
+msgstr "مەنبە كودىنىڭ كودلىنىشى:"
+
+#: src/resources/prefs.xrc:128
+#, c-format
+msgid ""
+"This will be attached to the command line\n"
+"only if source code charset was given. %c expands to charset value."
+msgstr ""
+"پەقەت مەنبە كود ھەرپ توپلىمىدا بەلگىلىگەندىلا ئاندىن بۇيرۇق قۇرىغا قوشۇلىدۇ. "
+"%c ھەرپ توپلىمى قىممىتى قىلىپ يېشىلىدۇ."
+
+#: src/resources/properties.xrc:10
+msgid "Project name and version:"
+msgstr "قۇرۇلۇش ئاتى ۋە نەشرى:"
+
+#: src/resources/properties.xrc:25
+msgid "Language team:"
+msgstr "تىل قوشۇنى:"
+
+#: src/resources/properties.xrc:57
+msgid "Plural forms:"
+msgstr "كۆپلۈك شەكلى:"
+
+#: src/resources/properties.xrc:64
+msgid "Use default rules for this language"
+msgstr "بۇ تىلنىڭ كۆڭۈلدىكى قائىدىسىنى ئىشلەت"
+
+#: src/resources/properties.xrc:73
+msgid "Use custom expression"
+msgstr "ئىختىيارىچە ئىپادە ئىشلەت"
+
+#: src/resources/properties.xrc:89
+msgid "Learn about plural forms"
+msgstr "كۆپلۈك ھەققىدە بىلدۈرگۈ"
+
+#: src/resources/properties.xrc:103
+msgid "Charset:"
+msgstr "كودلاش:"
+
+#: src/resources/properties.xrc:129
+msgid "Advanced Extraction Settings…"
+msgstr "ئالىي ئاجرىتىش تەڭشەكلەر…"
+
+#: src/resources/properties.xrc:130
+msgid "Advanced extraction settings…"
+msgstr "ئالىي ئاجرىتىش تەڭشەكلەر…"
+
+#: src/resources/properties.xrc:150
+msgid "Extract text from source files in the following directories:"
+msgstr "تېكىستنى مەنبە ھۆججەتتىن تۆۋەندىكى مۇندەرىجىگە چىقار:"
+
+#: src/resources/properties.xrc:159
+msgid "Base path:"
+msgstr "ئاساسىي يول:"
+
+#: src/resources/properties.xrc:210
+msgid ""
+"Use these keywords (function names) to recognize translatable strings\n"
+"in source files:"
+msgstr ""
+"بۇ ئاچقۇچلۇق سۆزلەر (فۇنكىتسىيە نامى)نى ئىشلىتىش ئارقىلىق مەنبە "
+"ھۆججەتلەردىكى تەرجىمە قىلغىلى بولىدىغان ھەرپ تىزمىسىنى  تونۇيدۇ:"
+
+#: src/resources/properties.xrc:226
+msgid "Also use default keywords for supported languages"
+msgstr "قوللايدىغان تىللارغىمۇ كۆڭۈلدىكى ئاچقۇچلۇق سۆزنى ئىشلىتىدۇ"
+
+#: src/resources/properties.xrc:233
+msgid "Learn about gettext keywords"
+msgstr "Gettext ئاچقۇچلۇق سۆز ھەققىدە بىلدۈرگۈ"
+
+#. TRANSLATORS: "Previous" as in used in the past, now replaced with newer.
+#: src/sidebar.cpp:135
+msgid "Previous source text"
+msgstr "ئالدىنقى مەنبە تېكست"
+
+#: src/sidebar.cpp:138
+msgid ""
+"The old source text (before it changed during an update) that the now-"
+"inaccurate translation corresponds to."
+msgstr ""
+"ھازىرقى توغرا بولمىغان تەرجىمىگە مۇناسىپ كونا ئەسلى تېكىست (بۇ قېتىملىق "
+"يېڭىلاشتىن ئىلگىرى ئۆزگەرتىلگەن)"
+
+#: src/sidebar.cpp:164
+msgid "Notes for translators"
+msgstr "تەرجىمانلارغا ئىزاھات"
+
+#: src/sidebar.cpp:197
+msgid "Comment"
+msgstr "ئىزاھات"
+
+#: src/sidebar.cpp:227 src/sidebar.cpp:246
+msgid "Add comment"
+msgstr "ئىزاھات قوش"
+
+#: src/sidebar.cpp:229 src/sidebar.cpp:231 src/sidebar.cpp:249
+msgid "Add Comment"
+msgstr "ئىزاھات قوش"
+
+#: src/sidebar.cpp:486
+msgid "Delete From Translation Memory"
+msgstr "تەرجىمە خاتىرىسىدىن ئۆچۈر"
+
+#: src/sidebar.cpp:486
+msgid "Delete from translation memory"
+msgstr "تەرجىمە خاتىرىسىدىن ئۆچۈر"
+
+#: src/sidebar.cpp:543
+msgid "Translation suggestions"
+msgstr "تەرجىمە تەۋسىيەلىرى"
+
+#. TRANSLATORS: This is shown when no translation suggestions can be found in the TM (Windows).
+#: src/sidebar.cpp:584
+msgid "No matches found"
+msgstr "ماس كەلگەنلىرى تېپىلمىدى"
+
+#. TRANSLATORS: This is shown when no translation suggestions can be found in the TM (macOS, Linux).
+#: src/sidebar.cpp:587
+msgid "No Matches Found"
+msgstr "ماس كەلگىنى تېپىلمىدى"
+
+#: src/sidebar.cpp:627
+msgid "This string was found in Poedit’s translation memory."
+msgstr "بۇ تىزىق Poedit نىڭ تەرجىمە خاتىرىسىدە بايقالدى."
+
+#: src/sidebar.cpp:881
+msgid ""
+"Translation suggestions require that source text is available. They don’t "
+"work if only IDs without the actual text are used."
+msgstr ""
+"تەرجىمە تەۋسىيەسى ئۈچۈن مەنبە تېكىستىنى ئىشلەتكىلى بولۇشى كېرەك. ئەگەر "
+"ئەمەلىي تېكىست بولماي ID لا ئىشلىتىلسە ئۇلار ئىشلىمەيدۇ."
+
+#: src/sidebar.cpp:886
+msgid ""
+"Translation suggestions require that source text’s language is known. Poedit "
+"couldn’t detect it in this file."
+msgstr ""
+"تەرجىمە تەۋسىيەسى ئۈچۈن مەنبە تېكىستنىڭ تىلى ئېنىق بولۇشى كېرەك. Poedit بۇ "
+"ھۆججەتتىن ئۇنى بايقىيالمىدى."
+
+#: src/subprocess.cpp:219 src/subprocess.cpp:251
+#, c-format
+msgid "Cannot execute program: %s"
+msgstr "پروگراممىنى ئىجرا قىلالمايدۇ: %s"
+
+#: src/tm/tmx_io.cpp:88 src/tm/tmx_io.cpp:104
+msgid "The TMX file is malformed."
+msgstr "بۇ TMX ھۆججىتىنىڭ پىچىمى خاتا."
+
+#: src/tm/transmem.cpp:87
+#, c-format
+msgid "Translation memory database is corrupted: %s (%d)."
+msgstr "تەرجىمە خاتىرە ساندانى بۇزۇلدى: %s (%d)."
+
+#: src/tm/transmem.cpp:90
+#, c-format
+msgid "Translation memory error: %s (%d)."
+msgstr "تەرجىمە خاتىرىسى خاتالىقى: %s (%d)."
+
+#: src/uilang.cpp:235
+msgid "(Use default language)"
+msgstr "كۆڭۈلدىكى تىلنى ئىشلەت"
+
+#: src/uilang.cpp:246
+msgid "Language selection"
+msgstr "تىل تاللاش"
+
+#: src/uilang.cpp:246
+msgid "Select your preferred language"
+msgstr "ياقتۇرىدىغان تىلنى تاللاڭ"
+
+#: src/uilang.cpp:263
+msgid "You must restart Poedit for this change to take effect."
+msgstr "بۇ ئۆزگەرتىش كۈچكە ئىگە بولۇشى ئۈچۈن Poedit نى چوقۇم قايتا قوزغىتىڭ."
+
+#: src/utility.cpp:143 src/utility.cpp:153
+msgid "Cannot create temporary directory."
+msgstr "ۋاقىتلىق  قىسقۇچىنى قۇرالمىدى."
+
+#: src/welcomescreen.cpp:139
+msgid "There are no translations. That’s unusual."
+msgstr "تەرجىمىسى يوق. بۇ ئادەتتىكىدەك ئەمەس."
+
+#: src/welcomescreen.cpp:148
+msgid ""
+"Translatable entries aren’t added manually in the Gettext system, but are "
+"automatically extracted from source code. This way, they stay up to date and "
+"accurate. Translators typically use PO template files (POTs) prepared for "
+"them by the developer."
+msgstr ""
+"تەرجىمە تۈرى Gettext سىستېمىسىدا قولدا كىرگۈزۈلمەيدۇ، ئەمما مەنبە كودتىن "
+"ئۆزلۈكىدىن ئاجرىتىلىدۇ. بۇنداق بولغاندا، ئەڭ يېڭى ۋە ئەڭ توغرا بولغان "
+"تەرجىمە قىلىشقا تېگىشلىك تۈرلەرنى بىلەلەيمىز. تەرجىمانلار ئادەتتە "
+"ئىجادكارلار ئۇلارغا تەييارلاپ بەرگەن PO قېلىپ ھۆججەت (POT) نى ئىشلىتىدۇ."
+
+#: src/welcomescreen.cpp:151
+msgid "Learn more about GNU gettext"
+msgstr "GNU gettext ھەققىدە تېخىمۇ كۆپ ئۇچۇر"
+
+#: src/welcomescreen.cpp:155
+msgid ""
+"The simplest way to fill this file with translations is to update it from a "
+"POT:"
+msgstr "بۇ ھۆججەتنىڭ تەرجىمىسىنى تولدۇرۇشنىڭ قۇلاي يولى ئۇنى POT تىن يېڭىلاش:"
+
+#: src/welcomescreen.cpp:160
+msgid "Update from POT"
+msgstr "POT تىن يېڭىلا"
+
+#: src/welcomescreen.cpp:161
+msgid "Take translatable strings from an existing POT template."
+msgstr "مەۋجۇت POT قېلىپىدىن تەرجىمە قىلغىلى بولىدىغان تىزىقنى ئاجرىتىدۇ."
+
+#: src/welcomescreen.cpp:165
+msgid ""
+"You can also extract translatable strings directly from the source code:"
+msgstr ""
+"مەنبە كودتىن تەرجىمە قىلغىلى بولىدىغان ھەرپ تىزىقلىرىنى بىۋاسىتە "
+"ئاجرىتالايسىز:"
+
+#: src/welcomescreen.cpp:170
+msgid "Extract from sources"
+msgstr "مەنبەدىن ياي"
+
+#: src/welcomescreen.cpp:171
+msgid "Configure source code extraction in Properties."
+msgstr "خاسلىقىدا ئەسلى كود ئاجرىتىش سەپلىمىسى."
+
+#. TRANSLATORS: This is version information in about dialog, "%s" will be
+#. version number when used
+#: src/welcomescreen.cpp:272 src/wx_translatable_strings.h:46
+#, c-format
+msgid "Version %s"
+msgstr "نەشر %s"
+
+#: src/welcomescreen.cpp:279
+msgid "Create new"
+msgstr "يېڭىدىن قۇر"
+
+#: src/welcomescreen.cpp:280
+msgid "Create new translation from POT template."
+msgstr "يېڭى تەرجىمىنى POT قېلىپىدىن قۇرىدۇ."
+
+#: src/welcomescreen.cpp:285
+msgid "Browse files"
+msgstr "ھۆججەتكە كۆز يۈگۈرت"
+
+#: src/welcomescreen.cpp:286
+msgid "Open and edit translation files."
+msgstr "تەرجىمە ھۆججەتلەرنى ئېچىپ ۋە تەھرىرلەيدۇ."
+
+#: src/welcomescreen.cpp:292
+msgid "Translate cloud project"
+msgstr "بۇلۇت قۇرۇلۇشى تەرجىمىسى"
+
+#: src/welcomescreen.cpp:293
+msgid "Collaborate with other people online."
+msgstr "توردىكى باشقا كىشىلەر بىلەن ھەمكارلىشىڭ."
+
+#: src/welcomescreen.cpp:312
+msgid "Recent files"
+msgstr "يېقىنقى ھۆججەتلەر"
+
+#: src/wx/main_toolbar.cpp:98 src/wx/main_toolbar.cpp:133
+msgid "Sync"
+msgstr "قەدەمداشلا"
+
+#: src/wx/main_toolbar.cpp:99
+msgid "Synchronize translations with Crowdin"
+msgstr "تەرجىمىنى Crowdin بىلەن قەدەمداشلايدۇ"
+
+#: src/wx/main_toolbar.cpp:104
+msgid "Upload"
+msgstr "يۈكلە"
+
+#. TRANSLATORS: this is the tooltip for the "Upload" button in the toolbar, %s is hostname or service (Crowdin, ftp.foo.com etc.)
+#: src/wx/main_toolbar.cpp:106
+#, c-format
+msgid "Upload translations to %s"
+msgstr "تەرجىمىنى %s غا يۈكلەيدۇ"
+
+#: src/wx/main_toolbar.cpp:124
+msgid "Open file"
+msgstr "ھۆججەت ئاچ"
+
+#: src/wx/main_toolbar.cpp:125
+msgid "Save file"
+msgstr "ھۆججەت ساقلا"
+
+#: src/wx/main_toolbar.cpp:129
+msgid "Check for errors in the translation"
+msgstr "تەرجىمىدىكى خاتالىقلارنى تەكشۈر"
+
+#: src/wx/main_toolbar.cpp:129
+msgid "Validate"
+msgstr "دەلىللەش"
+
+#: src/wx/main_toolbar.cpp:131
+msgid "Pre-translate strings that don’t have a translation yet"
+msgstr "ئالدىن تەرجىمە تىزىقىنىڭ تېخى تەرجىمىسى يوق"
+
+#: src/wx/main_toolbar.cpp:132
+msgid "Update from Code"
+msgstr "كودتىن يېڭىلا"
+
+#: src/wx/main_toolbar.cpp:132
+msgid "Update from code"
+msgstr "كودتىن يېڭىلا"
+
+#: src/wx/main_toolbar.cpp:132
+msgid "Update from source code"
+msgstr "ئەسلى كودتىن يېڭىلا"
+
+#: src/wx/main_toolbar.cpp:137
+msgid "Show or hide the sidebar"
+msgstr "يان بالداقنى كۆرسەت ياكى يوشۇر"
+
+#. TRANSLATORS: This is titlebar of about dialog, "%s" is application name
+#. ("Poedit" here, but please use "%s")
+#: src/wx_translatable_strings.h:42
+#, c-format
+msgid "About %s"
+msgstr "%s ھەققىدە"
+
+#. TRANSLATORS: Title of the preferences window on Windows and Linux. "%s" is replaced with "Poedit" when running.
+#: src/wx_translatable_strings.h:49
+#, c-format
+msgid "%s Preferences"
+msgstr "%s مايىللىقلار"
+
+#. TRANSLATORS: This is titlebar of about dialog, "%s" is application name
+#. ("Poedit" here, but please use "%s")
+#: src/wx_translatable_strings.h:60
+#, c-format
+msgctxt "macOS menu item"
+msgid "About %s"
+msgstr "%s ھەققىدە"
+
+#. TRANSLATORS: macOS item in app menu
+#: src/wx_translatable_strings.h:64
+msgctxt "macOS menu item"
+msgid "Services"
+msgstr "مۇلازىمەتلەر"
+
+#. TRANSLATORS: macOS item in app menu, %s is replaced with "Poedit"
+#: src/wx_translatable_strings.h:66
+#, c-format
+msgctxt "macOS menu item"
+msgid "Hide %s"
+msgstr "%s نى يوشۇر"
+
+#. TRANSLATORS: macOS item in app menu
+#: src/wx_translatable_strings.h:68
+msgctxt "macOS menu item"
+msgid "Hide Others"
+msgstr "باشقىلارنى يوشۇر"
+
+#. TRANSLATORS: macOS item in app menu
+#: src/wx_translatable_strings.h:70
+msgctxt "macOS menu item"
+msgid "Show All"
+msgstr "ھەممىنى كۆرسەت"
+
+#. TRANSLATORS: macOS item in app menu, %s is replaced with "Poedit"
+#: src/wx_translatable_strings.h:72
+#, c-format
+msgctxt "macOS menu item"
+msgid "Quit %s"
+msgstr "%s چېكىن"
+
+#. TRANSLATORS: macOS item in app menu
+#: src/wx_translatable_strings.h:74
+msgid "Preferences…"
+msgstr "مايىللىق…"
+
+#. TRANSLATORS: macOS item in app menu
+#: src/wx_translatable_strings.h:76
+msgid "Preferences..."
+msgstr "مايىللىق…"
+
+#. TRANSLATORS: macOS item in app menu
+#: src/wx_translatable_strings.h:78
+msgctxt "macOS menu item"
+msgid "Preferences..."
+msgstr "مايىللىق…"
+
+#: src/wx_translatable_strings.h:92
+msgid "&Apply"
+msgstr "قوللان(&A)"
+
+#: src/wx_translatable_strings.h:92
+msgid "Apply"
+msgstr "قوللان"
+
+#: src/wx_translatable_strings.h:93
+msgid "&Back"
+msgstr "كەينى(&B)"
+
+#: src/wx_translatable_strings.h:93
+msgid "Back"
+msgstr "قايت"
+
+#: src/wx_translatable_strings.h:94
+msgid "&Cancel"
+msgstr "ۋاز كەچ(&C)"
+
+#: src/wx_translatable_strings.h:95
+msgid "&Clear"
+msgstr "تازىلا(&C)"
+
+#: src/wx_translatable_strings.h:95
+msgid "Clear"
+msgstr "تازىلا"
+
+#: src/wx_translatable_strings.h:98
+msgid "Copy"
+msgstr "كۆچۈر"
+
+#: src/wx_translatable_strings.h:99
+msgid "Cu&t"
+msgstr "كەس(&T)"
+
+#: src/wx_translatable_strings.h:99
+msgid "Cut"
+msgstr "كەس"
+
+#: src/wx_translatable_strings.h:100
+msgid "&Delete"
+msgstr "ئۆچۈر(&D)"
+
+#: src/wx_translatable_strings.h:102
+msgid "Edit"
+msgstr "تەھرىر"
+
+#: src/wx_translatable_strings.h:103
+msgid "&Quit"
+msgstr "چېكىن(&Q)"
+
+#: src/wx_translatable_strings.h:105
+msgid "Help"
+msgstr "ياردەم"
+
+#: src/wx_translatable_strings.h:106
+msgid "&New"
+msgstr "يېڭى(&N)"
+
+#: src/wx_translatable_strings.h:106
+msgid "New"
+msgstr "يېڭى"
+
+#: src/wx_translatable_strings.h:107
+msgid "&No"
+msgstr "ياق(&N)"
+
+#: src/wx_translatable_strings.h:107
+msgid "No"
+msgstr "ياق"
+
+#: src/wx_translatable_strings.h:108
+msgid "&OK"
+msgstr "جەزملە(&O)"
+
+#: src/wx_translatable_strings.h:108
+msgid "OK"
+msgstr "جەزملە"
+
+#: src/wx_translatable_strings.h:109
+msgid "Open…"
+msgstr "ئاچ…"
+
+#: src/wx_translatable_strings.h:110
+msgid "&Open..."
+msgstr "ئاچ(&O)…"
+
+#: src/wx_translatable_strings.h:110
+msgid "Open..."
+msgstr "ئاچ…"
+
+#: src/wx_translatable_strings.h:111
+msgid "&Paste"
+msgstr "چاپلا(&P)"
+
+#: src/wx_translatable_strings.h:111
+msgid "Paste"
+msgstr "چاپلا"
+
+#: src/wx_translatable_strings.h:112
+msgid "Preferences"
+msgstr "مايىللىق"
+
+#: src/wx_translatable_strings.h:113
+msgid "&Redo"
+msgstr "قايتىلا(&R)"
+
+#: src/wx_translatable_strings.h:114
+msgid "Refresh"
+msgstr "يېڭىلا"
+
+#: src/wx_translatable_strings.h:116
+msgid "&Save as"
+msgstr "باشقا ئاتتا ساقلا(&S)"
+
+#: src/wx_translatable_strings.h:116
+msgid "Save as"
+msgstr "باشقا ئاتتا ساقلا"
+
+#: src/wx_translatable_strings.h:117
+msgid "Select &All"
+msgstr "ھەممىنى تاللا(&A)"
+
+#: src/wx_translatable_strings.h:117
+msgid "Select All"
+msgstr "ھەممىنى تاللا"
+
+#: src/wx_translatable_strings.h:118
+msgid "&Undo"
+msgstr "يېنىۋال(&U)"
+
+#: src/wx_translatable_strings.h:119
+msgid "&Yes"
+msgstr "ھەئە(&Y)"
+
+#: src/wx_translatable_strings.h:119
+msgid "Yes"
+msgstr "ھەئە"
+
+#. TRANSLATORS: Keyboard shortcut for display in Windows menus
+#: src/wx_translatable_strings.h:125
+msgctxt "keyboard key"
+msgid "Alt+"
+msgstr "Alt+"
+
+#. TRANSLATORS: Keyboard shortcut for display in Windows menus
+#: src/wx_translatable_strings.h:127
+msgctxt "keyboard key"
+msgid "Shift+"
+msgstr "Shift+"
+
+#. TRANSLATORS: Keyboard shortcut for display in Windows menus
+#: src/wx_translatable_strings.h:129
+msgctxt "keyboard key"
+msgid "Enter"
+msgstr "Enter"
+
+#. TRANSLATORS: Keyboard shortcut for display in Windows menus
+#: src/wx_translatable_strings.h:131
+msgctxt "keyboard key"
+msgid "Up"
+msgstr "ئۈستى"
+
+#. TRANSLATORS: Keyboard shortcut for display in Windows menus
+#: src/wx_translatable_strings.h:133
+msgctxt "keyboard key"
+msgid "Down"
+msgstr "ئاستى"
+
+#. TRANSLATORS: Keyboard shortcut for display in Windows menus
+#: src/wx_translatable_strings.h:135
+msgctxt "keyboard key"
+msgid "Left"
+msgstr "سول"
+
+#. TRANSLATORS: Keyboard shortcut for display in Windows menus
+#: src/wx_translatable_strings.h:137
+msgctxt "keyboard key"
+msgid "Right"
+msgstr "ئوڭ"
+
+#. TRANSLATORS: Keyboard shortcut, must correspond to translation of "Ctrl+"
+#: src/wx_translatable_strings.h:140
+msgctxt "keyboard key"
+msgid "ctrl"
+msgstr "ctrl"
+
+#. TRANSLATORS: Keyboard shortcut, must correspond to translation of "Alt+"
+#: src/wx_translatable_strings.h:142
+msgctxt "keyboard key"
+msgid "alt"
+msgstr "alt"
+
+#. TRANSLATORS: Keyboard shortcut, must correspond to translation of "Shift+"
+#: src/wx_translatable_strings.h:144
+msgctxt "keyboard key"
+msgid "shift"
+msgstr "shift"
+
+#: src/wx_translatable_strings.h:152
+msgid "Warning: "
+msgstr "ئاگاھلاندۇرۇش: "

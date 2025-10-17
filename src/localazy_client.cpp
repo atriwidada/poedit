@@ -1,7 +1,7 @@
 /*
  *  This file is part of Poedit (https://poedit.net)
  *
- *  Copyright (C) 2023-2024 Vaclav Slavik
+ *  Copyright (C) 2023-2025 Vaclav Slavik
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
@@ -394,7 +394,7 @@ dispatch::future<CloudAccountClient::ProjectDetails> LocalazyClient::GetProjectD
                    }
                }
 
-               throw Exception(_(L"Couldn’t download Localazy project details."));
+               BOOST_THROW_EXCEPTION(Exception(_(L"Couldn’t download Localazy project details.")));
            });
 }
 
@@ -466,7 +466,7 @@ dispatch::future<void> LocalazyClient::UploadFile(const std::string& file_buffer
             auto ok = r.at("result").get<bool>();
             if (!ok)
             {
-                throw Exception(_(L"There was an error when uploading translations to Localazy."));
+                BOOST_THROW_EXCEPTION(Exception(_(L"There was an error when uploading translations to Localazy.")));
             }
 
             auto status_url = prefix + "/status/" + r.at("statusId").get<std::string>();
@@ -480,7 +480,7 @@ dispatch::future<void> LocalazyClient::UploadFile(const std::string& file_buffer
                     return;
                 if (text != "in_progress" && text != "scheduled")
                 {
-                    throw Exception(_(L"There was an error when uploading translations to Localazy."));
+                    BOOST_THROW_EXCEPTION(Exception(_(L"There was an error when uploading translations to Localazy.")));
                 }
             };
         });
